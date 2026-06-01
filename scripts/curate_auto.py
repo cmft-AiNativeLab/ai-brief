@@ -77,8 +77,10 @@ def call_llm(candidates, retries=3):
     last_err = None
     for attempt in range(1, retries + 2):
         try:
+            print(f"[i] 正在调用 Claude 提炼…（第 {attempt} 次 · 约 1–3 分钟，请勿按 Ctrl+C 中断）",
+                  file=sys.stderr, flush=True)
             r = session.post(f"{BASE_URL}/v1/chat/completions",
-                             headers=headers, json=body, timeout=(20, 180), stream=True)
+                             headers=headers, json=body, timeout=(20, 100), stream=True)
             r.raise_for_status()
             parts = []
             for raw in r.iter_lines():
