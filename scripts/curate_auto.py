@@ -24,7 +24,7 @@ from collections import Counter
 BASE_URL = os.environ.get("AI_BRIEF_BASE_URL", "https://newapi.ai-native-lab.com").rstrip("/")
 API_KEY = os.environ.get("AI_BRIEF_API_KEY", "")
 MODEL = os.environ.get("AI_BRIEF_MODEL", "claude-opus-4-7")
-MAX_CAND = 70  # 传给 LLM 的候选上限（items 已按时效排序，取前 N）
+MAX_CAND = 50  # 传给 LLM 的候选上限（太多会让单次生成过久、触发中转 504）
 
 SYSTEM = (
     "你是面向企业高层管理者的 AI 资讯主编。从候选 AI 资讯中，以「管理者视角」精选并加工成每日简报。"
@@ -56,7 +56,8 @@ USER_TMPL = """今天的候选 AI 资讯（JSON 数组，每条含 id/source/tit
 """
 
 
-def call_llm(candidates):
+def call_llm(candidates, retries=2):
+    """流式调用：边收边拼，避免大请求触发中转网关 504；失败自动重试。"""
     body = {
         "model": MODEL,
         "messages": [
@@ -66,17 +67,42 @@ def call_llm(candidates):
         ],
         "temperature": 0.4,
         "max_tokens": 4096,
+        "stream": True,
     }
     # 中转 API 直连：不走系统代理（fetch 海外源才需代理，二者分开，互不干扰）
     session = requests.Session()
     session.trust_env = False
-    r = session.post(
-        f"{BASE_URL}/v1/chat/completions",
-        headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
-        json=body, timeout=150,
-    )
-    r.raise_for_status()
-    return r.json()["choices"][0]["message"]["content"]
+    headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
+    last_err = None
+    for attempt in range(1, retries + 2):
+        try:
+            r = session.post(f"{BASE_URL}/v1/chat/completions",
+                             headers=headers, json=body, timeout=(20, 180), stream=True)
+            r.raise_for_status()
+            parts = []
+            for raw in r.iter_lines():
+                if not raw:
+                    continue
+                line = raw.decode("utf-8", "ignore").strip()
+                if not line.startswith("data:"):
+                    continue
+                data = line[5:].strip()
+                if data == "[DONE]":
+                    break
+                try:
+                    delta = json.loads(data)["choices"][0]["delta"].get("content")
+                    if delta:
+                        parts.append(delta)
+                except Exception:
+                    continue
+            text = "".join(parts).strip()
+            if text:
+                return text
+            last_err = "空响应"
+        except Exception as e:
+            last_err = e
+        print(f"[warn] LLM 第 {attempt} 次失败，重试…（{str(last_err)[:100]}）", file=sys.stderr)
+    raise RuntimeError(f"LLM 调用失败（已重试 {retries} 次）: {last_err}")
 
 
 def extract_json(text):
