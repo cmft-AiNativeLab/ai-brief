@@ -12,3 +12,4 @@ __pycache__/
 *.png
 *.docx
 ai-exec-brief-*.json
+!docs/logo.png
