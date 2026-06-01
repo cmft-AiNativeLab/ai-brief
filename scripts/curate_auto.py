@@ -88,6 +88,9 @@ def extract_json(text):
 def main():
     if not API_KEY:
         sys.exit("ERROR: 未设置 AI_BRIEF_API_KEY（请配 .env 或环境变量）")
+    if not API_KEY.isascii() or "你的" in API_KEY or "填" in API_KEY:
+        sys.exit("ERROR: AI_BRIEF_API_KEY 还是占位值或含中文——请在 .env 里把它改成真实 key"
+                 "（纯英文 / 数字，整行不要有中文）。")
     if len(sys.argv) < 3:
         sys.exit("用法: python curate_auto.py <fetch.json> <curated.json>")
     src, dst = sys.argv[1], sys.argv[2]
