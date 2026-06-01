@@ -37,8 +37,11 @@ def run(cmd):
 
 
 def build_archive():
-    dates = sorted([p.stem for p in DOCS.glob("20*.html")], reverse=True)
-    lis = "\n".join(f'  <li><a href="{d}.html">{d}</a></li>' for d in dates)
+    dates = sorted([p.stem for p in DOCS.glob("20*.html") if p.stem.isdigit()], reverse=True)
+    def _fmt(d):
+        return f"{d[:4]}-{d[4:6]}-{d[6:8]}" if len(d) == 8 else d
+    # href 用无后缀（/20260601），GitHub Pages 自动命中 20260601.html
+    lis = "\n".join(f'  <li><a href="{d}">{_fmt(d)}</a></li>' for d in dates)
     html = (
         "<!doctype html><html lang=zh><head><meta charset=utf-8>"
         "<meta name=viewport content=\"width=device-width,initial-scale=1\">"
@@ -76,7 +79,8 @@ def main():
     from render import render_report
     payload = json.loads(curated_json.read_text(encoding="utf-8"))
     html = render_report(payload)
-    date = (payload.get("generated_at") or "")[:10] or datetime.date.today().isoformat()
+    date_iso = (payload.get("generated_at") or "")[:10] or datetime.date.today().isoformat()
+    date = date_iso.replace("-", "")  # 紧凑日期 YYYYMMDD → URL 形如 /ai-brief/20260601
     (DOCS / "index.html").write_text(html, encoding="utf-8")
     (DOCS / f"{date}.html").write_text(html, encoding="utf-8")
     print(f"[ok] wrote docs/index.html + docs/{date}.html")
