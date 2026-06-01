@@ -18,6 +18,7 @@ import os
 import re
 import sys
 import json
+import time
 import requests
 from collections import Counter
 
@@ -56,7 +57,7 @@ USER_TMPL = """今天的候选 AI 资讯（JSON 数组，每条含 id/source/tit
 """
 
 
-def call_llm(candidates, retries=2):
+def call_llm(candidates, retries=3):
     """流式调用：边收边拼，避免大请求触发中转网关 504；失败自动重试。"""
     body = {
         "model": MODEL,
@@ -102,6 +103,8 @@ def call_llm(candidates, retries=2):
         except Exception as e:
             last_err = e
         print(f"[warn] LLM 第 {attempt} 次失败，重试…（{str(last_err)[:100]}）", file=sys.stderr)
+        if attempt <= retries:
+            time.sleep(2)
     raise RuntimeError(f"LLM 调用失败（已重试 {retries} 次）: {last_err}")
 
 
