@@ -67,7 +67,10 @@ def call_llm(candidates):
         "temperature": 0.4,
         "max_tokens": 4096,
     }
-    r = requests.post(
+    # 中转 API 直连：不走系统代理（fetch 海外源才需代理，二者分开，互不干扰）
+    session = requests.Session()
+    session.trust_env = False
+    r = session.post(
         f"{BASE_URL}/v1/chat/completions",
         headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
         json=body, timeout=150,
