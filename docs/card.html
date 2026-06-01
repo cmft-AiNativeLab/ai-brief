@@ -24,12 +24,8 @@
     box-shadow:0 18px 50px rgba(28,58,110,.16); padding:34px 28px 26px; text-align:center;
   }
   /* 品牌区 */
-  .brand{ display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:6px; }
-  .brand svg{ flex-shrink:0; }
-  .brand-tx{ text-align:left; line-height:1.15; }
-  .brand-en{ font-size:18px; font-weight:800; letter-spacing:.3px; }
-  .brand-en .c{ color:var(--gold); } .brand-en .f{ color:var(--blue); }
-  .brand-cn{ font-size:13px; color:var(--navy); letter-spacing:3px; font-weight:600; margin-top:2px; }
+  .brand{ text-align:center; margin-bottom:4px; }
+  .logo{ width:82%; max-width:300px; height:auto; display:block; margin:2px auto 0; }
   .divider{ height:1px; background:var(--line); margin:20px 0 18px; }
   /* 标题 */
   h1{ font-size:30px; font-weight:800; color:var(--navy); letter-spacing:1px; }
@@ -56,18 +52,7 @@
 <body>
   <div class="card">
     <div class="brand">
-      <svg width="56" height="56" viewBox="0 0 80 80" aria-label="CMG Fintech">
-        <circle cx="40" cy="40" r="38" fill="#3d7ff0"/>
-        <g fill="#fff">
-          <polygon points="20,56 29,24 37,24 28,56" opacity="0.5"/>
-          <polygon points="31,56 40,24 48,24 39,56" opacity="0.75"/>
-          <polygon points="42,56 51,24 59,24 50,56" opacity="1"/>
-        </g>
-      </svg>
-      <div class="brand-tx">
-        <div class="brand-en"><span class="c">CMG</span><span class="f">Fintech</span></div>
-        <div class="brand-cn">招商金融科技</div>
-      </div>
+      <img src="logo.png" alt="招商金融科技 · CMG Fintech" class="logo">
     </div>
 
     <div class="divider"></div>
