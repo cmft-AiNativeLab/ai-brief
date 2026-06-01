@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AI 简讯 · 招商金融科技</title>
+<meta property="og:title" content="AI 简讯 · 招商金融科技">
+<meta property="og:description" content="每日 AI 行业关键动向 — 战略动向 / 行业影响 / 管理实践 + 大模型能力榜">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://cmft-AiNativeLab.github.io/ai-brief/og.png">
+<meta name="theme-color" content="#3d7ff0">
+<style>
+  :root{ --blue:#3d7ff0; --navy:#1c3a6e; --gold:#b8862b; --ink:#1f2a3a; --grey:#6b7686; --line:#e7ecf3; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{
+    font-family:'PingFang SC','Microsoft YaHei',-apple-system,sans-serif;
+    background:linear-gradient(160deg,#eaf1fb 0%,#f4f7fc 55%,#eef2f8 100%);
+    min-height:100%; display:flex; align-items:center; justify-content:center;
+    padding:24px 16px; color:var(--ink);
+  }
+  .card{
+    width:100%; max-width:440px; background:#fff; border-radius:22px;
+    box-shadow:0 18px 50px rgba(28,58,110,.16); padding:34px 28px 26px; text-align:center;
+  }
+  /* 品牌区 */
+  .brand{ display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:6px; }
+  .brand svg{ flex-shrink:0; }
+  .brand-tx{ text-align:left; line-height:1.15; }
+  .brand-en{ font-size:18px; font-weight:800; letter-spacing:.3px; }
+  .brand-en .c{ color:var(--gold); } .brand-en .f{ color:var(--blue); }
+  .brand-cn{ font-size:13px; color:var(--navy); letter-spacing:3px; font-weight:600; margin-top:2px; }
+  .divider{ height:1px; background:var(--line); margin:20px 0 18px; }
+  /* 标题 */
+  h1{ font-size:30px; font-weight:800; color:var(--navy); letter-spacing:1px; }
+  .sub{ font-size:13.5px; color:var(--grey); margin-top:8px; line-height:1.6; }
+  .badge{ display:inline-block; margin-top:12px; font-size:11.5px; color:var(--blue);
+    background:#eaf1ff; border-radius:20px; padding:4px 12px; font-weight:600; }
+  /* 入口 */
+  .entries{ margin-top:22px; display:flex; flex-direction:column; gap:12px; }
+  .entry{ display:flex; align-items:center; gap:14px; text-decoration:none; color:inherit;
+    border:1px solid var(--line); border-radius:14px; padding:15px 16px; transition:.15s;
+    background:#fbfcfe; }
+  .entry:active,.entry:hover{ border-color:var(--blue); box-shadow:0 6px 18px rgba(61,127,240,.14); transform:translateY(-1px); }
+  .ico{ width:42px; height:42px; flex-shrink:0; border-radius:11px; display:flex; align-items:center;
+    justify-content:center; font-size:20px; }
+  .ico.b{ background:#e8f0ff; } .ico.g{ background:#f5edda; } .ico.n{ background:#e7ecf6; }
+  .etx{ flex:1; text-align:left; }
+  .etx .t{ font-size:15.5px; font-weight:700; color:var(--ink); }
+  .etx .d{ font-size:12px; color:var(--grey); margin-top:2px; }
+  .arr{ color:#b8c2d4; font-size:18px; font-weight:700; }
+  .foot{ margin-top:22px; font-size:11.5px; color:#9aa5b4; line-height:1.7; }
+  .foot b{ color:var(--gold); font-weight:700; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">
+      <svg width="56" height="56" viewBox="0 0 80 80" aria-label="CMG Fintech">
+        <circle cx="40" cy="40" r="38" fill="#3d7ff0"/>
+        <g fill="#fff">
+          <polygon points="20,56 29,24 37,24 28,56" opacity="0.5"/>
+          <polygon points="31,56 40,24 48,24 39,56" opacity="0.75"/>
+          <polygon points="42,56 51,24 59,24 50,56" opacity="1"/>
+        </g>
+      </svg>
+      <div class="brand-tx">
+        <div class="brand-en"><span class="c">CMG</span><span class="f">Fintech</span></div>
+        <div class="brand-cn">招商金融科技</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h1>AI 简讯</h1>
+    <div class="sub">每日 AI 行业关键动向<br>战略动向 · 行业影响 · 管理实践 + 大模型能力榜</div>
+    <div class="badge">每日 7:30 自动更新</div>
+
+    <div class="entries">
+      <a class="entry" href="./">
+        <div class="ico b">📰</div>
+        <div class="etx"><div class="t">今日最新一期</div><div class="d">当天精选 12 条 + 实时榜单</div></div>
+        <div class="arr">›</div>
+      </a>
+      <a class="entry" href="./archive">
+        <div class="ico n">🗂️</div>
+        <div class="etx"><div class="t">往期列表</div><div class="d">按日期翻阅历史每一期</div></div>
+        <div class="arr">›</div>
+      </a>
+      <a class="entry" href="./20260601">
+        <div class="ico g">📅</div>
+        <div class="etx"><div class="t">指定日期直达</div><div class="d">网址后加日期，如 /20260601</div></div>
+        <div class="arr">›</div>
+      </a>
+    </div>
+
+    <div class="foot">
+      数据来源:量子位 · 新智元 · 36氪 · 虎嗅 · 华尔街见闻 等 + artificialanalysis.ai<br>
+      由 <b>招商金融科技</b> · AI 简讯自动生成
+    </div>
+  </div>
+</body>
+</html>
