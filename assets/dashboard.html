@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, initial-scale=1">
+<title>AI 简讯 · {{DATE}}</title>
+<style>
+  :root {
+    --bg: #08101e;
+    --bg-2: #0f1a30;
+    --panel: rgba(15, 26, 48, 0.78);
+    --panel-border: rgba(212, 163, 115, 0.22);
+    --gold: #d4a373;
+    --gold-dim: #a07a4c;
+    --blue: #4a9eff;
+    --blue-dim: #3a78c0;
+    --red: #c44536;
+    --green: #4ade80;
+    --text: #ecf0fa;
+    --text-dim: #9aa6c0;
+    --text-faint: #5a6480;
+    --strategy: #d4a373;
+    --industry: #4a9eff;
+    --practice: #4ade80;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #000;
+    overflow: hidden;
+    font-family: 'JetBrains Mono', 'SF Mono', 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #000;
+  }
+  .page {
+    width: 1920px; height: 1080px;
+    transform-origin: center center;
+    position: relative; overflow: hidden;
+    color: var(--text);
+    background:
+      radial-gradient(ellipse at 0% 0%, rgba(74, 158, 255, 0.10), transparent 50%),
+      radial-gradient(ellipse at 100% 100%, rgba(212, 163, 115, 0.10), transparent 50%),
+      var(--bg);
+    display: flex; flex-direction: column;
+  }
+  .page::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(74, 158, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74, 158, 255, 0.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+    pointer-events: none;
+  }
+
+  /* ===== Header ===== */
+  header {
+    height: 72px;
+    padding: 0 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--panel-border);
+    position: relative; z-index: 2;
+    flex-shrink: 0;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 16px;
+  }
+  .brand-mark {
+    width: 10px; height: 10px;
+    background: var(--gold);
+    box-shadow: 0 0 14px var(--gold);
+    transform: rotate(45deg);
+  }
+  .brand-title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: linear-gradient(95deg, #fff, var(--gold), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .brand-sub {
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    padding-left: 14px;
+    margin-left: 14px;
+    border-left: 1px solid var(--panel-border);
+  }
+  .header-meta {
+    font-size: 13px;
+    color: var(--text-faint);
+    letter-spacing: 1px;
+  }
+  .header-meta strong { color: var(--gold); font-weight: 700; margin: 0 8px; }
+
+  /* ===== Body ===== */
+  .body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 22px;
+    padding: 22px 48px 28px;
+    position: relative; z-index: 2;
+    min-height: 0;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    backdrop-filter: blur(8px);
+  }
+  .panel-title {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-title::before { content: '◆'; color: var(--gold); }
+
+  /* --- Left rail --- */
+  .left-rail {
+    display: flex; flex-direction: column;
+    gap: 18px;
+    min-height: 0;
+    height: 100%;       /* 强制与 body grid 单元格等高，与 main-col 底部对齐 */
+  }
+  .panel-pie {
+    display: flex; flex-direction: column;
+    gap: 14px;
+  }
+  .pie-wrap {
+    display: flex; align-items: center; gap: 22px;
+    padding: 4px 0;
+  }
+  .pie-svg { flex-shrink: 0; }
+  .pie-legend { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .legend-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px;
+  }
+  .legend-row .dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    margin-right: 8px;
+  }
+  .legend-row .name { color: var(--text); }
+  .legend-row .num {
+    color: var(--gold);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .panel-actions {
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .action-list {
+    list-style: none;
+    counter-reset: act;
+    flex: 1;
+    display: flex; flex-direction: column;
+    /* 条数少时让 li 拉开间距；条数多时按内容堆 */
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .action-list li {
+    counter-increment: act;
+    padding: 14px 16px 14px 44px;
+    background: rgba(74, 158, 255, 0.07);
+    border-left: 3px solid var(--blue);
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    position: relative;
+    /* 让每条最小高度撑开，避免视觉太瘪 */
+    flex: 1;
+    display: flex; align-items: center;
+  }
+  .action-list li::before {
+    content: counter(act, decimal-leading-zero);
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--blue);
+    letter-spacing: 1px;
+  }
+
+  /* --- Main column --- */
+  .main-col {
+    display: flex; flex-direction: column;
+    gap: 18px;
+    min-height: 0;
+    height: 100%;       /* 与 left-rail 等高 */
+  }
+  .exec-summary {
+    padding: 16px 22px;
+    background: linear-gradient(95deg, rgba(212, 163, 115, 0.10), rgba(74, 158, 255, 0.06));
+    border: 1px solid rgba(212, 163, 115, 0.25);
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .exec-summary .lbl {
+    font-size: 12px; letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .exec-summary .lbl::before { content: '◆ '; }
+  .exec-summary .txt {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .section {
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .section-head {
+    display: flex; align-items: center; gap: 12px;
+    padding-bottom: 4px;
+  }
+  .section-tag {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  .section-cn { font-size: 16px; font-weight: 700; color: var(--text); }
+  .section-count { font-size: 11px; color: var(--text-faint); letter-spacing: 1px; }
+  .section-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--panel-border), transparent);
+  }
+  .dim-strategy .section-tag { background: rgba(212, 163, 115, 0.18); color: var(--strategy); border: 1px solid rgba(212, 163, 115, 0.4); }
+  .dim-industry .section-tag { background: rgba(74, 158, 255, 0.18); color: var(--industry); border: 1px solid rgba(74, 158, 255, 0.4); }
+  .dim-practice .section-tag { background: rgba(74, 222, 128, 0.18); color: var(--practice); border: 1px solid rgba(74, 222, 128, 0.4); }
+
+  .cards {
+    flex: 1; min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 1fr;       /* 强制行铺满，配合 .card height:100% */
+    gap: 14px;
+  }
+  .card {
+    padding: 16px 18px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    gap: 10px;
+    height: 100%;                  /* 撑满 grid 单元格 */
+  }
+  .card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--gold);
+    opacity: 0.6;
+  }
+  .dim-strategy .card::before { background: var(--strategy); }
+  .dim-industry .card::before { background: var(--industry); }
+  .dim-practice .card::before { background: var(--practice); }
+  .card-top {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+  .card-stars {
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+  }
+  .card-source { color: var(--text-dim); }
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.34;
+    color: var(--text);
+    padding-right: 22px;
+    position: relative;
+    transition: color 0.18s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-title::after {
+    content: '↗';
+    position: absolute; right: 0; top: -1px;
+    color: var(--gold);
+    opacity: 0.55;
+    font-size: 14px;
+    transition: opacity 0.18s, transform 0.18s;
+  }
+  a.card-link { text-decoration: none; color: inherit; }
+  a.card-link:hover .card-title { color: var(--gold); }
+  a.card-link:hover .card-title::after { opacity: 1; transform: translate(2px, -2px); }
+  .card-brief {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--text-dim);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-meaning {
+    margin-top: auto;
+    padding: 10px 12px;
+    background: rgba(212, 163, 115, 0.08);
+    border-left: 2px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--text);
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-meaning::before {
+    content: 'so what · ';
+    color: var(--gold);
+    font-size: 10px;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+  .dim-industry .card-meaning { background: rgba(74, 158, 255, 0.08); border-left-color: var(--blue); }
+  .dim-industry .card-meaning::before { color: var(--blue); }
+  .dim-practice .card-meaning { background: rgba(74, 222, 128, 0.08); border-left-color: var(--practice); }
+  .dim-practice .card-meaning::before { color: var(--practice); }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="page" id="page">
+      <header>
+        <div class="brand">
+          <div class="brand-mark"></div>
+          <div class="brand-title">AI 简讯</div>
+          <div class="brand-sub">近 24 小时 AI 关键动向</div>
+        </div>
+        <div class="header-meta">
+          {{DATE_FULL}}
+          <strong>·</strong>
+          扫描 <strong>{{TOTAL_SCANNED}}</strong> 条 · {{SOURCE_COUNT}} 源
+          <strong>·</strong>
+          生成于 {{GENERATED_AT}}
+        </div>
+      </header>
+
+      <div class="body">
+        <!-- Left rail -->
+        <div class="left-rail">
+          <div class="panel panel-pie">
+            <div class="panel-title">维度分布</div>
+            <div class="pie-wrap">
+              {{PIE_SVG}}
+              <div class="pie-legend">
+                <div class="legend-row"><span><span class="dot" style="background:var(--strategy)"></span>战略动向</span><span class="num">{{N_STRATEGY}}</span></div>
+                <div class="legend-row"><span><span class="dot" style="background:var(--industry)"></span>行业影响</span><span class="num">{{N_INDUSTRY}}</span></div>
+                <div class="legend-row"><span><span class="dot" style="background:var(--practice)"></span>管理实践</span><span class="num">{{N_PRACTICE}}</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel panel-actions">
+            <div class="panel-title">行动建议</div>
+            <ol class="action-list">
+              {{ACTION_ITEMS}}
+            </ol>
+          </div>
+        </div>
+
+        <!-- Main col -->
+        <div class="main-col">
+          <div class="exec-summary">
+            <div class="lbl">EXECUTIVE SUMMARY · 执行摘要</div>
+            <div class="txt">{{EXECUTIVE_SUMMARY}}</div>
+          </div>
+
+          {{SECTIONS}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const page = document.getElementById('page');
+      function fit() {
+        const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        page.style.transform = 'scale(' + s + ')';
+      }
+      window.addEventListener('resize', fit);
+      window.addEventListener('DOMContentLoaded', fit);
+      fit();
+    })();
+  </script>
+</body>
+</html>

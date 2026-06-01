@@ -1,0 +1,14 @@
+# 密钥绝不入库
+.env
+
+# 中间产物
+build/
+__pycache__/
+*.pyc
+.DS_Store
+
+# 只发布 docs/ 里的 .html；其它格式不入库
+*.pdf
+*.png
+*.docx
+ai-exec-brief-*.json
