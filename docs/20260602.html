@@ -362,12 +362,13 @@
     margin-top: 4mm;
     font-size: 7.5pt;
     color: var(--text-faint);
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     border-top: 1px solid var(--line);
     padding-top: 2mm;
   }
+  .page-footer > span:last-child { text-align: right; }
 
   /* ===== 大模型榜单页 ===== */
   .page.lb-page { display: flex; flex-direction: column; }
@@ -642,7 +643,7 @@
       <div class="item-head">
         <span class="item-rank">#03</span>
         <span class="item-impl">★★★☆☆</span>
-        <span class="item-source">Hacker News · 4 小时前</span>
+        <span class="item-source">Hacker News · 5 小时前</span>
       </div>
       <div class="item-title"><a href="https://apnews.com/article/artificial-intelligence-military-hegseth-anthropic-d5fbaee17ee0bdb9738dbb808ea2d047" target="_blank">五角大楼推进战场AI引发军方审慎分歧</a></div>
       <div class="item-brief">美国国防体系加速推动战场AI应用，但部分军方领导层公开表达谨慎立场，核心争议集中于可靠性、责任边界与误判代价。</div>
