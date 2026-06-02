@@ -8,8 +8,10 @@
 依赖 .env（不进仓库）：AI_BRIEF_API_KEY / AI_BRIEF_BASE_URL / AI_BRIEF_MODEL
 """
 import os
+import re
 import sys
 import json
+import shutil
 import datetime
 import subprocess
 import pathlib
@@ -58,6 +60,123 @@ def build_archive():
     print(f"[ok] wrote docs/archive.html ({len(dates)} 期)")
 
 
+def _screenshot(html_path, png_path, w, h, scale=2):
+    """Chrome 无头截图（卡片用方形窗口）。"""
+    from render import CHROME_PATH
+    if not pathlib.Path(CHROME_PATH).exists():
+        print("[warn] Chrome 缺失，跳过卡片截图", file=sys.stderr)
+        return False
+    cmd = [CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars",
+           f"--window-size={w},{h}", "--virtual-time-budget=2500",
+           f"--force-device-scale-factor={scale}",
+           f"--screenshot={png_path}", f"file://{html_path.resolve()}"]
+    subprocess.run(cmd, capture_output=True, timeout=60, check=False)
+    return png_path.exists()
+
+
+def _prune_downloads(dl, keep_days=7):
+    """只保留近 keep_days 天的带日期产物，控制仓库体积。"""
+    today = datetime.date.today()
+    for p in dl.glob("ai-brief-*"):
+        m = re.search(r"(\d{8})", p.name)
+        if not m:
+            continue
+        try:
+            d = datetime.datetime.strptime(m.group(1), "%Y%m%d").date()
+        except ValueError:
+            continue
+        if (today - d).days > keep_days:
+            p.unlink(missing_ok=True)
+
+
+def _download_index(dl, keep_days=7):
+    """生成 docs/download/index.html —— 按日期列出可下载文件。"""
+    dates = set()
+    for p in dl.glob("ai-brief-*"):
+        m = re.search(r"(\d{8})", p.name)
+        if m:
+            dates.add(m.group(1))
+    dates = sorted(dates, reverse=True)
+    rows = []
+    for d in dates:
+        links = []
+        if (dl / f"ai-brief-{d}.pdf").exists():
+            links.append(f'<a download="AI简讯 · {d}.pdf" href="ai-brief-{d}.pdf">📄 日报 PDF</a>')
+        if (dl / f"ai-brief-overview-{d}.png").exists():
+            links.append(f'<a download="AI简讯-总览 · {d}.png" href="ai-brief-overview-{d}.png">🖼️ 总览大图</a>')
+        if (dl / f"ai-brief-card-{d}.png").exists():
+            links.append(f'<a download="AI简讯-卡片 · {d}.png" href="ai-brief-card-{d}.png">📇 分享卡片</a>')
+        if links:
+            dt = f"{d[:4]}-{d[4:6]}-{d[6:8]}"
+            rows.append(f'<div class="day"><div class="dt">{dt}</div>'
+                        f'<div class="lk">{"".join(links)}</div></div>')
+    body = "\n".join(rows) or '<div class="day">暂无可下载文件</div>'
+    html = (
+        '<!doctype html><html lang="zh"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
+        '<title>AI 简讯 · 下载</title><style>'
+        ':root{--ink:#26303f;--grey:#6a7488;--line:#e2e7f0;--blue:#3a63b8}'
+        '*{box-sizing:border-box;margin:0;padding:0}'
+        'body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);'
+        'background:linear-gradient(160deg,#eef1f7,#e7ebf3);min-height:100vh;padding:26px 16px}'
+        '.wrap{max-width:560px;margin:0 auto}'
+        'h1{font-size:21px;font-weight:800;letter-spacing:1px}'
+        '.sub{color:var(--grey);font-size:13px;margin:7px 0 20px;line-height:1.6}'
+        '.day{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;'
+        'margin-bottom:12px;box-shadow:0 6px 18px rgba(40,55,90,.06)}'
+        '.dt{font-size:15px;font-weight:700;margin-bottom:10px}'
+        '.lk{display:flex;flex-wrap:wrap;gap:9px}'
+        '.lk a{flex:1 1 30%;min-width:126px;text-align:center;text-decoration:none;color:var(--blue);'
+        'background:#f3f6fc;border:1px solid var(--line);border-radius:10px;padding:10px 8px;'
+        'font-size:13.5px;font-weight:600;transition:.15s}'
+        '.lk a:hover{background:#e8effb;border-color:var(--blue)}'
+        '.back{display:inline-block;margin-bottom:14px;color:var(--blue);text-decoration:none;font-size:13px}'
+        '.foot{color:var(--grey);font-size:11.5px;margin-top:16px;line-height:1.6;text-align:center}'
+        '</style></head><body><div class="wrap">'
+        '<a class="back" href="../card">‹ 返回 AI 简讯</a>'
+        '<h1>📥 AI 简讯 · 资料下载</h1>'
+        f'<div class="sub">每日 7:30 自动生成 · 日报 PDF / 总览大图 / 分享卡片 · 保留近 {keep_days} 天</div>'
+        f'{body}'
+        '<div class="foot">由 招商金融科技 出品 · 数据来源 量子位 / 新智元 / 36氪 / 华尔街见闻 等 ＋ artificialanalysis.ai</div>'
+        '</div></body></html>'
+    )
+    (dl / "index.html").write_text(html, encoding="utf-8")
+
+
+def build_downloads(payload, date):
+    """生成可下载产物到 docs/download/：日报 PDF、总览 PNG、卡片 PNG（+ latest.* 固定链接）。"""
+    from render import render_dashboard, export_pdf, export_png
+    dl = DOCS / "download"
+    dl.mkdir(exist_ok=True)
+    report_html = DOCS / f"{date}.html"
+    made = []
+
+    # 1) 日报 PDF（A4 多页，从报告 HTML 同源渲染）
+    pdf_path = dl / f"ai-brief-{date}.pdf"
+    if report_html.exists() and export_pdf(report_html, pdf_path):
+        shutil.copyfile(pdf_path, dl / "latest.pdf")
+        made.append("PDF")
+
+    # 2) 总览 PNG（16:9 仪表盘）
+    dash_html = BUILD / f"dashboard-{date}.html"
+    dash_html.write_text(render_dashboard(payload), encoding="utf-8")
+    overview_png = dl / f"ai-brief-overview-{date}.png"
+    if export_png(dash_html, overview_png, scale=1):
+        shutil.copyfile(overview_png, dl / "latest-overview.png")
+        made.append("总览PNG")
+    dash_html.unlink(missing_ok=True)
+
+    # 3) 卡片 PNG（正方形分享卡，520×520 窗口）
+    card_png = dl / f"ai-brief-card-{date}.png"
+    if _screenshot(DOCS / "card.html", card_png, 520, 520, scale=2):
+        shutil.copyfile(card_png, dl / "latest-card.png")
+        made.append("卡片PNG")
+
+    _prune_downloads(dl, keep_days=7)
+    _download_index(dl, keep_days=7)
+    print(f"[ok] downloads -> docs/download/ [{', '.join(made) or '空'}]")
+
+
 def main():
     load_env()
     push = "--push" in sys.argv
@@ -86,9 +205,14 @@ def main():
     print(f"[ok] wrote docs/index.html + docs/{date}.html")
     # 4. 往期归档页
     build_archive()
-    # 5. 推送（Pages 从 docs/ 自动发布）
+    # 5. 可下载产物（日报 PDF / 总览 PNG / 卡片 PNG）→ docs/download/
+    try:
+        build_downloads(payload, date)
+    except Exception as e:
+        print(f"[warn] 生成下载产物失败（不影响网页发布）：{e}", file=sys.stderr)
+    # 6. 推送（Pages 从 docs/ 自动发布）
     if push:
-        run(["git", "-C", ROOT, "add", "docs"])
+        run(["git", "-C", ROOT, "add", "-A", "docs"])
         run(["git", "-C", ROOT, "commit", "-m", f"AI 简讯 {date}"])
         run(["git", "-C", ROOT, "push"])
         print("[ok] pushed — 稍等 1 分钟 GitHub Pages 会更新")

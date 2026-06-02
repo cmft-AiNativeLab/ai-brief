@@ -14,3 +14,6 @@ __pycache__/
 ai-exec-brief-*.json
 !docs/logo.png
 !docs/qr.png
+# 可下载产物：放行 docs/download/ 下的 pdf/png（其它目录仍忽略）
+!docs/download/*.pdf
+!docs/download/*.png
