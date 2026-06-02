@@ -10,5 +10,15 @@ export HTTPS_PROXY="http://127.0.0.1:7897"
 cd "$(dirname "$0")" || exit 1
 mkdir -p build
 echo "===== $(date '+%F %T') 开始 =====" >> build/daily.log
+
+# 等网络/代理就绪（电脑睡眠唤醒后 Clash 自启需时间），最多等 ~5 分钟
+for i in $(seq 1 20); do
+  if /usr/bin/curl -s --max-time 8 -o /dev/null https://github.com; then
+    echo "$(date '+%F %T') 网络就绪（第 $i 次探测）" >> build/daily.log; break
+  fi
+  echo "$(date '+%F %T') 网络/代理未就绪，等待…($i)" >> build/daily.log
+  sleep 15
+done
+
 /usr/local/bin/python3 build.py --push >> build/daily.log 2>&1
 echo "===== $(date '+%F %T') 结束 (exit=$?) =====" >> build/daily.log
