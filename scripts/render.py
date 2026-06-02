@@ -335,6 +335,7 @@ def _report_dim_page(dim_idx: int, dim: str, items: list[dict], total_pages: int
       </div>
       <div class="page-footer">
         <span>AI 简讯 · {info['cn']}</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
         <span>{page_no} / {total_pages}</span>
       </div>
     </div>
@@ -447,6 +448,7 @@ def _leaderboard_page(lb: list[dict], page_no: int, total_pages: int) -> str:
         'https://artificialanalysis.ai/models#intelligence</a></div>'
         '<div class="page-footer">'
         '<span>AI 简讯 · 大模型榜单</span>'
+        '<img class="footer-logo" src="logo.png" alt="招商金融科技">'
         f'<span>{page_no} / {total_pages}</span>'
         '</div>'
         '</div>'
@@ -504,7 +506,6 @@ def render_report(payload: dict) -> str:
         .replace("{{DIMENSION_PAGES}}", dim_pages)
         .replace("{{LEADERBOARD_PAGE}}", leaderboard_page)
         .replace("{{ACTION_ITEMS_PDF}}", action_items_html)
-        .replace("{{LOGO}}", '<img class="cover-logo" src="logo.png" alt="招商金融科技 · CMG Fintech">')
     )
 
 
