@@ -99,12 +99,9 @@
   }
   .header-meta strong { color: var(--gold); font-weight: 700; margin: 0 8px; }
   .header-right { display: flex; align-items: center; gap: 20px; }
-  .dash-logo {
-    background: #fff; border-radius: 9px; padding: 5px 10px;
-    display: flex; align-items: center;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
-  }
-  .dash-logo img { height: 30px; width: auto; display: block; }
+  /* 无背景：透明 logo 直接置于深色头部 */
+  .dash-logo { display: flex; align-items: center; }
+  .dash-logo img { height: 34px; width: auto; display: block; }
 
   /* ===== Body ===== */
   .body {
