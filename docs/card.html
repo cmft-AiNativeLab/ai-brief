@@ -9,55 +9,50 @@
 <meta property="og:image" content="https://cmft-AiNativeLab.github.io/ai-brief/logo.png">
 <meta name="theme-color" content="#14223a">
 <style>
-  :root{ --blue:#2d6cf0; --navy:#14223a; --gold:#c79a4b; --ink:#1f2a3a; --grey:#7a8699; --line:#e6ecf5; }
+  :root{ --blue:#2d6cf0; --navy:#14223a; --gold:#c79a4b; --ink:#1f2a3a; --grey:#7a8699; --line:#e6ecf5;
+    --serif:Georgia,"Songti SC","STSong","SimSun",serif; --sans:"PingFang SC","Microsoft YaHei",sans-serif; }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; }
-  body{
-    font-family:'PingFang SC','Microsoft YaHei',-apple-system,sans-serif;
+  body{ font-family:var(--serif);
     background:linear-gradient(165deg,#0f2147 0%,#1c3a6e 45%,#2d6cf0 130%);
-    min-height:100%; display:flex; align-items:center; justify-content:center; padding:22px 16px;
-  }
-  .card{ width:100%; max-width:466px; background:#fff; border-radius:24px; overflow:hidden;
-    box-shadow:0 26px 64px rgba(8,22,55,.38); }
+    min-height:100%; display:flex; align-items:center; justify-content:center; padding:18px; }
+  .card{ width:min(94vw,484px); aspect-ratio:1/1; background:#fff; border-radius:24px;
+    overflow:hidden; box-shadow:0 26px 64px rgba(8,22,55,.42); display:flex; flex-direction:column; }
 
-  /* 顶部：深蓝科技渐变 + 右上角品牌 logo */
-  .head{ position:relative; padding:28px 28px 32px; color:#fff;
-    background:linear-gradient(135deg,#14223a 0%,#1c3a6e 58%,#2d6cf0 150%); overflow:hidden; }
-  .head::before{ content:''; position:absolute; right:-50px; top:-50px; width:210px; height:210px;
+  /* 头部：深蓝科技 + 右上角 logo */
+  .head{ position:relative; flex-shrink:0; padding:22px 24px 19px; color:#fff;
+    background:linear-gradient(135deg,#14223a 0%,#1c3a6e 60%,#2d6cf0 158%); overflow:hidden; }
+  .head::before{ content:''; position:absolute; right:-46px; top:-46px; width:185px; height:185px;
     background:radial-gradient(circle,rgba(255,255,255,.13),transparent 68%); }
-  .head::after{ content:''; position:absolute; left:-30px; bottom:-60px; width:160px; height:160px;
-    background:radial-gradient(circle,rgba(45,108,240,.35),transparent 70%); }
-  .logo-wrap{ position:absolute; top:18px; right:20px; background:#fff; border-radius:10px;
-    padding:6px 9px; box-shadow:0 4px 14px rgba(0,0,0,.18); z-index:2; }
-  .logo{ height:30px; width:auto; display:block; }
-  .kicker{ position:relative; z-index:1; font-size:12px; letter-spacing:3px; color:#a8c2f0; font-weight:700; }
-  h1{ position:relative; z-index:1; font-size:42px; font-weight:800; letter-spacing:2px; margin-top:10px; }
-  .sub{ position:relative; z-index:1; font-size:14.5px; color:#d2def3; margin-top:12px; line-height:1.65; }
-  .badge{ position:relative; z-index:1; display:inline-block; margin-top:16px; font-size:12px; color:#fff;
-    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3); border-radius:20px; padding:5px 15px; font-weight:600; }
+  .logo-wrap{ position:absolute; top:16px; right:18px; background:#fff; border-radius:9px;
+    padding:5px 8px; box-shadow:0 3px 12px rgba(0,0,0,.2); z-index:2; }
+  .logo{ height:26px; width:auto; display:block; }
+  .kicker{ position:relative; z-index:1; font-family:Georgia,serif; font-size:11px; letter-spacing:2.5px; color:#a8c2f0; font-weight:700; }
+  h1{ position:relative; z-index:1; font-size:38px; font-weight:700; letter-spacing:3px; margin-top:8px; }
+  .sub{ position:relative; z-index:1; font-size:12.5px; color:#cfdcf2; margin-top:9px; line-height:1.65; font-family:var(--sans); }
 
-  /* 入口卡片（放大 + 科技感） */
-  .body{ padding:24px 22px 6px; }
-  .entry{ display:flex; align-items:center; gap:15px; text-decoration:none; color:inherit;
-    border:1px solid var(--line); border-radius:16px; padding:18px 18px; margin-bottom:14px;
-    background:#fbfcff; transition:.16s; }
-  .entry:active,.entry:hover{ border-color:var(--blue); box-shadow:0 10px 26px rgba(45,108,240,.18); transform:translateY(-2px); }
-  .ico{ width:48px; height:48px; flex-shrink:0; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:23px; }
+  /* 主体 */
+  .body{ flex:1; display:flex; flex-direction:column; padding:16px 20px 18px; }
+  .entries{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:10px; }
+  .entry{ display:flex; align-items:center; gap:13px; text-decoration:none; color:inherit;
+    border:1px solid var(--line); border-radius:13px; padding:12px 14px; background:#fbfcff; transition:.15s; }
+  .entry:active,.entry:hover{ border-color:var(--blue); box-shadow:0 7px 18px rgba(45,108,240,.16); }
+  .ico{ width:40px; height:40px; flex-shrink:0; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; }
   .ico.b{ background:linear-gradient(135deg,#e8f0ff,#d4e4ff); }
   .ico.n{ background:linear-gradient(135deg,#eef1f8,#e1e8f4); }
   .ico.g{ background:linear-gradient(135deg,#f8f0db,#f0e3c2); }
-  .etx{ flex:1; } .etx .t{ font-size:17.5px; font-weight:700; color:var(--ink); }
-  .etx .d{ font-size:13px; color:var(--grey); margin-top:3px; }
-  .arr{ color:#c2cde0; font-size:23px; font-weight:700; }
+  .etx{ flex:1; } .etx .t{ font-size:16.5px; font-weight:700; color:var(--ink); }
+  .etx .d{ font-size:11.5px; color:var(--grey); margin-top:2px; font-family:var(--sans); }
+  .arr{ color:#c2cde0; font-size:21px; }
 
-  /* 二维码 */
-  .qr{ text-align:center; padding:10px 0 6px; }
-  .qrimg{ width:140px; height:140px; border:1px solid var(--line); border-radius:15px; padding:9px; background:#fff; }
-  .qrtx{ font-size:13px; color:var(--grey); margin-top:10px; }
-
-  .foot{ margin-top:10px; padding:15px 22px 24px; text-align:center; font-size:11.5px;
-    color:#9aa5b4; line-height:1.75; border-top:1px solid var(--line); }
-  .foot b{ color:var(--gold); font-weight:700; }
+  /* 底部：二维码 + 出品信息 一行 */
+  .bottom{ flex-shrink:0; display:flex; align-items:center; gap:14px;
+    margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+  .qrimg{ width:80px; height:80px; border:1px solid var(--line); border-radius:11px; padding:5px; background:#fff; flex-shrink:0; }
+  .btx{ flex:1; text-align:left; }
+  .btx .b1{ font-size:13.5px; color:var(--ink); font-weight:700; }
+  .btx .b2{ font-size:10.5px; color:var(--grey); margin-top:5px; line-height:1.55; font-family:var(--sans); }
+  .btx .b2 b{ color:var(--gold); font-weight:700; }
 </style>
 </head>
 <body>
@@ -66,36 +61,33 @@
       <div class="logo-wrap"><img src="logo.png" alt="招商金融科技 · CMG Fintech" class="logo"></div>
       <div class="kicker">CMG FINTECH · 招商金融科技</div>
       <h1>AI 简讯</h1>
-      <div class="sub">每日 AI 行业关键动向<br>战略动向 · 行业影响 · 管理实践 ＋ 大模型能力榜</div>
-      <div class="badge">每日 7:30 自动更新</div>
+      <div class="sub">每日 AI 行业关键动向 · 每日 7:30 自动更新<br>战略动向 · 行业影响 · 管理实践 ＋ 大模型能力榜</div>
     </div>
-
     <div class="body">
-      <a class="entry" href="./">
-        <div class="ico b">📰</div>
-        <div class="etx"><div class="t">今日最新一期</div><div class="d">当天精选 12 条 ＋ 实时榜单</div></div>
-        <div class="arr">›</div>
-      </a>
-      <a class="entry" href="./archive">
-        <div class="ico n">🗂️</div>
-        <div class="etx"><div class="t">往期列表</div><div class="d">按日期翻阅历史每一期</div></div>
-        <div class="arr">›</div>
-      </a>
-      <a class="entry" href="./20260601">
-        <div class="ico g">📅</div>
-        <div class="etx"><div class="t">指定日期直达</div><div class="d">网址后加日期，如 /20260601</div></div>
-        <div class="arr">›</div>
-      </a>
-
-      <div class="qr">
-        <img src="qr.png" alt="扫码访问 AI 简讯" class="qrimg">
-        <div class="qrtx">📱 手机扫码 · 直达最新一期</div>
+      <div class="entries">
+        <a class="entry" href="./">
+          <div class="ico b">📰</div>
+          <div class="etx"><div class="t">今日最新一期</div><div class="d">当天精选 12 条 ＋ 实时榜单</div></div>
+          <div class="arr">›</div>
+        </a>
+        <a class="entry" href="./archive">
+          <div class="ico n">🗂️</div>
+          <div class="etx"><div class="t">往期列表</div><div class="d">按日期翻阅历史每一期</div></div>
+          <div class="arr">›</div>
+        </a>
+        <a class="entry" href="./20260601">
+          <div class="ico g">📅</div>
+          <div class="etx"><div class="t">指定日期直达</div><div class="d">网址后加日期，如 /20260601</div></div>
+          <div class="arr">›</div>
+        </a>
       </div>
-    </div>
-
-    <div class="foot">
-      数据来源:量子位 · 新智元 · 36氪 · 虎嗅 · 华尔街见闻 等 ＋ artificialanalysis.ai<br>
-      由 <b>招商金融科技</b> 出品 · AI 简讯自动生成
+      <div class="bottom">
+        <img src="qr.png" alt="扫码访问 AI 简讯" class="qrimg">
+        <div class="btx">
+          <div class="b1">📱 手机扫码 · 直达最新一期</div>
+          <div class="b2">数据来源 量子位 / 新智元 / 36氪 / 华尔街见闻 等 ＋ artificialanalysis.ai · 由 <b>招商金融科技</b> 出品</div>
+        </div>
+      </div>
     </div>
   </div>
 </body>

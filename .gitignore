@@ -13,3 +13,4 @@ __pycache__/
 *.docx
 ai-exec-brief-*.json
 !docs/logo.png
+!docs/qr.png
