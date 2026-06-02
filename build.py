@@ -125,7 +125,15 @@ def _download_index(dl):
             dt = f"{d[:4]}-{d[4:6]}-{d[6:8]}"
             rows.append(f'<div class="day"><div class="dt">{dt}</div>'
                         f'<div class="lk">{"".join(links)}</div></div>')
-    body = "\n".join(rows) or '<div class="day">暂无可下载文件</div>'
+    wk = dl / "ai-brief-7days.pdf"
+    weekly = ""
+    if wk.exists():
+        weekly = ('<div class="day feat"><div class="dt">📚 近 7 天 AI 资讯报告 · 合辑</div>'
+                  '<div class="lk">'
+                  f'<a class="full" download="AI简讯-近7天合辑.pdf" '
+                  f'href="ai-brief-7days.pdf?v={ver("ai-brief-7days.pdf")}">📦 下载合辑 PDF（近 7 天全部日报）</a>'
+                  '</div></div>')
+    body = weekly + ("\n".join(rows) or '<div class="day">暂无可下载文件</div>')
     html = (
         '<!doctype html><html lang="zh"><head><meta charset="utf-8">'
         '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">'
@@ -147,6 +155,10 @@ def _download_index(dl):
         'background:#f3f6fc;border:1px solid var(--line);border-radius:10px;padding:10px 8px;'
         'font-size:13.5px;font-weight:600;transition:.15s}'
         '.lk a:hover{background:#e8effb;border-color:var(--blue)}'
+        '.lk a.full{flex:1 1 100%;background:var(--blue);color:#fff;border-color:var(--blue)}'
+        '.lk a.full:hover{background:#2f56a8}'
+        '.day.feat{border-color:#9fbef0;background:#eef4ff}'
+        '.day.feat .dt{color:var(--blue)}'
         '.back{display:inline-block;margin-bottom:10px;color:var(--blue);text-decoration:none;font-size:13px}'
         '.brand{height:32px;width:auto;display:block;margin:2px 0 14px}'
         '.foot{color:var(--grey);font-size:11.5px;margin-top:16px;line-height:1.6;text-align:center}'
@@ -162,8 +174,53 @@ def _download_index(dl):
     (dl / "index.html").write_text(html, encoding="utf-8")
 
 
+def build_weekly(date):
+    """合并近 7 天日报 PDF 为「近七天 AI 资讯报告」合辑（最新在前）。"""
+    from render import export_pdf
+    from pypdf import PdfWriter
+    dl = DOCS / "download"
+    today = datetime.date(int(date[:4]), int(date[4:6]), int(date[6:8]))
+    # 近 7 天内（含今天）有日报 HTML 的日期，最新在前
+    dates = []
+    for p in sorted(DOCS.glob("20*.html"), key=lambda x: x.stem, reverse=True):
+        if not p.stem.isdigit():
+            continue
+        try:
+            d = datetime.datetime.strptime(p.stem, "%Y%m%d").date()
+        except ValueError:
+            continue
+        if 0 <= (today - d).days < 7:
+            dates.append(p.stem)
+    if not dates:
+        return None
+    # 取已有的当期 PDF，缺的从对应 HTML 临时渲染
+    pdfs, tmps = [], []
+    for ds in dates:
+        dated = dl / f"ai-brief-{ds}.pdf"
+        if dated.exists():
+            pdfs.append(dated)
+        else:
+            t = BUILD / f"wk-{ds}.pdf"
+            if export_pdf(DOCS / f"{ds}.html", t):
+                pdfs.append(t)
+                tmps.append(t)
+    if not pdfs:
+        return None
+    out = dl / "ai-brief-7days.pdf"
+    writer = PdfWriter()
+    for pf in pdfs:
+        writer.append(str(pf))
+    with open(out, "wb") as f:
+        writer.write(f)
+    writer.close()
+    for t in tmps:
+        t.unlink(missing_ok=True)
+    print(f"[ok] 近 7 天合辑：{len(pdfs)} 期 -> {out.name}")
+    return out
+
+
 def build_downloads(payload, date):
-    """生成可下载产物到 docs/download/：日报 PDF、总览 PNG、卡片 PNG（+ latest.* 固定链接）。"""
+    """生成可下载产物到 docs/download/：日报 PDF、总览 PNG、卡片 PNG、近 7 天合辑（+ latest.* 固定链接）。"""
     from render import render_dashboard, export_pdf, export_png
     dl = DOCS / "download"
     dl.mkdir(exist_ok=True)
@@ -190,6 +247,13 @@ def build_downloads(payload, date):
     if _screenshot(DOCS / "card.html", card_png, 520, 520, scale=2):
         shutil.copyfile(card_png, dl / "latest-card.png")
         made.append("卡片PNG")
+
+    # 4) 近 7 天合辑 PDF
+    try:
+        if build_weekly(date):
+            made.append("近7天合辑")
+    except Exception as e:
+        print(f"[warn] 近 7 天合辑生成失败：{e}", file=sys.stderr)
 
     # 往期全部永久保留，不做清理
     _download_index(dl)
