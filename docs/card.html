@@ -7,20 +7,20 @@
 <meta property="og:title" content="AI 简讯 · 招商金融科技">
 <meta property="og:description" content="每日 AI 行业关键动向 — 战略 / 行业 / 实践 + 大模型能力榜">
 <meta property="og:image" content="https://cmft-AiNativeLab.github.io/ai-brief/logo.png">
-<meta name="theme-color" content="#c3ccdb">
+<meta name="theme-color" content="#c6ccdb">
 <style>
-  :root{ --ink:#2b333f; --ink2:#48526a; --grey:#69727f; --gold:#6f7f9c; --accent:#5a6e92;
+  :root{ --ink:#2a3344; --ink2:#4b5670; --grey:#6a7488; --gold:#a98a55; --accent:#5f7295;
     --serif:Georgia,"Songti SC","STSong","SimSun",serif; --sans:"PingFang SC","Microsoft YaHei",sans-serif; }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; }
   body{ font-family:var(--serif);
-    /* 低饱和度 · 偏冷灰蓝色系背景 */
+    /* 低饱和度柔和色系背景 */
     background:
-      radial-gradient(680px 520px at 14% 10%, #c4cedd 0%, transparent 60%),
-      radial-gradient(620px 520px at 88% 16%, #ccd5e0 0%, transparent 60%),
-      radial-gradient(720px 560px at 82% 92%, #c3ced7 0%, transparent 60%),
-      radial-gradient(600px 520px at 8% 90%, #ccd3dc 0%, transparent 60%),
-      linear-gradient(160deg,#c3ccdb 0%,#bfc8d6 50%,#c4cbd6 100%);
+      radial-gradient(680px 520px at 14% 10%, #c3cde4 0%, transparent 60%),
+      radial-gradient(620px 520px at 88% 16%, #d8cdd6 0%, transparent 60%),
+      radial-gradient(720px 560px at 82% 92%, #c6d4cd 0%, transparent 60%),
+      radial-gradient(600px 520px at 8% 90%, #d8d2c6 0%, transparent 60%),
+      linear-gradient(160deg,#c7cedd 0%,#c2c8d6 50%,#c9ccd3 100%);
     min-height:100%; display:flex; align-items:center; justify-content:center; padding:18px; }
 
   /* 毛玻璃卡片 */
@@ -32,45 +32,44 @@
   /* 卡片内的低饱和度光晕（供毛玻璃虚化） */
   .bg{ position:absolute; inset:-12%; z-index:0; filter:blur(10px);
     background:
-      radial-gradient(closest-side, rgba(140,160,202,.54), transparent) 0% 0%/60% 58% no-repeat,
-      radial-gradient(closest-side, rgba(150,170,198,.48), transparent) 100% 6%/58% 56% no-repeat,
-      radial-gradient(closest-side, rgba(146,172,186,.46), transparent) 92% 104%/60% 58% no-repeat,
-      radial-gradient(closest-side, rgba(158,176,200,.44), transparent) -4% 100%/56% 56% no-repeat; }
+      radial-gradient(closest-side, rgba(150,168,210,.55), transparent) 0% 0%/60% 58% no-repeat,
+      radial-gradient(closest-side, rgba(196,170,190,.50), transparent) 100% 6%/58% 56% no-repeat,
+      radial-gradient(closest-side, rgba(160,190,172,.48), transparent) 92% 104%/60% 58% no-repeat,
+      radial-gradient(closest-side, rgba(206,188,158,.45), transparent) -4% 100%/56% 56% no-repeat; }
 
-  /* 头部：毛玻璃横幅 */
-  .head{ position:relative; z-index:1; flex-shrink:0; padding:16px 22px 15px; color:var(--ink); overflow:hidden;
+  /* 头部：毛玻璃横幅（左侧标题 + 右上 logo） */
+  .head{ position:relative; z-index:1; flex-shrink:0; padding:20px 22px 17px; color:var(--ink); overflow:hidden;
     background:linear-gradient(135deg, rgba(255,255,255,.34), rgba(214,222,238,.20));
     backdrop-filter:blur(16px) saturate(118%); -webkit-backdrop-filter:blur(16px) saturate(118%);
     border-bottom:1px solid rgba(255,255,255,.45); }
-  .logo-wrap{ position:absolute; top:14px; right:16px; z-index:2; border-radius:10px; padding:5px 8px;
+  .logo-wrap{ position:absolute; top:18px; right:16px; z-index:2; border-radius:10px; padding:5px 8px;
     background:rgba(255,255,255,.72); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
     border:1px solid rgba(255,255,255,.8); box-shadow:0 6px 18px rgba(40,55,90,.18); }
-  .logo{ height:26px; width:auto; display:block; }
-  .kicker{ font-family:Georgia,serif; font-size:11px; letter-spacing:2.5px; color:var(--accent); font-weight:700; }
-  h1{ font-size:34px; font-weight:700; letter-spacing:3px; margin-top:7px; color:var(--ink); }
-  .sub{ font-size:12px; color:var(--ink2); margin-top:8px; line-height:1.65; font-family:var(--sans); }
+  .logo{ height:28px; width:auto; display:block; }
+  h1{ font-size:35px; font-weight:700; letter-spacing:3px; color:var(--ink); }
+  .sub{ font-size:12px; color:var(--ink2); margin-top:10px; line-height:1.65; font-family:var(--sans); }
 
   /* 主体 */
-  .body{ position:relative; z-index:1; flex:1; display:flex; flex-direction:column; padding:12px 18px 14px; }
-  .entries{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:9px; }
+  .body{ position:relative; z-index:1; flex:1; display:flex; flex-direction:column; padding:13px 18px 15px; }
+  .entries{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:10px; }
   .entry{ display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit;
-    border:1px solid rgba(255,255,255,.55); border-radius:14px; padding:10px 13px;
+    border:1px solid rgba(255,255,255,.55); border-radius:14px; padding:11px 13px;
     background:rgba(255,255,255,.40); backdrop-filter:blur(10px) saturate(120%); -webkit-backdrop-filter:blur(10px) saturate(120%);
     box-shadow:0 6px 16px rgba(45,60,95,.10), inset 0 1px 0 rgba(255,255,255,.6); transition:.18s; }
   .entry:hover,.entry:active{ background:rgba(255,255,255,.58); border-color:rgba(255,255,255,.85);
     box-shadow:0 10px 24px rgba(45,60,95,.16); transform:translateY(-1px); }
   .ico{ width:38px; height:38px; flex-shrink:0; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:19px;
     border:1px solid rgba(255,255,255,.6); box-shadow:inset 0 1px 0 rgba(255,255,255,.5); }
-  .ico.b{ background:rgba(146,166,206,.44); }
-  .ico.n{ background:rgba(160,176,200,.44); }
-  .ico.g{ background:rgba(150,174,190,.44); }
+  .ico.b{ background:rgba(150,168,210,.42); }
+  .ico.n{ background:rgba(172,182,202,.42); }
+  .ico.g{ background:rgba(206,186,150,.42); }
   .etx{ flex:1; } .etx .t{ font-size:16px; font-weight:700; color:var(--ink); }
   .etx .d{ font-size:11.5px; color:var(--grey); margin-top:2px; font-family:var(--sans); }
-  .arr{ color:#94a0b8; font-size:20px; }
+  .arr{ color:#97a2ba; font-size:20px; }
 
   /* 底部：二维码 + 出品信息 */
   .bottom{ flex-shrink:0; display:flex; align-items:center; gap:13px;
-    margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,.45); }
+    margin-top:13px; padding-top:13px; border-top:1px solid rgba(255,255,255,.45); }
   .qrimg{ width:72px; height:72px; border:1px solid rgba(255,255,255,.7); border-radius:11px; padding:5px;
     background:rgba(255,255,255,.78); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
     flex-shrink:0; box-shadow:0 6px 16px rgba(45,60,95,.12); }
@@ -85,7 +84,6 @@
     <div class="bg"></div>
     <div class="head">
       <div class="logo-wrap"><img src="logo.png" alt="招商金融科技 · CMG Fintech" class="logo"></div>
-      <div class="kicker">CMG FINTECH · 招商金融科技</div>
       <h1>AI 简讯</h1>
       <div class="sub">每日 AI 行业关键动向 · 每日 7:30 自动更新<br>战略动向 · 行业影响 · 管理实践 ＋ 大模型能力榜</div>
     </div>
