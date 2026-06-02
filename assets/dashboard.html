@@ -98,6 +98,13 @@
     letter-spacing: 1px;
   }
   .header-meta strong { color: var(--gold); font-weight: 700; margin: 0 8px; }
+  .header-right { display: flex; align-items: center; gap: 20px; }
+  .dash-logo {
+    background: #fff; border-radius: 9px; padding: 5px 10px;
+    display: flex; align-items: center;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+  }
+  .dash-logo img { height: 30px; width: auto; display: block; }
 
   /* ===== Body ===== */
   .body {
@@ -357,12 +364,15 @@
           <div class="brand-title">AI 简讯</div>
           <div class="brand-sub">近 24 小时 AI 关键动向</div>
         </div>
-        <div class="header-meta">
-          {{DATE_FULL}}
-          <strong>·</strong>
-          扫描 <strong>{{TOTAL_SCANNED}}</strong> 条 · {{SOURCE_COUNT}} 源
-          <strong>·</strong>
-          生成于 {{GENERATED_AT}}
+        <div class="header-right">
+          <div class="header-meta">
+            {{DATE_FULL}}
+            <strong>·</strong>
+            扫描 <strong>{{TOTAL_SCANNED}}</strong> 条 · {{SOURCE_COUNT}} 源
+            <strong>·</strong>
+            生成于 {{GENERATED_AT}}
+          </div>
+          {{LOGO}}
         </div>
       </header>
 

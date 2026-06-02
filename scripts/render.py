@@ -27,6 +27,7 @@ from typing import Any
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 DASHBOARD_TEMPLATE = ASSETS / "dashboard.html"
 REPORT_TEMPLATE = ASSETS / "report.html"
+LOGO_PATH = Path(__file__).resolve().parent.parent / "docs" / "logo.png"
 CHROME_PATH = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 CN_TZ = timezone(timedelta(hours=8))
 
@@ -42,6 +43,21 @@ DIM_ORDER = ["strategy", "industry", "practice"]
 
 def _esc(s: str) -> str:
     return html.escape(s or "", quote=True)
+
+
+def _logo_data_uri() -> str:
+    """docs/logo.png 的 base64 data URI（用于深底仪表盘等非同目录场景）。"""
+    try:
+        return "data:image/png;base64," + base64.b64encode(LOGO_PATH.read_bytes()).decode()
+    except Exception:
+        return ""
+
+
+def _dash_logo_html() -> str:
+    """仪表盘头部 logo（白色药丸底，深色背景下可见）。"""
+    uri = _logo_data_uri()
+    return (f'<span class="dash-logo"><img src="{uri}" '
+            f'alt="招商金融科技 · CMG Fintech"></span>') if uri else ""
 
 
 def _format_pub_short(iso_str: str) -> str:
@@ -232,6 +248,7 @@ def render_dashboard(payload: dict) -> str:
         .replace("{{EXECUTIVE_SUMMARY}}",
                  _esc(payload.get("executive_summary") or "今日无执行摘要。"))
         .replace("{{SECTIONS}}", sections)
+        .replace("{{LOGO}}", _dash_logo_html())
     )
 
 
@@ -487,6 +504,7 @@ def render_report(payload: dict) -> str:
         .replace("{{DIMENSION_PAGES}}", dim_pages)
         .replace("{{LEADERBOARD_PAGE}}", leaderboard_page)
         .replace("{{ACTION_ITEMS_PDF}}", action_items_html)
+        .replace("{{LOGO}}", '<img class="cover-logo" src="logo.png" alt="招商金融科技 · CMG Fintech">')
     )
 
 

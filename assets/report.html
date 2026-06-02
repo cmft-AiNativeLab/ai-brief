@@ -74,6 +74,13 @@
     border-top: 4px solid var(--gold);
     padding-top: 7mm;
   }
+  /* 封面右上角品牌 logo（信笺式） */
+  .cover-logo {
+    position: absolute;
+    top: 13mm; right: 18mm;
+    height: 11mm; width: auto;
+    z-index: 3;
+  }
   .cover-tagline {
     font-size: 9pt;
     letter-spacing: 4pt;
@@ -490,6 +497,7 @@
 
   <!-- ============ 封面页 ============ -->
   <div class="page cover">
+    {{LOGO}}
     <div class="cover-header">
       <h1 class="cover-title">AI 简讯</h1>
       <div class="cover-subtitle">{{DATE_FULL}}　|　近 24 小时 AI 行业关键动向</div>
