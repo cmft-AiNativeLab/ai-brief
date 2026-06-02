@@ -49,34 +49,32 @@
   h1{ font-size:35px; font-weight:700; letter-spacing:3px; color:var(--ink); }
   .sub{ font-size:12px; color:var(--ink2); margin-top:10px; line-height:1.65; font-family:var(--sans); }
 
-  /* 主体 */
-  .body{ position:relative; z-index:1; flex:1; display:flex; flex-direction:column; padding:13px 18px 15px; }
-  .entries{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:10px; }
-  .entry{ display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit;
-    border:1px solid rgba(255,255,255,.55); border-radius:14px; padding:11px 13px;
+  /* 主体：两栏目 + 二维码 */
+  .body{ position:relative; z-index:1; flex:1; display:flex; flex-direction:column; padding:16px 20px 15px; }
+  .entries{ display:flex; flex-direction:column; gap:12px; }
+  .entry{ display:flex; align-items:center; gap:13px; text-decoration:none; color:inherit;
+    border:1px solid rgba(255,255,255,.55); border-radius:14px; padding:13px 15px;
     background:rgba(255,255,255,.40); backdrop-filter:blur(10px) saturate(120%); -webkit-backdrop-filter:blur(10px) saturate(120%);
     box-shadow:0 6px 16px rgba(45,60,95,.10), inset 0 1px 0 rgba(255,255,255,.6); transition:.18s; }
   .entry:hover,.entry:active{ background:rgba(255,255,255,.58); border-color:rgba(255,255,255,.85);
     box-shadow:0 10px 24px rgba(45,60,95,.16); transform:translateY(-1px); }
-  .ico{ width:38px; height:38px; flex-shrink:0; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:19px;
+  .ico{ width:42px; height:42px; flex-shrink:0; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:21px;
     border:1px solid rgba(255,255,255,.6); box-shadow:inset 0 1px 0 rgba(255,255,255,.5); }
   .ico.b{ background:rgba(150,168,210,.42); }
   .ico.n{ background:rgba(172,182,202,.42); }
-  .ico.g{ background:rgba(206,186,150,.42); }
-  .etx{ flex:1; } .etx .t{ font-size:16px; font-weight:700; color:var(--ink); }
-  .etx .d{ font-size:11.5px; color:var(--grey); margin-top:2px; font-family:var(--sans); }
-  .arr{ color:#97a2ba; font-size:20px; }
+  .etx{ flex:1; } .etx .t{ font-size:17px; font-weight:700; color:var(--ink); }
+  .etx .d{ font-size:12px; color:var(--grey); margin-top:3px; font-family:var(--sans); }
+  .arr{ color:#97a2ba; font-size:21px; }
 
-  /* 底部：二维码 + 出品信息 */
-  .bottom{ flex-shrink:0; display:flex; align-items:center; gap:13px;
-    margin-top:13px; padding-top:13px; border-top:1px solid rgba(255,255,255,.45); }
-  .qrimg{ width:72px; height:72px; border:1px solid rgba(255,255,255,.7); border-radius:11px; padding:5px;
-    background:rgba(255,255,255,.78); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-    flex-shrink:0; box-shadow:0 6px 16px rgba(45,60,95,.12); }
-  .btx{ flex:1; text-align:left; }
-  .btx .b1{ font-size:13px; color:var(--ink); font-weight:700; }
-  .btx .b2{ font-size:10.5px; color:var(--grey); margin-top:5px; line-height:1.55; font-family:var(--sans); }
-  .btx .b2 b{ color:var(--gold); font-weight:700; }
+  /* 二维码：底色透明，与卡片背景融为一体 */
+  .qr-block{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; }
+  .qr{ width:126px; height:126px; display:block; filter:drop-shadow(0 2px 6px rgba(40,55,90,.14)); }
+  .qr-cap{ font-size:12.5px; font-weight:700; color:var(--ink2); font-family:var(--sans); letter-spacing:.3px; }
+
+  /* 底部出品信息 */
+  .foot{ flex-shrink:0; text-align:center; font-size:10px; color:var(--grey); font-family:var(--sans); line-height:1.55;
+    border-top:1px solid rgba(255,255,255,.42); padding-top:11px; }
+  .foot b{ color:var(--gold); font-weight:700; }
 </style>
 </head>
 <body>
@@ -96,22 +94,15 @@
         </a>
         <a class="entry" href="./archive">
           <div class="ico n">🗂️</div>
-          <div class="etx"><div class="t">往期列表</div><div class="d">按日期翻阅历史每一期</div></div>
-          <div class="arr">›</div>
-        </a>
-        <a class="entry" href="./20260601">
-          <div class="ico g">📅</div>
-          <div class="etx"><div class="t">指定日期直达</div><div class="d">网址后加日期，如 /20260601</div></div>
+          <div class="etx"><div class="t">往期资讯内容</div><div class="d">按日期翻阅历史每一期</div></div>
           <div class="arr">›</div>
         </a>
       </div>
-      <div class="bottom">
-        <img src="qr.png" alt="扫码访问 AI 简讯" class="qrimg">
-        <div class="btx">
-          <div class="b1">📱 手机扫码 · 直达最新一期</div>
-          <div class="b2">数据来源 量子位 / 新智元 / 36氪 / 华尔街见闻 等 ＋ artificialanalysis.ai · 由 <b>招商金融科技</b> 出品</div>
-        </div>
+      <div class="qr-block">
+        <img src="qr.png" alt="扫码访问 AI 简讯" class="qr">
+        <div class="qr-cap">📱 微信扫码 · 直达最新一期</div>
       </div>
+      <div class="foot">数据来源 量子位 / 新智元 / 36氪 / 华尔街见闻 等 ＋ artificialanalysis.ai · 由 <b>招商金融科技</b> 出品</div>
     </div>
   </div>
 </body>
