@@ -180,7 +180,7 @@ def build_downloads(payload, date):
     dash_html = BUILD / f"dashboard-{date}.html"
     dash_html.write_text(render_dashboard(payload), encoding="utf-8")
     overview_png = dl / f"ai-brief-overview-{date}.png"
-    if export_png(dash_html, overview_png, scale=1):
+    if export_png(dash_html, overview_png, scale=2):
         shutil.copyfile(overview_png, dl / "latest-overview.png")
         made.append("总览PNG")
     dash_html.unlink(missing_ok=True)
