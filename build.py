@@ -52,9 +52,14 @@ def build_archive():
         "background:#1b1e25;color:#e8e8e8;max-width:680px;margin:0 auto;padding:28px 20px}"
         "h1{color:#d4a373;font-size:22px}a{color:#4a9eff;text-decoration:none}"
         "li{margin:11px 0;font-size:17px;list-style:none}"
-        "ul{padding:0}.t{color:#888;font-size:13px;margin-bottom:18px}</style></head><body>"
+        "ul{padding:0}.t{color:#888;font-size:13px;margin-bottom:18px}"
+        ".brand{height:32px;width:auto;display:block;margin-bottom:16px}"
+        ".foot{color:#5a6480;font-size:12px;margin-top:26px;border-top:1px solid #2a2f3a;padding-top:14px}"
+        "</style></head><body>"
+        "<img class=brand src=\"logo.png\" alt=\"招商金融科技 · CMG Fintech\">"
         "<h1>AI 简讯 · 往期</h1><div class=t>点任意日期查看当日简报</div><ul>\n"
-        f"{lis}\n</ul></body></html>"
+        f"{lis}\n</ul>"
+        "<div class=foot>由 招商金科 出品</div></body></html>"
     )
     (DOCS / "archive.html").write_text(html, encoding="utf-8")
     print(f"[ok] wrote docs/archive.html ({len(dates)} 期)")
@@ -130,14 +135,16 @@ def _download_index(dl, keep_days=7):
         'background:#f3f6fc;border:1px solid var(--line);border-radius:10px;padding:10px 8px;'
         'font-size:13.5px;font-weight:600;transition:.15s}'
         '.lk a:hover{background:#e8effb;border-color:var(--blue)}'
-        '.back{display:inline-block;margin-bottom:14px;color:var(--blue);text-decoration:none;font-size:13px}'
+        '.back{display:inline-block;margin-bottom:10px;color:var(--blue);text-decoration:none;font-size:13px}'
+        '.brand{height:32px;width:auto;display:block;margin:2px 0 14px}'
         '.foot{color:var(--grey);font-size:11.5px;margin-top:16px;line-height:1.6;text-align:center}'
         '</style></head><body><div class="wrap">'
         '<a class="back" href="../card">‹ 返回 AI 简讯</a>'
-        '<h1>📥 AI 简讯 · 资料下载</h1>'
+        '<img class="brand" src="../logo.png" alt="招商金融科技 · CMG Fintech">'
+        '<h1>AI 简讯 · 资料下载</h1>'
         f'<div class="sub">每日 7:30 自动生成 · 日报 PDF / 总览大图 / 分享卡片 · 保留近 {keep_days} 天</div>'
         f'{body}'
-        '<div class="foot">由 招商金融科技 出品 · 数据来源 量子位 / 新智元 / 36氪 / 华尔街见闻 等 ＋ artificialanalysis.ai</div>'
+        '<div class="foot">由 招商金科 出品 · 数据来源 量子位 / 新智元 / 36氪 / 华尔街见闻 等 ＋ artificialanalysis.ai</div>'
         '</div></body></html>'
     )
     (dl / "index.html").write_text(html, encoding="utf-8")
