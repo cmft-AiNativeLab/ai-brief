@@ -73,13 +73,13 @@
   .cover-header {
     border-top: 4px solid var(--gold);
     padding-top: 7mm;
+    display: flex; align-items: center; justify-content: space-between; gap: 8mm;
   }
-  /* 封面右上角品牌 logo（信笺式） */
+  .cover-header-main { flex: 1; min-width: 0; }
+  /* 品牌 logo：与标题同排、垂直居中，置于金线之下 */
   .cover-logo {
-    position: absolute;
-    top: 13mm; right: 18mm;
-    height: 11mm; width: auto;
-    z-index: 3;
+    height: 12mm; width: auto;
+    flex-shrink: 0;
   }
   .cover-tagline {
     font-size: 9pt;
@@ -497,10 +497,12 @@
 
   <!-- ============ 封面页 ============ -->
   <div class="page cover">
-    {{LOGO}}
     <div class="cover-header">
-      <h1 class="cover-title">AI 简讯</h1>
-      <div class="cover-subtitle">{{DATE_FULL}}　|　近 24 小时 AI 行业关键动向</div>
+      <div class="cover-header-main">
+        <h1 class="cover-title">AI 简讯</h1>
+        <div class="cover-subtitle">{{DATE_FULL}}　|　近 24 小时 AI 行业关键动向</div>
+      </div>
+      {{LOGO}}
     </div>
 
     <div class="cover-meta-grid">
