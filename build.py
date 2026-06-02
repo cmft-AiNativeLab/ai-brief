@@ -128,6 +128,8 @@ def _download_index(dl, keep_days=7):
     body = "\n".join(rows) or '<div class="day">暂无可下载文件</div>'
     html = (
         '<!doctype html><html lang="zh"><head><meta charset="utf-8">'
+        '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">'
+        '<meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">'
         '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
         '<title>AI 简讯 · 下载</title><style>'
         ':root{--ink:#26303f;--grey:#6a7488;--line:#e2e7f0;--blue:#3a63b8}'
