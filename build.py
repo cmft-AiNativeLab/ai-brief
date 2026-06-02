@@ -95,8 +95,8 @@ def _prune_downloads(dl, keep_days=7):
             p.unlink(missing_ok=True)
 
 
-def _download_index(dl, keep_days=7):
-    """生成 docs/download/index.html —— 按日期列出可下载文件。"""
+def _download_index(dl):
+    """生成 docs/download/index.html —— 按日期列出全部可下载文件（永久保留）。"""
     dates = set()
     for p in dl.glob("ai-brief-*"):
         m = re.search(r"(\d{8})", p.name)
@@ -154,7 +154,7 @@ def _download_index(dl, keep_days=7):
         '<a class="back" href="../card">‹ 返回 AI 简讯</a>'
         '<img class="brand" src="../logo.png" alt="招商金融科技 · CMG Fintech">'
         '<h1>AI 简讯 · 资料下载</h1>'
-        f'<div class="sub">每日 7:30 自动生成 · 日报 PDF / 总览大图 / 分享卡片 · 保留近 {keep_days} 天</div>'
+        '<div class="sub">每日 7:30 自动生成 · 日报 PDF / 总览大图 / 分享卡片 · 往期全部永久保留</div>'
         f'{body}'
         '<div class="foot">由 招商金科 出品 · 数据来源 量子位 / 新智元 / 36氪 / 华尔街见闻 等 ＋ artificialanalysis.ai</div>'
         '</div></body></html>'
@@ -191,8 +191,8 @@ def build_downloads(payload, date):
         shutil.copyfile(card_png, dl / "latest-card.png")
         made.append("卡片PNG")
 
-    _prune_downloads(dl, keep_days=7)
-    _download_index(dl, keep_days=7)
+    # 往期全部永久保留，不做清理
+    _download_index(dl)
     print(f"[ok] downloads -> docs/download/ [{', '.join(made) or '空'}]")
 
 
