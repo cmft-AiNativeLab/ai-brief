@@ -480,6 +480,12 @@
     .lb-page { overflow-x: auto; }
     .lb-head, .lb-list { min-width: 540px; }
   }
+
+  /* —— 适配最新模板：页脚 logo / 去脚注 / 居中 —— */
+  .footer-logo{ height:6mm; width:auto; flex-shrink:0; }
+  .cover-foot{ margin-top:auto; padding-top:3mm; border-top:1px solid var(--line); display:flex; justify-content:center; }
+  .page-footer{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; }
+  .page-footer > span:last-child{ text-align:right; }
 </style>
 </head>
 <body>
@@ -538,11 +544,7 @@
       </ol>
     </div>
 
-    <div class="cover-footnote">
-      <strong>数据来源</strong>：AIbase、量子位、InfoQ、新智元、36 氪 AI、Hacker News、虎嗅、钛媒体、新浪财经、华尔街见闻；榜单 artificialanalysis.ai<br>
-      <strong>生成于</strong>：2026-06-01 17:48:35 (UTC+8)　|
-      <strong>方法论</strong>：脚本并发抓取 → 按战略/行业/实践三维度分类打标 → 重要度排序
-    </div>
+    <div class="cover-foot"><img class="footer-logo" src="logo.png" alt="招商金融科技 · CMG Fintech"></div>
   </div>
 
   <!-- ============ 3 内容页（战略 / 行业 / 实践） ============ -->
@@ -601,6 +603,7 @@
       </div>
       <div class="page-footer">
         <span>AI 简讯 · 战略动向</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
         <span>2 / 5</span>
       </div>
     </div>
@@ -659,6 +662,7 @@
       </div>
       <div class="page-footer">
         <span>AI 简讯 · 行业影响</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
         <span>3 / 5</span>
       </div>
     </div>
@@ -717,6 +721,7 @@
       </div>
       <div class="page-footer">
         <span>AI 简讯 · 管理实践</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
         <span>4 / 5</span>
       </div>
     </div>
@@ -741,7 +746,8 @@
 <div class="lb-row lb-cn"><span class="lb-rank">17</span><span class="lb-name"><span class="lb-main">DeepSeek V4 Pro<span class="lb-tag">R</span></span><span class="lb-cfg">(Reasoning, Max Effort)</span></span><span class="lb-param">≈671B MoE</span><span class="lb-price">0.43<span class="lb-sep">/</span>0.87</span><span class="lb-creator">DeepSeek · 中国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:83.9%"></span></span><span class="lb-score">51.5</span></div>
 <div class="lb-row lb-cn"><span class="lb-rank">18</span><span class="lb-name"><span class="lb-main">GLM-5.1<span class="lb-tag">R</span></span><span class="lb-cfg">(Reasoning)</span></span><span class="lb-param">745B MoE</span><span class="lb-price">1.4<span class="lb-sep">/</span>4.4</span><span class="lb-creator">Z AI · 中国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:83.7%"></span></span><span class="lb-score">51.4</span></div>
 <div class="lb-row"><span class="lb-rank">19</span><span class="lb-name"><span class="lb-main">GPT-5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(low)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">5<span class="lb-sep">/</span>30</span><span class="lb-creator">OpenAI · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:82.7%"></span></span><span class="lb-score">50.8</span></div>
-<div class="lb-row lb-cn"><span class="lb-rank">20</span><span class="lb-name"><span class="lb-main">Qwen3.6 Plus<span class="lb-tag">R</span></span></span><span class="lb-param">闭源未知</span><span class="lb-price">0.5<span class="lb-sep">/</span>3</span><span class="lb-creator">Alibaba · 中国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:81.4%"></span></span><span class="lb-score">50.0</span></div></div><div class="lb-note">数据来源：artificialanalysis.ai · II=综合推理/编程/Agent 能力 · 单价=每百万 token 输入/输出（美元）· 参数量据公开资料（闭源标「闭源未知」）· <b>R</b>=推理模型 · 中国模型高亮</div><div class="lb-link">完整榜单：<a href="https://artificialanalysis.ai/models#intelligence" target="_blank">https://artificialanalysis.ai/models#intelligence</a></div><div class="page-footer"><span>AI 简讯 · 大模型榜单</span><span>5 / 5</span></div></div>
+<div class="lb-row lb-cn"><span class="lb-rank">20</span><span class="lb-name"><span class="lb-main">Qwen3.6 Plus<span class="lb-tag">R</span></span></span><span class="lb-param">闭源未知</span><span class="lb-price">0.5<span class="lb-sep">/</span>3</span><span class="lb-creator">Alibaba · 中国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:81.4%"></span></span><span class="lb-score">50.0</span></div></div><div class="lb-note">数据来源：artificialanalysis.ai · II=综合推理/编程/Agent 能力 · 单价=每百万 token 输入/输出（美元）· 参数量据公开资料（闭源标「闭源未知」）· <b>R</b>=推理模型 · 中国模型高亮</div><div class="lb-link">完整榜单：<a href="https://artificialanalysis.ai/models#intelligence" target="_blank">https://artificialanalysis.ai/models#intelligence</a></div><div class="page-footer"><span>AI 简讯 · 大模型榜单</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技"><span>5 / 5</span></div></div>
 
 </body>
 </html>

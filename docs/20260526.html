@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>AI 简讯 · 20260601</title>
+<title>AI 简讯 · 20260526</title>
 <style>
   @page {
     size: A4;
@@ -480,6 +480,12 @@
     .lb-page { overflow-x: auto; }
     .lb-head, .lb-list { min-width: 540px; }
   }
+
+  /* —— 适配最新模板：页脚 logo / 去脚注 / 居中 —— */
+  .footer-logo{ height:6mm; width:auto; flex-shrink:0; }
+  .cover-foot{ margin-top:auto; padding-top:3mm; border-top:1px solid var(--line); display:flex; justify-content:center; }
+  .page-footer{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; }
+  .page-footer > span:last-child{ text-align:right; }
 </style>
 </head>
 <body>
@@ -488,7 +494,7 @@
   <div class="page cover">
     <div class="cover-header">
       <h1 class="cover-title">AI 简讯</h1>
-      <div class="cover-subtitle">2026年06月01日 周一　|　近 24 小时 AI 行业关键动向</div>
+      <div class="cover-subtitle">2026年05月26日 周二　|　近 24 小时 AI 行业关键动向</div>
     </div>
 
     <div class="cover-meta-grid">
@@ -538,11 +544,7 @@
       </ol>
     </div>
 
-    <div class="cover-footnote">
-      <strong>数据来源</strong>：AIbase、量子位、InfoQ、新智元、36 氪 AI、Hacker News、虎嗅、钛媒体、新浪财经、华尔街见闻；榜单 artificialanalysis.ai<br>
-      <strong>生成于</strong>：2026-06-01 14:11:13 (UTC+8)　|
-      <strong>方法论</strong>：脚本并发抓取 → 按战略/行业/实践三维度分类打标 → 重要度排序
-    </div>
+    <div class="cover-foot"><img class="footer-logo" src="logo.png" alt="招商金融科技 · CMG Fintech"></div>
   </div>
 
   <!-- ============ 3 内容页（战略 / 行业 / 实践） ============ -->
@@ -590,6 +592,7 @@
       </div>
       <div class="page-footer">
         <span>AI 简讯 · 战略动向</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
         <span>2 / 5</span>
       </div>
     </div>
@@ -637,6 +640,7 @@
       </div>
       <div class="page-footer">
         <span>AI 简讯 · 行业影响</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
         <span>3 / 5</span>
       </div>
     </div>
@@ -684,12 +688,14 @@
       </div>
       <div class="page-footer">
         <span>AI 简讯 · 管理实践</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
         <span>4 / 5</span>
       </div>
     </div>
 
   <!-- ============ 大模型能力榜单页 ============ -->
-  <div class="page lb-page"><div class="dim-header lb-header"><div class="dim-cn">大模型能力榜</div><div class="dim-en">MODEL LEADERBOARD · TOP 20</div><div class="dim-count">0 个</div></div><div class="lb-head"><span class="lb-rank">#</span><span class="lb-name">模型</span><span class="lb-param">参数量</span><span class="lb-price">单价 $/1M</span><span class="lb-creator">厂商 · 国家</span><span class="lb-bar">能力分布（II）</span><span class="lb-score">分数</span></div><div class="lb-list"><div style="opacity:0.5;padding:20mm 0;text-align:center">榜单数据暂时获取失败（artificialanalysis.ai）</div></div><div class="lb-note">数据来源：artificialanalysis.ai · II=综合推理/编程/Agent 能力 · 单价=每百万 token 输入/输出（美元）· 参数量据公开资料（闭源标「闭源未知」）· <b>R</b>=推理模型 · 中国模型高亮</div><div class="lb-link">完整榜单：<a href="https://artificialanalysis.ai/models#intelligence" target="_blank">https://artificialanalysis.ai/models#intelligence</a></div><div class="page-footer"><span>AI 简讯 · 大模型榜单</span><span>5 / 5</span></div></div>
+  <div class="page lb-page"><div class="dim-header lb-header"><div class="dim-cn">大模型能力榜</div><div class="dim-en">MODEL LEADERBOARD · TOP 20</div><div class="dim-count">0 个</div></div><div class="lb-head"><span class="lb-rank">#</span><span class="lb-name">模型</span><span class="lb-param">参数量</span><span class="lb-price">单价 $/1M</span><span class="lb-creator">厂商 · 国家</span><span class="lb-bar">能力分布（II）</span><span class="lb-score">分数</span></div><div class="lb-list"><div style="opacity:0.5;padding:20mm 0;text-align:center">榜单数据暂时获取失败（artificialanalysis.ai）</div></div><div class="lb-note">数据来源：artificialanalysis.ai · II=综合推理/编程/Agent 能力 · 单价=每百万 token 输入/输出（美元）· 参数量据公开资料（闭源标「闭源未知」）· <b>R</b>=推理模型 · 中国模型高亮</div><div class="lb-link">完整榜单：<a href="https://artificialanalysis.ai/models#intelligence" target="_blank">https://artificialanalysis.ai/models#intelligence</a></div><div class="page-footer"><span>AI 简讯 · 大模型榜单</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技"><span>5 / 5</span></div></div>
 
 </body>
 </html>
