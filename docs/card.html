@@ -42,10 +42,9 @@
     background:linear-gradient(135deg, rgba(255,255,255,.34), rgba(214,222,238,.20));
     backdrop-filter:blur(16px) saturate(118%); -webkit-backdrop-filter:blur(16px) saturate(118%);
     border-bottom:1px solid rgba(255,255,255,.45); }
-  .logo-wrap{ position:absolute; top:18px; right:16px; z-index:2; border-radius:10px; padding:5px 9px;
-    background:rgba(255,255,255,.72); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-    border:1px solid rgba(255,255,255,.8); box-shadow:0 6px 18px rgba(40,55,90,.18); }
-  .logo{ height:26px; width:auto; display:block; }
+  /* 无背景：透明 logo 直接置于浅色头部 */
+  .logo-wrap{ position:absolute; top:17px; right:18px; z-index:2; }
+  .logo{ height:30px; width:auto; display:block; filter:drop-shadow(0 2px 5px rgba(40,55,90,.16)); }
   h1{ font-size:35px; font-weight:700; letter-spacing:3px; color:var(--ink); }
   .sub{ font-size:12px; color:var(--ink2); margin-top:10px; line-height:1.65; font-family:var(--sans); }
 
