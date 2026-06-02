@@ -12,6 +12,7 @@ import re
 import sys
 import json
 import shutil
+import hashlib
 import datetime
 import subprocess
 import pathlib
@@ -102,15 +103,24 @@ def _download_index(dl, keep_days=7):
         if m:
             dates.add(m.group(1))
     dates = sorted(dates, reverse=True)
+
+    def ver(name):
+        # 内容哈希作为版本号：文件一变，链接就变，破微信/浏览器旧缓存
+        f = dl / name
+        return hashlib.md5(f.read_bytes()).hexdigest()[:8] if f.exists() else ""
+
     rows = []
     for d in dates:
         links = []
-        if (dl / f"ai-brief-{d}.pdf").exists():
-            links.append(f'<a download="AI简讯 · {d}.pdf" href="ai-brief-{d}.pdf">📄 日报 PDF</a>')
-        if (dl / f"ai-brief-overview-{d}.png").exists():
-            links.append(f'<a download="AI简讯-总览 · {d}.png" href="ai-brief-overview-{d}.png">🖼️ 总览大图</a>')
-        if (dl / f"ai-brief-card-{d}.png").exists():
-            links.append(f'<a download="AI简讯-卡片 · {d}.png" href="ai-brief-card-{d}.png">📇 分享卡片</a>')
+        n = f"ai-brief-{d}.pdf"
+        if (dl / n).exists():
+            links.append(f'<a download="AI简讯 · {d}.pdf" href="{n}?v={ver(n)}">📄 日报 PDF</a>')
+        n = f"ai-brief-overview-{d}.png"
+        if (dl / n).exists():
+            links.append(f'<a download="AI简讯-总览 · {d}.png" href="{n}?v={ver(n)}">🖼️ 总览大图</a>')
+        n = f"ai-brief-card-{d}.png"
+        if (dl / n).exists():
+            links.append(f'<a download="AI简讯-卡片 · {d}.png" href="{n}?v={ver(n)}">📇 分享卡片</a>')
         if links:
             dt = f"{d[:4]}-{d[4:6]}-{d[6:8]}"
             rows.append(f'<div class="day"><div class="dt">{dt}</div>'
