@@ -42,36 +42,36 @@
     background:linear-gradient(135deg, rgba(255,255,255,.34), rgba(214,222,238,.20));
     backdrop-filter:blur(16px) saturate(118%); -webkit-backdrop-filter:blur(16px) saturate(118%);
     border-bottom:1px solid rgba(255,255,255,.45); }
-  .logo-wrap{ position:absolute; top:18px; right:16px; z-index:2; border-radius:10px; padding:5px 8px;
+  .logo-wrap{ position:absolute; top:18px; right:16px; z-index:2; border-radius:10px; padding:5px 9px;
     background:rgba(255,255,255,.72); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
     border:1px solid rgba(255,255,255,.8); box-shadow:0 6px 18px rgba(40,55,90,.18); }
-  .logo{ height:28px; width:auto; display:block; }
+  .logo{ height:26px; width:auto; display:block; }
   h1{ font-size:35px; font-weight:700; letter-spacing:3px; color:var(--ink); }
   .sub{ font-size:12px; color:var(--ink2); margin-top:10px; line-height:1.65; font-family:var(--sans); }
 
-  /* 主体：两个栏目，各自一个二维码 */
-  .body{ position:relative; z-index:1; flex:1; display:flex; flex-direction:column; padding:16px 20px 15px; }
+  /* 主体：三个栏目，各自一个二维码 */
+  .body{ position:relative; z-index:1; flex:1; display:flex; flex-direction:column; padding:15px 18px 14px; }
   .cols-wrap{ flex:1; display:flex; align-items:center; }
-  .cols{ flex:1; display:flex; gap:13px; align-items:stretch; }
-  .col{ flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; gap:11px;
+  .cols{ flex:1; display:flex; gap:10px; align-items:stretch; }
+  .col{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px;
     text-decoration:none; color:inherit;
-    border:1px solid rgba(255,255,255,.55); border-radius:16px; padding:15px 10px 14px;
+    border:1px solid rgba(255,255,255,.55); border-radius:15px; padding:13px 8px 12px;
     background:rgba(255,255,255,.40); backdrop-filter:blur(10px) saturate(120%); -webkit-backdrop-filter:blur(10px) saturate(120%);
     box-shadow:0 6px 16px rgba(45,60,95,.10), inset 0 1px 0 rgba(255,255,255,.6); transition:.18s; }
   .col:hover,.col:active{ background:rgba(255,255,255,.58); border-color:rgba(255,255,255,.85);
     box-shadow:0 10px 24px rgba(45,60,95,.16); transform:translateY(-1px); }
-  .ch{ display:flex; align-items:center; gap:8px; }
   .ci{ width:30px; height:30px; flex-shrink:0; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:16px;
     border:1px solid rgba(255,255,255,.6); box-shadow:inset 0 1px 0 rgba(255,255,255,.5); }
   .ci.b{ background:rgba(150,168,210,.46); }
   .ci.n{ background:rgba(172,182,202,.46); }
-  .ct{ font-size:15.5px; font-weight:700; color:var(--ink); }
-  .qr{ width:122px; height:122px; display:block; filter:drop-shadow(0 2px 6px rgba(40,55,90,.13)); }
-  .cc{ font-size:11px; font-weight:600; color:var(--grey); font-family:var(--sans); letter-spacing:.2px; }
+  .ci.g{ background:rgba(206,186,150,.46); }
+  .ct{ font-size:13.5px; font-weight:700; color:var(--ink); line-height:1.2; }
+  .qr{ width:100%; max-width:106px; height:auto; display:block; filter:drop-shadow(0 2px 6px rgba(40,55,90,.13)); }
+  .cc{ font-size:10px; font-weight:600; color:var(--grey); font-family:var(--sans); letter-spacing:.2px; }
 
   /* 底部出品信息 */
   .foot{ flex-shrink:0; text-align:center; font-size:10px; color:var(--grey); font-family:var(--sans); line-height:1.55;
-    border-top:1px solid rgba(255,255,255,.42); padding-top:11px; margin-top:14px; }
+    border-top:1px solid rgba(255,255,255,.42); padding-top:11px; margin-top:13px; }
   .foot b{ color:var(--gold); font-weight:700; }
 </style>
 </head>
@@ -87,14 +87,22 @@
       <div class="cols-wrap">
         <div class="cols">
           <a class="col" href="./">
-            <div class="ch"><span class="ci b">📰</span><span class="ct">今日最新一期</span></div>
+            <span class="ci b">📰</span>
+            <div class="ct">今日最新一期</div>
             <img class="qr" src="qr.png" alt="扫码进入最新一期">
-            <div class="cc">扫码进入 · 最新一期</div>
+            <div class="cc">扫码进入</div>
           </a>
           <a class="col" href="./archive">
-            <div class="ch"><span class="ci n">🗂️</span><span class="ct">往期资讯内容</span></div>
+            <span class="ci n">🗂️</span>
+            <div class="ct">往期资讯内容</div>
             <img class="qr" src="qr-archive.png" alt="扫码进入往期列表">
-            <div class="cc">扫码进入 · 往期列表</div>
+            <div class="cc">扫码进入</div>
+          </a>
+          <a class="col" href="./download/">
+            <span class="ci g">📥</span>
+            <div class="ct">资料下载</div>
+            <img class="qr" src="qr-download.png" alt="扫码进入资料下载">
+            <div class="cc">扫码进入</div>
           </a>
         </div>
       </div>
