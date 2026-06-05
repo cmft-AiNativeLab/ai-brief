@@ -26,6 +26,7 @@ BASE_URL = os.environ.get("AI_BRIEF_BASE_URL", "https://newapi.ai-native-lab.com
 API_KEY = os.environ.get("AI_BRIEF_API_KEY", "")
 MODEL = os.environ.get("AI_BRIEF_MODEL", "claude-opus-4-7")
 MAX_CAND = 50  # 传给 LLM 的候选上限（太多会让单次生成过久、触发中转 504）
+PER_SRC_CAP = 6  # 候选阶段每来源最多 N 条：避免高频源（如 Hacker News）淹没候选池导致选稿偏科
 
 SYSTEM = (
     "你是面向企业高层管理者的 AI 资讯主编。从候选 AI 资讯中，以「管理者视角」精选并加工成每日简报。"
@@ -42,7 +43,7 @@ USER_TMPL = """今天的候选 AI 资讯（JSON 数组，每条含 id/source/tit
    - strategy 战略动向（巨头 / 融资并购 / 模型发布 / 技术路线）
    - industry 行业影响（颠覆某行业 / 岗位与招聘 / 市场格局 / 政策监管）
    - practice 管理实践（企业部署 / ROI / 团队协作 / AI 工具落地 / 安全治理）
-2. 源分布尽量均衡：同一 source 原则上不超过 3 条，尽量覆盖更多来源。
+2. 源分布必须均衡：任一 source 最多 3 条（硬性约束，务必遵守），并尽量覆盖更多不同来源（理想 ≥6 个源）。
 3. 每条写：
    - importance：1-5 整数（5 = 高管必看：影响格局 / 重大金额 / 政策级）
    - headline：中文 12-22 字，讲清"发生了什么"，不标题党，英文源必须翻译成中文
@@ -131,8 +132,17 @@ def main():
     data = json.loads(open(src, encoding="utf-8").read())
     items = data["items"]
 
-    cand = [{"id": it["id"], "source": it["source"], "title": it["title"],
-             "summary": (it.get("summary") or "")[:140]} for it in items[:MAX_CAND]]
+    # 候选池按来源限流，保证多样性（items 已按时间倒序，每来源取最新若干）
+    per_src, cand = {}, []
+    for it in items:
+        s = it.get("source", "")
+        if per_src.get(s, 0) >= PER_SRC_CAP:
+            continue
+        per_src[s] = per_src.get(s, 0) + 1
+        cand.append({"id": it["id"], "source": s, "title": it["title"],
+                     "summary": (it.get("summary") or "")[:140]})
+        if len(cand) >= MAX_CAND:
+            break
     result = extract_json(call_llm(cand))
 
     for it in items:
