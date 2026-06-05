@@ -14,11 +14,14 @@
     --bg-soft:#ecf0f5;
     --steel:#3a5a8c;         /* 钢蓝（替代金色，做强调） */
     --steel-soft:#7287a8;    /* 浅蓝灰 */
+    --bronze:#a38660;        /* 暖铜（杂志封面日期/序号色） */
     --ink:#1c2433;           /* 冷墨 */
     --ink2:#3a4659;
     --grey:#6c7587;
     --pill:#161d2c;          /* 来源胶囊深底 */
     --pill-ink:#9bb3d4;      /* 冷调金属字 */
+    /* 杂志封面字体栈：Didot / Bodoni 强对比衬线，中文回落到宋体 */
+    --display:"Didot","Bodoni 72","Bodoni 72 Smallcaps","Playfair Display","Songti SC","STSong","Source Han Serif SC","Noto Serif SC",Georgia,serif;
     --serif:"Source Han Serif SC","Noto Serif SC","Songti SC","STSong",Georgia,serif;
     --sans:"PingFang SC","Microsoft YaHei",sans-serif;
   }
@@ -50,10 +53,13 @@
     width:540px; height:540px; border-radius:50%;
     border:1px solid rgba(58,90,140,.16); pointer-events:none; }
 
-  /* Row 1：标题 + 日期 */
+  /* Row 1：标题 + 日期 — 杂志封面式高对比衬线 */
   .row-1{ position:relative; z-index:1; display:flex; justify-content:space-between; align-items:baseline; }
-  .title{ font-size:32px; font-weight:700; letter-spacing:3px; color:var(--ink); }
-  .date{ font-family:Georgia,serif; font-size:13.5px; color:var(--steel); letter-spacing:2.5px; font-weight:700; }
+  .title{ font-family:var(--display); font-size:36px; font-weight:700;
+    letter-spacing:2.5px; color:var(--ink); line-height:1; }
+  .date{ font-family:var(--display); font-size:20px; font-weight:400;
+    color:var(--bronze); letter-spacing:.5px;
+    font-feature-settings:"lnum","tnum"; }
 
   /* Row 2：副标 + 出品方 */
   .row-2{ position:relative; z-index:1; margin-top:10px; padding-bottom:16px;
