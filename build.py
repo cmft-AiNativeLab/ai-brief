@@ -219,6 +219,38 @@ def build_weekly(date):
     return out
 
 
+def _render_card(payload, date):
+    """从 assets/card.html 模板渲染分享卡到 docs/card.html：
+    自动注入当日日期与「今日爆款」（取 importance 最高一条的 headline + briefing）。
+    """
+    import html as _html
+    tpl_path = ROOT / "assets" / "card.html"
+    if not tpl_path.exists():
+        print("[warn] assets/card.html 模板缺失，跳过卡片更新", file=sys.stderr)
+        return False
+    items = [it for it in payload.get("items", []) if it.get("dimension")]
+    if not items:
+        print("[warn] curated 无条目，跳过卡片更新", file=sys.stderr)
+        return False
+    # importance 降序，id 升序兜底
+    top = sorted(items, key=lambda x: (-(x.get("importance") or 0), x.get("id") or 0))[0]
+    headline = top.get("headline") or top.get("title") or ""
+    briefing = top.get("briefing") or top.get("summary") or top.get("exec_meaning") or ""
+    source = top.get("source") or "—"
+    imp = int(top.get("importance") or 0)
+    stars = "★" * imp + "☆" * (5 - imp) if imp else "—"
+    date_dot = f"{date[:4]}.{date[4:6]}.{date[6:8]}"  # 2026.06.05
+    out = (tpl_path.read_text(encoding="utf-8")
+           .replace("{{DATE_DOT}}", _html.escape(date_dot))
+           .replace("{{HOT_HEADLINE}}", _html.escape(headline))
+           .replace("{{HOT_QUOTE}}", _html.escape(briefing))
+           .replace("{{HOT_SOURCE}}", _html.escape(source))
+           .replace("{{HOT_STARS}}", stars))
+    (DOCS / "card.html").write_text(out, encoding="utf-8")
+    print(f"[ok] wrote docs/card.html · 今日爆款：{headline[:24]}…")
+    return True
+
+
 def build_downloads(payload, date):
     """生成可下载产物到 docs/download/：日报 PDF、总览 PNG、卡片 PNG、近 7 天合辑（+ latest.* 固定链接）。"""
     from render import render_dashboard, export_pdf, export_png
@@ -226,6 +258,10 @@ def build_downloads(payload, date):
     dl.mkdir(exist_ok=True)
     report_html = DOCS / f"{date}.html"
     made = []
+
+    # 0) 先按当日数据刷新分享卡片（注入日期 + 今日爆款），随后才截图
+    if _render_card(payload, date):
+        made.append("卡片HTML")
 
     # 1) 日报 PDF（A4 多页，从报告 HTML 同源渲染）
     pdf_path = dl / f"ai-brief-{date}.pdf"
@@ -242,9 +278,9 @@ def build_downloads(payload, date):
         made.append("总览PNG")
     dash_html.unlink(missing_ok=True)
 
-    # 3) 卡片 PNG（正方形分享卡，520×520 窗口）
+    # 3) 卡片 PNG（4:5 竖版杂志样式，580×720 窗口可容纳 520 宽卡 + 边距）
     card_png = dl / f"ai-brief-card-{date}.png"
-    if _screenshot(DOCS / "card.html", card_png, 520, 520, scale=2):
+    if _screenshot(DOCS / "card.html", card_png, 580, 720, scale=2):
         shutil.copyfile(card_png, dl / "latest-card.png")
         made.append("卡片PNG")
 
