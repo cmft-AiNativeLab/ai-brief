@@ -63,40 +63,44 @@
   .tagline{ letter-spacing:.4px; }
   .by{ color:var(--steel); font-weight:700; letter-spacing:.5px; }
 
-  /* Row 3：今日精选 — 卡片视觉中心，垂直居中、字号放大 */
-  .row-3{ position:relative; z-index:1; margin-top:20px; flex:1;
-    display:flex; flex-direction:column; justify-content:center; min-height:0;
-    padding:18px 0; }
+  /* Row 3：今日精选区——居中、用毛玻璃框包裹 */
+  .row-3{ position:relative; z-index:1; margin-top:18px; flex:1;
+    display:flex; flex-direction:column; justify-content:center; min-height:0; }
+  .hot-box{ position:relative;
+    background:rgba(255,255,255,.5);
+    backdrop-filter:blur(14px) saturate(120%);
+    -webkit-backdrop-filter:blur(14px) saturate(120%);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:18px; padding:22px 24px 18px;
+    box-shadow:0 10px 26px rgba(28,36,55,.10), inset 0 1px 0 rgba(255,255,255,.75); }
   .label{ font-family:var(--sans); font-size:12px; font-weight:800;
-    letter-spacing:6px; color:var(--steel); margin-bottom:18px; }
-  .hot-title{ font-family:var(--sans); font-weight:800; font-size:20px;
-    line-height:1.5; color:var(--ink); margin-bottom:20px; letter-spacing:.5px; }
-  .quote p{ font-family:var(--serif); font-size:19.5px; font-weight:700;
-    line-height:1.8; color:var(--ink); letter-spacing:.4px;
-    text-indent:0; }
+    letter-spacing:6px; color:var(--steel); margin-bottom:16px; }
+  .hot-title{ font-family:var(--sans); font-weight:800; font-size:19px;
+    line-height:1.5; color:var(--ink); margin-bottom:16px; letter-spacing:.5px; }
+  .quote p{ font-family:var(--serif); font-size:18px; font-weight:700;
+    line-height:1.78; color:var(--ink); letter-spacing:.4px; text-indent:0; }
   .quote p::before{ content:'\201C'; color:var(--steel-soft);
     font-family:Georgia,serif; font-weight:700; margin-right:2px; }
   .quote p::after{ content:'\201D'; color:var(--steel-soft);
     font-family:Georgia,serif; font-weight:700; margin-left:2px; }
-  /* 源胶囊靠右 */
-  .source-row{ margin-top:22px; display:flex; justify-content:flex-end; }
+  /* 源胶囊靠右，仍在毛玻璃框内 */
+  .source-row{ margin-top:18px; display:flex; justify-content:flex-end; }
   .source-pill{ background:var(--pill); color:var(--pill-ink);
     padding:6px 14px; border-radius:18px;
     font-family:var(--sans); font-size:11.5px; letter-spacing:.4px; }
 
-  /* Row 4：左下角 — 双二维码 + logo 簇 */
-  .row-4{ position:relative; z-index:1; margin-top:auto; padding-top:18px;
-    display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
-  .qr-group{ display:flex; gap:14px; }
-  .qr-mini{ text-decoration:none; color:inherit; text-align:center;
-    transition:.18s; }
+  /* Row 4：底部 — 左侧双二维码，右侧 logo */
+  .row-4{ position:relative; z-index:1; margin-top:auto; padding-top:20px;
+    display:flex; justify-content:space-between; align-items:flex-end; gap:14px; }
+  .qr-group{ display:flex; gap:14px; align-items:flex-start; }
+  .qr-mini{ text-decoration:none; color:inherit; text-align:center; transition:.18s; }
   .qr-mini:hover{ transform:translateY(-1px); }
   .qr-mini img{ width:68px; height:68px; display:block;
     filter:drop-shadow(0 2px 4px rgba(28,36,55,.16)); }
   .qr-mini .lbl{ margin-top:4px; font-family:var(--sans); font-size:10px; font-weight:700;
     color:var(--ink2); letter-spacing:.3px; }
-  .foot-logo{ height:20px; width:auto; opacity:.95;
-    filter:drop-shadow(0 1px 3px rgba(28,36,55,.14)); }
+  .foot-logo{ height:26px; width:auto; opacity:.95; flex-shrink:0;
+    filter:drop-shadow(0 1px 3px rgba(28,36,55,.14)); align-self:center; }
 
   /* —— 窄屏适配 —— */
   @media (max-width:460px){
@@ -104,15 +108,16 @@
     .title{ font-size:26px; letter-spacing:2px; }
     .date{ font-size:12px; letter-spacing:1.5px; }
     .row-2{ flex-direction:column; align-items:flex-start; gap:4px; font-size:11.5px; padding-bottom:12px; }
-    .row-3{ padding:12px 0; }
+    .hot-box{ padding:18px 18px 14px; border-radius:14px; }
     .label{ font-size:11px; letter-spacing:4px; margin-bottom:12px; }
-    .hot-title{ font-size:16px; line-height:1.5; margin-bottom:14px; }
-    .quote p{ font-size:16px; line-height:1.75; }
-    .source-row{ margin-top:16px; }
+    .hot-title{ font-size:15.5px; line-height:1.5; margin-bottom:12px; }
+    .quote p{ font-size:15px; line-height:1.72; }
+    .source-row{ margin-top:14px; }
     .source-pill{ font-size:10.5px; padding:5px 12px; }
+    .row-4{ padding-top:16px; }
     .qr-mini img{ width:60px; height:60px; }
     .qr-mini .lbl{ font-size:9.5px; }
-    .foot-logo{ height:18px; }
+    .foot-logo{ height:22px; }
   }
 </style>
 </head>
@@ -127,13 +132,15 @@
       <div class="by">由 招商金科 出品</div>
     </div>
     <div class="row-3">
-      <div class="label">今 日 精 选</div>
-      <div class="hot-title">美政府探讨收购OpenAI等AI巨头股份</div>
-      <div class="quote">
-        <p>美国高级官员已与OpenAI等多家大型AI公司进行初步讨论，探讨联邦政府收购这些公司部分股份的可能性，以加强国家对核心AI技术的控制与战略协同。</p>
-      </div>
-      <div class="source-row">
-        <div class="source-pill">源：华尔街见闻 · ★★★★★</div>
+      <div class="hot-box">
+        <div class="label">今 日 精 选</div>
+        <div class="hot-title">美政府探讨收购OpenAI等AI巨头股份</div>
+        <div class="quote">
+          <p>美国高级官员已与OpenAI等多家大型AI公司进行初步讨论，探讨联邦政府收购这些公司部分股份的可能性，以加强国家对核心AI技术的控制与战略协同。</p>
+        </div>
+        <div class="source-row">
+          <div class="source-pill">源：华尔街见闻 · ★★★★★</div>
+        </div>
       </div>
     </div>
     <div class="row-4">
