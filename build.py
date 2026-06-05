@@ -220,14 +220,12 @@ def build_weekly(date):
 
 
 def _render_card(payload, date):
-    """从 assets/card.html 模板渲染分享卡到 docs/card.html：
-    自动注入当日日期与「今日爆款」（取 importance 最高一条的 headline + briefing）。
+    """从 assets/card*.html 模板渲染分享卡到 docs/card*.html：
+    自动注入当日日期与「今日精选」（取 importance 最高一条的 headline + briefing + so what）。
+    card.html      —— 标准版（精选标题 + 引文 + 来源）
+    card-pro.html  —— 深度版（追加 SO WHAT 影响价值点评）
     """
     import html as _html
-    tpl_path = ROOT / "assets" / "card.html"
-    if not tpl_path.exists():
-        print("[warn] assets/card.html 模板缺失，跳过卡片更新", file=sys.stderr)
-        return False
     items = [it for it in payload.get("items", []) if it.get("dimension")]
     if not items:
         print("[warn] curated 无条目，跳过卡片更新", file=sys.stderr)
@@ -236,19 +234,33 @@ def _render_card(payload, date):
     top = sorted(items, key=lambda x: (-(x.get("importance") or 0), x.get("id") or 0))[0]
     headline = top.get("headline") or top.get("title") or ""
     briefing = top.get("briefing") or top.get("summary") or top.get("exec_meaning") or ""
+    meaning = top.get("exec_meaning") or top.get("briefing") or ""
     source = top.get("source") or "—"
     imp = int(top.get("importance") or 0)
     stars = "★" * imp + "☆" * (5 - imp) if imp else "—"
     date_dot = f"{date[:4]}.{date[4:6]}.{date[6:8]}"  # 2026.06.05
-    out = (tpl_path.read_text(encoding="utf-8")
-           .replace("{{DATE_DOT}}", _html.escape(date_dot))
-           .replace("{{HOT_HEADLINE}}", _html.escape(headline))
-           .replace("{{HOT_QUOTE}}", _html.escape(briefing))
-           .replace("{{HOT_SOURCE}}", _html.escape(source))
-           .replace("{{HOT_STARS}}", stars))
-    (DOCS / "card.html").write_text(out, encoding="utf-8")
-    print(f"[ok] wrote docs/card.html · 今日爆款：{headline[:24]}…")
-    return True
+
+    def _fill(text):
+        return (text
+                .replace("{{DATE_DOT}}", _html.escape(date_dot))
+                .replace("{{HOT_HEADLINE}}", _html.escape(headline))
+                .replace("{{HOT_QUOTE}}", _html.escape(briefing))
+                .replace("{{HOT_MEANING}}", _html.escape(meaning))
+                .replace("{{HOT_SOURCE}}", _html.escape(source))
+                .replace("{{HOT_STARS}}", stars))
+
+    rendered = 0
+    for name in ("card.html", "card-pro.html"):
+        tpl = ROOT / "assets" / name
+        if not tpl.exists():
+            continue
+        (DOCS / name).write_text(_fill(tpl.read_text(encoding="utf-8")), encoding="utf-8")
+        rendered += 1
+    if rendered:
+        print(f"[ok] wrote docs/card*.html × {rendered} · 今日精选：{headline[:24]}…")
+        return True
+    print("[warn] assets/card*.html 模板缺失，跳过卡片更新", file=sys.stderr)
+    return False
 
 
 def build_downloads(payload, date):

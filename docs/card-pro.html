@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AI 简讯 · 招商金科</title>
+<meta property="og:title" content="AI 简讯 · 招商金科">
+<meta property="og:description" content="每日 AI 行业关键动向 — 战略 / 行业 / 实践 + 大模型能力榜">
+<meta property="og:image" content="https://cmft-AiNativeLab.github.io/ai-brief/logo.png">
+<meta name="theme-color" content="#e2e7ef">
+<style>
+  :root{
+    --bg:#e2e7ef;            /* 冷调纸感 */
+    --bg-soft:#ecf0f5;
+    --steel:#3a5a8c;         /* 钢蓝（替代金色，做强调） */
+    --steel-soft:#7287a8;    /* 浅蓝灰 */
+    --bronze:#a38660;        /* 暖铜（杂志封面日期/序号色） */
+    --ink:#1c2433;           /* 冷墨 */
+    --ink2:#3a4659;
+    --grey:#6c7587;
+    --pill:#161d2c;          /* 来源胶囊深底 */
+    --pill-ink:#9bb3d4;      /* 冷调金属字 */
+    /* 杂志封面字体栈：Didot / Bodoni 强对比衬线，中文回落到宋体 */
+    --display:"Didot","Bodoni 72","Bodoni 72 Smallcaps","Playfair Display","Songti SC","STSong","Source Han Serif SC","Noto Serif SC",Georgia,serif;
+    --serif:"Source Han Serif SC","Noto Serif SC","Songti SC","STSong",Georgia,serif;
+    --sans:"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ font-family:var(--serif);
+    background:linear-gradient(160deg,#d2dae6 0%,#dee4ed 35%,#cad3df 100%);
+    min-height:100%; display:flex; align-items:center; justify-content:center; padding:18px; }
+
+  /* 主卡：冷调纸质 + 大圆角 + 柔和投影 */
+  .card{ position:relative; width:min(100%,520px); aspect-ratio:4/5;
+    border-radius:28px; overflow:hidden;
+    background:linear-gradient(168deg,var(--bg-soft) 0%,var(--bg) 60%,#d6dde8 100%);
+    box-shadow:0 30px 70px rgba(28,36,55,.24), inset 0 1px 0 rgba(255,255,255,.6);
+    padding:34px 30px 24px; display:flex; flex-direction:column; }
+
+  /* 右上角放射冷光（替代暖金光） */
+  .card::before{ content:''; position:absolute; top:-160px; right:-160px;
+    width:480px; height:480px; border-radius:50%;
+    background:
+      radial-gradient(circle at center,
+        rgba(114,135,168,.28) 0%,
+        rgba(58,90,140,.16) 28%,
+        rgba(58,90,140,.08) 55%,
+        transparent 78%);
+    pointer-events:none; }
+  /* 同心圆细线点缀 */
+  .card::after{ content:''; position:absolute; top:-188px; right:-188px;
+    width:540px; height:540px; border-radius:50%;
+    border:1px solid rgba(58,90,140,.16); pointer-events:none; }
+
+  /* Row 1：标题 + 日期 — 杂志封面式高对比衬线 */
+  .row-1{ position:relative; z-index:1; display:flex; justify-content:space-between; align-items:baseline; }
+  .title{ font-family:var(--display); font-size:36px; font-weight:700;
+    letter-spacing:2.5px; color:var(--ink); line-height:1; }
+  .date{ font-family:var(--sans);
+    font-size:13px; font-weight:600;
+    color:var(--steel); letter-spacing:0;
+    font-feature-settings:"tnum"; }
+
+  /* Row 2：副标 + 出品方 */
+  .row-2{ position:relative; z-index:1; margin-top:10px; padding-bottom:16px;
+    border-bottom:1px dashed rgba(58,90,140,.4);
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:var(--sans); font-size:12px; color:var(--ink2); }
+  .tagline{ letter-spacing:.4px; }
+  .by{ font-family:"SF Pro Text","Helvetica Neue","Inter",-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;
+    color:var(--steel-soft); font-weight:700; letter-spacing:.5px; }
+
+  /* Row 3：今日精选区——居中、用毛玻璃框包裹 */
+  .row-3{ position:relative; z-index:1; margin-top:18px; flex:1;
+    display:flex; flex-direction:column; justify-content:center; min-height:0; }
+  .hot-box{ position:relative;
+    background:rgba(255,255,255,.5);
+    backdrop-filter:blur(14px) saturate(120%);
+    -webkit-backdrop-filter:blur(14px) saturate(120%);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:18px; padding:22px 24px 18px;
+    box-shadow:0 10px 26px rgba(28,36,55,.10), inset 0 1px 0 rgba(255,255,255,.75); }
+  .label{ font-family:var(--sans); font-size:12px; font-weight:800;
+    letter-spacing:6px; color:var(--steel); margin-bottom:16px; }
+  .hot-title{ font-family:var(--sans); font-weight:800; font-size:19px;
+    line-height:1.5; color:var(--ink); margin-bottom:16px; letter-spacing:.5px; }
+  /* 引文区：粗马克笔斜线条底色——浅色 + 不规则边界 */
+  .quote{ position:relative; padding:14px 12px 14px; margin:8px -10px 4px;
+    isolation:isolate; }
+  .quote::before{ content:''; position:absolute; inset:-12px -16px -10px;
+    background:
+      /* 主笔触：粗条纹，颜色降低 */
+      repeating-linear-gradient(
+        -25deg,
+        transparent 0,
+        transparent 12px,
+        rgba(58,90,140,.14) 18px,
+        rgba(58,90,140,.20) 24px,
+        rgba(58,90,140,.14) 30px,
+        transparent 36px
+      ),
+      /* 第二层：稍稀的副笔触叠墨 */
+      repeating-linear-gradient(
+        -20deg,
+        transparent 0,
+        transparent 30px,
+        rgba(58,90,140,.07) 36px,
+        rgba(58,90,140,.11) 42px,
+        transparent 48px
+      );
+    /* 用多团 mask 让笔触边界不规则：四个偏移椭圆并集 + 衰减 */
+    -webkit-mask:
+      radial-gradient(48% 58% at 22% 38%, #000 30%, transparent 88%),
+      radial-gradient(52% 56% at 72% 32%, #000 30%, transparent 88%),
+      radial-gradient(55% 50% at 50% 72%, #000 30%, transparent 88%),
+      radial-gradient(45% 52% at 80% 68%, #000 30%, transparent 90%);
+    mask:
+      radial-gradient(48% 58% at 22% 38%, #000 30%, transparent 88%),
+      radial-gradient(52% 56% at 72% 32%, #000 30%, transparent 88%),
+      radial-gradient(55% 50% at 50% 72%, #000 30%, transparent 88%),
+      radial-gradient(45% 52% at 80% 68%, #000 30%, transparent 90%);
+    filter:blur(.6px);
+    z-index:-1; pointer-events:none; }
+  .quote p{ font-family:var(--serif); font-size:18px; font-weight:700;
+    line-height:1.78; color:var(--ink); letter-spacing:.4px; text-indent:0; }
+  .quote p::before{ content:'\201C'; color:var(--steel-soft);
+    font-family:Georgia,serif; font-weight:700; margin-right:2px; }
+  .quote p::after{ content:'\201D'; color:var(--steel-soft);
+    font-family:Georgia,serif; font-weight:700; margin-left:2px; }
+  /* 源胶囊靠右，仍在毛玻璃框内 */
+  .source-row{ margin-top:18px; display:flex; justify-content:flex-end; }
+  .source-pill{ background:var(--pill); color:var(--pill-ink);
+    padding:6px 14px; border-radius:18px;
+    font-family:var(--sans); font-size:11.5px; letter-spacing:.4px; }
+
+  /* SO WHAT 模块：编辑视角点评，置于 hot-box 之下 */
+  .sw-box{ position:relative; z-index:1; margin-top:14px;
+    padding:12px 16px 12px 18px;
+    border-left:3px solid var(--steel);
+    background:linear-gradient(95deg, rgba(58,90,140,.10), rgba(58,90,140,.04) 70%, transparent);
+    border-radius:0 12px 12px 0; }
+  .sw-label{ font-family:var(--sans); font-size:10.5px; font-weight:800;
+    letter-spacing:3px; color:var(--steel); margin-bottom:6px; }
+  .sw-label::before{ content:'◆ '; font-size:8px; vertical-align:1px; }
+  .sw-text{ font-family:var(--serif); font-size:13.5px; font-weight:600;
+    line-height:1.65; color:var(--ink2); letter-spacing:.3px; }
+
+  /* Row 4：底部 — 左侧双二维码，右侧 logo */
+  .row-4{ position:relative; z-index:1; margin-top:auto; padding-top:20px;
+    display:flex; justify-content:space-between; align-items:flex-end; gap:14px; }
+  .qr-group{ display:flex; gap:14px; align-items:flex-start; }
+  .qr-mini{ text-decoration:none; color:inherit; text-align:center; transition:.18s; }
+  .qr-mini:hover{ transform:translateY(-1px); }
+  .qr-mini img{ width:68px; height:68px; display:block;
+    filter:drop-shadow(0 2px 4px rgba(28,36,55,.16)); }
+  .qr-mini .lbl{ margin-top:4px; font-family:var(--sans); font-size:10px; font-weight:700;
+    color:var(--ink2); letter-spacing:.3px; }
+  .foot-logo{ height:26px; width:auto; opacity:.95; flex-shrink:0;
+    filter:drop-shadow(0 1px 3px rgba(28,36,55,.14)); align-self:center; }
+
+  /* —— 窄屏适配 —— */
+  @media (max-width:460px){
+    .card{ padding:26px 22px 20px; }
+    .title{ font-size:26px; letter-spacing:2px; }
+    .date{ font-size:12px; letter-spacing:1.5px; }
+    .row-2{ flex-direction:column; align-items:flex-start; gap:4px; font-size:11.5px; padding-bottom:12px; }
+    .hot-box{ padding:18px 18px 14px; border-radius:14px; }
+    .label{ font-size:11px; letter-spacing:4px; margin-bottom:12px; }
+    .hot-title{ font-size:15.5px; line-height:1.5; margin-bottom:12px; }
+    .quote{ padding:11px 8px 11px; margin:6px -6px 2px; }
+    .quote::before{ inset:-3px -4px -3px; filter:blur(1px); }
+    .quote p{ font-size:15px; line-height:1.72; }
+    .source-row{ margin-top:14px; }
+    .source-pill{ font-size:10.5px; padding:5px 12px; }
+    .row-4{ padding-top:16px; }
+    .qr-mini img{ width:60px; height:60px; }
+    .qr-mini .lbl{ font-size:9.5px; }
+    .foot-logo{ height:22px; }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="row-1">
+      <div class="title">AI 简讯</div>
+      <div class="date">2026.06.05</div>
+    </div>
+    <div class="row-2">
+      <div class="tagline">每日 AI 行业关键动向 · 战略 / 行业 / 实践</div>
+      <div class="by">由 招商金科 出品</div>
+    </div>
+    <div class="row-3">
+      <div class="hot-box">
+        <div class="label">今 日 精 选</div>
+        <div class="hot-title">美政府探讨收购OpenAI等AI巨头股份</div>
+        <div class="quote">
+          <p>美国高级官员已与OpenAI等多家大型AI公司进行初步讨论，探讨联邦政府收购这些公司部分股份的可能性，以加强国家对核心AI技术的控制与战略协同。</p>
+        </div>
+        <div class="source-row">
+          <div class="source-pill">源：华尔街见闻 · ★★★★★</div>
+        </div>
+      </div>
+      <div class="sw-box">
+        <div class="sw-label">SO WHAT · 影响 / 价值</div>
+        <p class="sw-text">AI已上升为国家级战略资产。企业需警惕地缘政治对技术供应链的干预，在出海或底层模型合作中必须增加合规与政策风险评估。</p>
+      </div>
+    </div>
+    <div class="row-4">
+      <img class="foot-logo" src="logo.png" alt="招商金融科技 · CMG Fintech">
+      <div class="qr-group">
+        <a class="qr-mini" href="./">
+          <img src="qr.png" alt="今日资讯">
+          <div class="lbl">今日资讯</div>
+        </a>
+        <a class="qr-mini" href="./download/">
+          <img src="qr-download.png" alt="往期下载">
+          <div class="lbl">往期下载</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
