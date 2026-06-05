@@ -85,31 +85,42 @@
     letter-spacing:6px; color:var(--steel); margin-bottom:16px; }
   .hot-title{ font-family:var(--sans); font-weight:800; font-size:19px;
     line-height:1.5; color:var(--ink); margin-bottom:16px; letter-spacing:.5px; }
-  /* 引文区：粗马克笔斜线条底色——两层不同角度/间距 + 软边模拟渗墨 */
+  /* 引文区：粗马克笔斜线条底色——浅色 + 不规则边界 */
   .quote{ position:relative; padding:14px 12px 14px; margin:8px -10px 4px;
     isolation:isolate; }
-  .quote::before{ content:''; position:absolute; inset:-4px -6px -4px;
+  .quote::before{ content:''; position:absolute; inset:-12px -16px -10px;
     background:
-      /* 主笔触：18-20px 宽的粗条纹，边缘羽化，颜色更饱和 */
+      /* 主笔触：粗条纹，颜色降低 */
       repeating-linear-gradient(
         -25deg,
         transparent 0,
         transparent 12px,
-        rgba(58,90,140,.26) 18px,
-        rgba(58,90,140,.34) 24px,
-        rgba(58,90,140,.26) 30px,
+        rgba(58,90,140,.14) 18px,
+        rgba(58,90,140,.20) 24px,
+        rgba(58,90,140,.14) 30px,
         transparent 36px
       ),
-      /* 第二层：稍稀的副笔触，模拟"再涂一遍"叠墨 */
+      /* 第二层：稍稀的副笔触叠墨 */
       repeating-linear-gradient(
         -20deg,
         transparent 0,
         transparent 30px,
-        rgba(58,90,140,.14) 36px,
-        rgba(58,90,140,.20) 42px,
+        rgba(58,90,140,.07) 36px,
+        rgba(58,90,140,.11) 42px,
         transparent 48px
       );
-    filter:blur(.8px);   /* 轻微渗墨，但保留笔触识别度 */
+    /* 用多团 mask 让笔触边界不规则：四个偏移椭圆并集 + 衰减 */
+    -webkit-mask:
+      radial-gradient(48% 58% at 22% 38%, #000 30%, transparent 88%),
+      radial-gradient(52% 56% at 72% 32%, #000 30%, transparent 88%),
+      radial-gradient(55% 50% at 50% 72%, #000 30%, transparent 88%),
+      radial-gradient(45% 52% at 80% 68%, #000 30%, transparent 90%);
+    mask:
+      radial-gradient(48% 58% at 22% 38%, #000 30%, transparent 88%),
+      radial-gradient(52% 56% at 72% 32%, #000 30%, transparent 88%),
+      radial-gradient(55% 50% at 50% 72%, #000 30%, transparent 88%),
+      radial-gradient(45% 52% at 80% 68%, #000 30%, transparent 90%);
+    filter:blur(.6px);
     z-index:-1; pointer-events:none; }
   .quote p{ font-family:var(--serif); font-size:18px; font-weight:700;
     line-height:1.78; color:var(--ink); letter-spacing:.4px; text-indent:0; }
