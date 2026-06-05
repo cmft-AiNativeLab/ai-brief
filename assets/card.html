@@ -26,13 +26,14 @@
     --sans:"PingFang SC","Microsoft YaHei",sans-serif;
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
-  html,body{ height:100%; }
+  html,body{ height:100%; max-width:100vw; overflow-x:hidden; }
   body{ font-family:var(--serif);
     background:linear-gradient(160deg,#d2dae6 0%,#dee4ed 35%,#cad3df 100%);
     min-height:100%; display:flex; align-items:center; justify-content:center; padding:18px; }
 
-  /* 主卡：冷调纸质 + 大圆角 + 柔和投影 */
-  .card{ position:relative; width:min(100%,520px); aspect-ratio:4/5;
+  /* 主卡：冷调纸质 + 大圆角 + 柔和投影
+     用 calc(100vw - 36px) 显式扣掉 body padding，避免 flex 容器下 width:100% 的歧义 */
+  .card{ position:relative; width:min(calc(100vw - 36px),520px); aspect-ratio:4/5;
     border-radius:28px; overflow:hidden;
     background:linear-gradient(168deg,var(--bg-soft) 0%,var(--bg) 60%,#d6dde8 100%);
     box-shadow:0 30px 70px rgba(28,36,55,.24), inset 0 1px 0 rgba(255,255,255,.6);
@@ -147,9 +148,14 @@
   .foot-logo{ height:26px; width:auto; opacity:.95; flex-shrink:0;
     filter:drop-shadow(0 1px 3px rgba(28,36,55,.14)); align-self:center; }
 
-  /* —— 窄屏适配 —— */
+  /* —— 窄屏适配 ——
+     - body 内边距缩小避免占用过多横向空间
+     - card 宽度直接锁到 100vw - 24px，并去掉 aspect-ratio 让高度由内容决定 */
   @media (max-width:460px){
-    .card{ padding:26px 22px 20px; }
+    body{ display:block; padding:12px 0; min-height:100vh; }
+    .card{ width:calc(100vw - 24px); max-width:none;
+      margin:18px auto; padding:24px 20px 18px;
+      aspect-ratio:auto; min-height:auto; }
     .title{ font-size:26px; letter-spacing:2px; }
     .date{ font-size:12px; letter-spacing:1.5px; }
     .row-2{ flex-direction:column; align-items:flex-start; gap:4px; font-size:11.5px; padding-bottom:12px; }
