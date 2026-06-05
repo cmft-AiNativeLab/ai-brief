@@ -85,14 +85,17 @@
     letter-spacing:6px; color:var(--steel); margin-bottom:16px; }
   .hot-title{ font-family:var(--sans); font-weight:800; font-size:19px;
     line-height:1.5; color:var(--ink); margin-bottom:16px; letter-spacing:.5px; }
-  /* 引文区：柔和发散底色，去掉硬边框，自由"晕染"感 */
-  .quote{ position:relative; padding:12px 6px 10px; margin:6px -6px 0;
+  /* 引文区：手绘涂鸦式背景——多个偏移晕团叠加，完全无边际感 */
+  .quote{ position:relative; padding:14px 10px 12px; margin:8px -10px 4px;
+    isolation:isolate; }
+  .quote::before{ content:''; position:absolute; inset:-10px -8px -6px;
     background:
-      radial-gradient(120% 100% at 50% 55%,
-        rgba(58,90,140,.11) 0%,
-        rgba(58,90,140,.05) 55%,
-        transparent 96%);
-    border-radius:22px; }
+      radial-gradient(45% 60% at 25% 30%, rgba(58,90,140,.16) 0%, transparent 78%),
+      radial-gradient(40% 55% at 75% 40%, rgba(58,90,140,.14) 0%, transparent 80%),
+      radial-gradient(50% 60% at 50% 70%, rgba(58,90,140,.13) 0%, transparent 78%),
+      radial-gradient(60% 70% at 20% 80%, rgba(58,90,140,.10) 0%, transparent 80%),
+      radial-gradient(55% 65% at 85% 75%, rgba(58,90,140,.10) 0%, transparent 80%);
+    filter:blur(12px); z-index:-1; pointer-events:none; }
   .quote p{ font-family:var(--serif); font-size:18px; font-weight:700;
     line-height:1.78; color:var(--ink); letter-spacing:.4px; text-indent:0; }
   .quote p::before{ content:'\201C'; color:var(--steel-soft);
@@ -127,7 +130,8 @@
     .hot-box{ padding:18px 18px 14px; border-radius:14px; }
     .label{ font-size:11px; letter-spacing:4px; margin-bottom:12px; }
     .hot-title{ font-size:15.5px; line-height:1.5; margin-bottom:12px; }
-    .quote{ padding:10px 4px 8px; margin:4px -4px 0; }
+    .quote{ padding:11px 6px 9px; margin:6px -6px 2px; }
+    .quote::before{ inset:-6px -4px -4px; filter:blur(10px); }
     .quote p{ font-size:15px; line-height:1.72; }
     .source-row{ margin-top:14px; }
     .source-pill{ font-size:10.5px; padding:5px 12px; }
@@ -161,6 +165,7 @@
       </div>
     </div>
     <div class="row-4">
+      <img class="foot-logo" src="logo.png" alt="招商金融科技 · CMG Fintech">
       <div class="qr-group">
         <a class="qr-mini" href="./">
           <img src="qr.png" alt="今日资讯">
@@ -171,7 +176,6 @@
           <div class="lbl">往期下载</div>
         </a>
       </div>
-      <img class="foot-logo" src="logo.png" alt="招商金融科技 · CMG Fintech">
     </div>
   </div>
 </body>
