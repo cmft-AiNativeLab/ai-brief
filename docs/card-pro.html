@@ -92,16 +92,26 @@
     letter-spacing:3.5px; color:var(--steel); margin-bottom:16px; }
   .hot-title{ font-family:var(--sans); font-weight:800; font-size:19px;
     line-height:1.5; color:var(--ink); margin-bottom:16px; letter-spacing:.5px; }
-  /* 引文区：底色横向延展到卡片边框，两端渐变淡出（钢蓝） */
-  .quote{ position:relative; padding:14px 16px 12px; margin:6px 0 4px; }
-  .quote::before{ content:''; position:absolute; top:-2px; bottom:-2px;
-    left:-120px; right:-120px;   /* 横向延展到 hot-box 之外，被 card overflow 裁到卡片边 */
+  /* 引文区：底色横向延展到卡片边框；上下也渐变淡出（四向羽化） */
+  .quote{ position:relative; padding:16px 16px 16px; margin:6px 0 4px; }
+  .quote::before{ content:''; position:absolute; top:-6px; bottom:-6px;
+    left:-120px; right:-120px;
     background:linear-gradient(90deg,
       transparent 0%,
       rgba(58,90,140,.06) 8%,
       rgba(58,90,140,.16) 35%,
       rgba(58,90,140,.16) 65%,
       rgba(58,90,140,.06) 92%,
+      transparent 100%);
+    -webkit-mask:linear-gradient(180deg,
+      transparent 0%,
+      #000 25%,
+      #000 75%,
+      transparent 100%);
+    mask:linear-gradient(180deg,
+      transparent 0%,
+      #000 25%,
+      #000 75%,
       transparent 100%);
     pointer-events:none; }
   .quote p{ position:relative; z-index:1; }
@@ -139,8 +149,8 @@
     filter:drop-shadow(0 2px 4px rgba(28,36,55,.16)); }
   .qr-mini .lbl{ margin-top:4px; font-family:var(--sans); font-size:10px; font-weight:700;
     color:var(--ink2); letter-spacing:.3px; }
-  /* logo 钉到卡片底部边缘，紧贴下边线，与右上 date 形成对角 */
-  .foot-logo{ position:absolute; bottom:10px; right:24px; z-index:3;
+  /* logo 钉到卡片右下角边缘，更贴右框 */
+  .foot-logo{ position:absolute; bottom:10px; right:12px; z-index:3;
     height:24px; width:auto; opacity:.95;
     filter:drop-shadow(0 1px 3px rgba(28,36,55,.14)); }
 
