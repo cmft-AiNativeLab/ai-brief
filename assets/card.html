@@ -58,11 +58,17 @@
   .row-1{ position:relative; z-index:1; display:flex; align-items:baseline; }
   .title{ font-family:var(--display); font-size:36px; font-weight:700;
     letter-spacing:2.5px; color:var(--ink); line-height:1; }
-  /* 日期：右上角"邮戳"，与右下 logo 形成右侧轴 */
-  .date{ position:absolute; top:18px; right:30px; z-index:3;
-    font-family:var(--sans); font-size:13px; font-weight:600;
-    color:var(--steel); letter-spacing:0;
-    font-feature-settings:"tnum"; }
+  /* 日期：右上角"钢印"——衬线 + 暗压字 + 高光与暗影模拟压印纸面 */
+  .date{ position:absolute; top:20px; right:30px; z-index:3;
+    font-family:"Bodoni 72","Didot","Playfair Display",Georgia,serif;
+    font-size:14px; font-weight:700; letter-spacing:2px;
+    color:rgba(58,90,140,.85);
+    text-shadow:
+      0 1px 0 rgba(255,255,255,.75),
+      0 -1px 0 rgba(28,36,55,.12),
+      1px 1px 1px rgba(28,36,55,.08);
+    font-feature-settings:"tnum","lnum";
+    -webkit-font-smoothing:antialiased; }
 
   /* Row 2：副标 + 出品方 */
   .row-2{ position:relative; z-index:1; margin-top:10px; padding-bottom:16px;
@@ -113,8 +119,9 @@
     filter:drop-shadow(0 2px 4px rgba(28,36,55,.16)); }
   .qr-mini .lbl{ margin-top:4px; font-family:var(--sans); font-size:10px; font-weight:700;
     color:var(--ink2); letter-spacing:.3px; }
-  .foot-logo{ height:26px; width:auto; opacity:.95; flex-shrink:0;
-    filter:drop-shadow(0 1px 3px rgba(28,36,55,.14)); align-self:center; }
+  .foot-logo{ height:28px; width:auto; opacity:.95; flex-shrink:0;
+    filter:drop-shadow(0 1px 3px rgba(28,36,55,.14));
+    align-self:flex-end; margin-bottom:-6px; }
 
   /* —— 窄屏适配 ——
      - body 内边距缩小避免占用过多横向空间
