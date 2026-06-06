@@ -59,9 +59,9 @@
   .title{ font-family:var(--display); font-size:36px; font-weight:700;
     letter-spacing:2.5px; color:var(--ink); line-height:1; }
   /* 日期：右上角"钢印"——衬线 + 暗压字 + 高光与暗影模拟压印纸面 */
-  .date{ position:absolute; top:20px; right:30px; z-index:3;
+  .date{ position:absolute; top:22px; right:30px; z-index:3;
     font-family:"Bodoni 72","Didot","Playfair Display",Georgia,serif;
-    font-size:14px; font-weight:700; letter-spacing:2px;
+    font-size:11.5px; font-weight:700; letter-spacing:1.5px;
     color:rgba(58,90,140,.85);
     text-shadow:
       0 1px 0 rgba(255,255,255,.75),
@@ -109,9 +109,9 @@
     padding:6px 14px; border-radius:18px;
     font-family:var(--sans); font-size:11.5px; letter-spacing:.4px; }
 
-  /* Row 4：底部 — 左侧双二维码，右侧 logo */
+  /* Row 4：底部 QR（左）；logo 改用绝对定位贴右下角，与右上日期形成对角轴 */
   .row-4{ position:relative; z-index:1; margin-top:auto; padding-top:20px;
-    display:flex; justify-content:space-between; align-items:flex-end; gap:14px; }
+    display:flex; justify-content:flex-start; align-items:flex-end; gap:14px; }
   .qr-group{ display:flex; gap:14px; align-items:flex-start; }
   .qr-mini{ text-decoration:none; color:inherit; text-align:center; transition:.18s; }
   .qr-mini:hover{ transform:translateY(-1px); }
@@ -119,9 +119,10 @@
     filter:drop-shadow(0 2px 4px rgba(28,36,55,.16)); }
   .qr-mini .lbl{ margin-top:4px; font-family:var(--sans); font-size:10px; font-weight:700;
     color:var(--ink2); letter-spacing:.3px; }
-  .foot-logo{ height:28px; width:auto; opacity:.95; flex-shrink:0;
-    filter:drop-shadow(0 1px 3px rgba(28,36,55,.14));
-    align-self:flex-end; margin-bottom:-6px; }
+  /* logo 钉到卡片底部边缘，紧贴下边线，与右上 date 形成对角 */
+  .foot-logo{ position:absolute; bottom:10px; right:24px; z-index:3;
+    height:24px; width:auto; opacity:.95;
+    filter:drop-shadow(0 1px 3px rgba(28,36,55,.14)); }
 
   /* —— 窄屏适配 ——
      - body 内边距缩小避免占用过多横向空间
