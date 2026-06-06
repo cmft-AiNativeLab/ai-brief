@@ -238,7 +238,7 @@ def _render_card(payload, date):
     source = top.get("source") or "—"
     imp = int(top.get("importance") or 0)
     stars = "★" * imp + "☆" * (5 - imp) if imp else "—"
-    date_dot = f"{date[:4]}.{date[4:6]}.{date[6:8]}"  # 2026.06.05
+    date_dot = date  # 紧凑 YYYYMMDD：20260605（按需求去掉点分隔）
 
     def _fill(text):
         return (text
