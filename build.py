@@ -249,18 +249,18 @@ def _render_card(payload, date):
                 .replace("{{HOT_SOURCE}}", _html.escape(source))
                 .replace("{{HOT_STARS}}", stars))
 
+    # 暂定 card-pro 为日卡设计：同一模板渲染到 /card 和 /card-pro
+    primary = ROOT / "assets" / "card-pro.html"
+    if not primary.exists():
+        print("[warn] assets/card-pro.html 模板缺失，跳过卡片更新", file=sys.stderr)
+        return False
+    filled = _fill(primary.read_text(encoding="utf-8"))
     rendered = 0
-    for name in ("card.html", "card-pro.html"):
-        tpl = ROOT / "assets" / name
-        if not tpl.exists():
-            continue
-        (DOCS / name).write_text(_fill(tpl.read_text(encoding="utf-8")), encoding="utf-8")
+    for out_name in ("card.html", "card-pro.html"):
+        (DOCS / out_name).write_text(filled, encoding="utf-8")
         rendered += 1
-    if rendered:
-        print(f"[ok] wrote docs/card*.html × {rendered} · 今日精选：{headline[:24]}…")
-        return True
-    print("[warn] assets/card*.html 模板缺失，跳过卡片更新", file=sys.stderr)
-    return False
+    print(f"[ok] wrote docs/card*.html × {rendered} (card-pro 模板) · 今日精选：{headline[:24]}…")
+    return True
 
 
 def build_downloads(payload, date):
