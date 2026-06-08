@@ -28,7 +28,7 @@ ASSETS = Path(__file__).resolve().parent.parent / "assets"
 DASHBOARD_TEMPLATE = ASSETS / "dashboard.html"
 REPORT_TEMPLATE = ASSETS / "report.html"
 LOGO_PATH = Path(__file__).resolve().parent.parent / "docs" / "logo.png"
-CHROME_PATH = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+CHROME_PATH = "/home/node/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome"
 CN_TZ = timezone(timedelta(hours=8))
 
 DIM_INFO = {
@@ -516,7 +516,7 @@ def export_png(html_path: Path, png_path: Path, scale: int = 2) -> bool:
         print(f"[warn] Chrome missing; skip PNG", file=sys.stderr)
         return False
     cmd = [
-        CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars",
+        CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars", "--no-sandbox",
         "--window-size=1920,1080", "--virtual-time-budget=3000",
         f"--force-device-scale-factor={scale}",
         f"--screenshot={png_path}",
@@ -532,7 +532,7 @@ def export_pdf(html_path: Path, pdf_path: Path) -> bool:
         print(f"[warn] Chrome missing; skip PDF", file=sys.stderr)
         return False
     cmd = [
-        CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars",
+        CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars", "--no-sandbox",
         "--no-pdf-header-footer",
         f"--print-to-pdf={pdf_path}",
         "--virtual-time-budget=3000",

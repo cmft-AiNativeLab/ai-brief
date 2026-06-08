@@ -59,12 +59,12 @@ USER_TMPL = """今天的候选 AI 资讯（JSON 数组，每条含 id/source/tit
 
 
 def call_llm(candidates, retries=3):
-    """流式调用：边收边拼，避免大请求触发中转网关 504；失败自动重试。"""
+    """流式调用：边收边拼，避免大请求触发中转网关 504；中转不支持 system role，合并到 user prompt；失败自动重试。"""
     body = {
         "model": MODEL,
         "messages": [
-            {"role": "system", "content": SYSTEM},
-            {"role": "user", "content": USER_TMPL.format(
+            # 中转不支持 system role，合并到 user prompt
+            {"role": "user", "content": SYSTEM + "\n\n" + USER_TMPL.format(
                 candidates=json.dumps(candidates, ensure_ascii=False))},
         ],
         "temperature": 0.4,
@@ -117,7 +117,62 @@ def extract_json(text):
     i, j = text.find("{"), text.rfind("}")
     if i < 0 or j < 0:
         raise ValueError("LLM 未返回 JSON：" + text[:200])
-    return json.loads(text[i:j + 1])
+    raw = text[i:j + 1]
+    # 先尝试直接解析
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        # 修复常见 JSON 问题：
+        # 1. 移除尾部逗号（}, ]前的逗号）
+        fixed = re.sub(r',([\s]*[}\]])', r'\1', raw)
+        try:
+            return json.loads(fixed)
+        except json.JSONDecodeError:
+            pass
+        # 2. 修复字符串中未转义的双引号（模型常在中文字符串中使用英文双引号）
+        def fix_quotes_in_json(s):
+            result = []
+            in_string = False
+            escape = False
+            idx = 0
+            while idx < len(s):
+                c = s[idx]
+                if escape:
+                    result.append(c)
+                    escape = False
+                    idx += 1
+                    continue
+                if c == '\\':
+                    result.append(c)
+                    escape = True
+                    idx += 1
+                    continue
+                if c == '"':
+                    if in_string:
+                        # 检查下一个非空白字符
+                        k = idx + 1
+                        while k < len(s) and s[k] in ' \t\n\r':
+                            k += 1
+                        if k < len(s) and s[k] in ',:}]':
+                            # 这是字符串结束引号
+                            result.append(c)
+                            in_string = False
+                        else:
+                            # 字符串内部的未转义引号，替换为中文引号
+                            result.append('\u300c')
+                    else:
+                        result.append(c)
+                        in_string = True
+                else:
+                    result.append(c)
+                idx += 1
+            return ''.join(result)
+        fixed2 = fix_quotes_in_json(fixed)
+        try:
+            return json.loads(fixed2)
+        except json.JSONDecodeError:
+            pass
+        raise ValueError(f"JSON 解析失败（原始错误: {e}）: " + raw[:200])
 
 
 def main():

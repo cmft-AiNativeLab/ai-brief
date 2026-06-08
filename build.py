@@ -72,7 +72,7 @@ def _screenshot(html_path, png_path, w, h, scale=2):
     if not pathlib.Path(CHROME_PATH).exists():
         print("[warn] Chrome 缺失，跳过卡片截图", file=sys.stderr)
         return False
-    cmd = [CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars",
+    cmd = [CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars", "--no-sandbox",
            f"--window-size={w},{h}", "--virtual-time-budget=2500",
            f"--force-device-scale-factor={scale}",
            f"--screenshot={png_path}", f"file://{html_path.resolve()}"]
