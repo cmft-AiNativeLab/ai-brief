@@ -290,9 +290,9 @@ def build_downloads(payload, date):
         made.append("总览PNG")
     dash_html.unlink(missing_ok=True)
 
-    # 3) 卡片 PNG（4:5 竖版杂志样式，580×720 窗口可容纳 520 宽卡 + 边距）
+    # 3) 卡片 PNG（card 改为 min-height 模式可自由生长，窗口加高到 900 确保不裁切）
     card_png = dl / f"ai-brief-card-{date}.png"
-    if _screenshot(DOCS / "card.html", card_png, 580, 720, scale=2):
+    if _screenshot(DOCS / "card.html", card_png, 580, 900, scale=2):
         shutil.copyfile(card_png, dl / "latest-card.png")
         made.append("卡片PNG")
 
