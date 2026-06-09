@@ -66,6 +66,16 @@ def build_archive():
     print(f"[ok] wrote docs/archive.html ({len(dates)} 期)")
 
 
+_LIB_PATHS = "/home/node/.local/lib:/tmp/libs/lib/x86_64-linux-gnu:/tmp/libs/usr/lib/x86_64-linux-gnu"
+def _chrome_env():
+    import os
+    env = os.environ.copy()
+    existing = env.get("LD_LIBRARY_PATH", "")
+    if _LIB_PATHS not in existing:
+        env["LD_LIBRARY_PATH"] = f"{_LIB_PATHS}:{existing}" if existing else _LIB_PATHS
+    return env
+
+
 def _screenshot(html_path, png_path, w, h, scale=2):
     """Chrome 无头截图（卡片用方形窗口）。"""
     from render import CHROME_PATH
@@ -76,7 +86,7 @@ def _screenshot(html_path, png_path, w, h, scale=2):
            f"--window-size={w},{h}", "--virtual-time-budget=2500",
            f"--force-device-scale-factor={scale}",
            f"--screenshot={png_path}", f"file://{html_path.resolve()}"]
-    subprocess.run(cmd, capture_output=True, timeout=60, check=False)
+    subprocess.run(cmd, capture_output=True, timeout=60, check=False, env=_chrome_env())
     return png_path.exists()
 
 

@@ -511,6 +511,18 @@ def render_report(payload: dict) -> str:
 
 # ---------- export ----------
 
+LIB_PATHS = "/home/node/.local/lib:/tmp/libs/lib/x86_64-linux-gnu:/tmp/libs/usr/lib/x86_64-linux-gnu"
+
+def _chrome_env() -> dict:
+    """Inject LD_LIBRARY_PATH for Chromium in containers missing system libs."""
+    import os
+    env = os.environ.copy()
+    existing = env.get("LD_LIBRARY_PATH", "")
+    if LIB_PATHS not in existing:
+        env["LD_LIBRARY_PATH"] = f"{LIB_PATHS}:{existing}" if existing else LIB_PATHS
+    return env
+
+
 def export_png(html_path: Path, png_path: Path, scale: int = 2) -> bool:
     if not Path(CHROME_PATH).exists():
         print(f"[warn] Chrome missing; skip PNG", file=sys.stderr)
@@ -522,7 +534,7 @@ def export_png(html_path: Path, png_path: Path, scale: int = 2) -> bool:
         f"--screenshot={png_path}",
         f"file://{html_path.resolve()}",
     ]
-    subprocess.run(cmd, capture_output=True, timeout=60, check=False)
+    subprocess.run(cmd, capture_output=True, timeout=60, check=False, env=_chrome_env())
     return png_path.exists()
 
 
@@ -538,7 +550,7 @@ def export_pdf(html_path: Path, pdf_path: Path) -> bool:
         "--virtual-time-budget=3000",
         f"file://{html_path.resolve()}",
     ]
-    subprocess.run(cmd, capture_output=True, timeout=60, check=False)
+    subprocess.run(cmd, capture_output=True, timeout=60, check=False, env=_chrome_env())
     return pdf_path.exists()
 
 
