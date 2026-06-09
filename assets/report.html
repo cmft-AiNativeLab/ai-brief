@@ -8,6 +8,46 @@
 <meta http-equiv="Expires" content="0">
 <title>AI 简讯 · {{DATE}}</title>
 <style>
+  /* === 容器环境字体兜底：@font-face 注册本地中文字体 === */
+  @font-face {
+    font-family: 'Noto Serif SC';
+    src: local('NotoSerifCJKsc-Regular'),
+         local('Noto Serif CJK SC'),
+         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc') format('truetype'),
+         url('/home/node/.openclaw/workspace/fonts/NotoSansCJKsc-Regular.otf') format('opentype');
+    font-weight: normal;
+  }
+  @font-face {
+    font-family: 'Noto Serif SC';
+    src: local('NotoSerifCJKsc-Bold'),
+         local('Noto Serif CJK SC Bold'),
+         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc') format('truetype'),
+         url('/home/node/.openclaw/workspace/fonts/NotoSansSC-Bold.ttf') format('truetype');
+    font-weight: 700;
+  }
+  @font-face {
+    font-family: 'Noto Sans SC';
+    src: local('NotoSansCJKsc-Regular'),
+         local('Noto Sans CJK SC'),
+         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc') format('truetype'),
+         url('/home/node/.openclaw/workspace/fonts/NotoSansSC.ttf') format('truetype');
+    font-weight: normal;
+  }
+  @font-face {
+    font-family: 'Noto Sans SC';
+    src: local('NotoSansCJKsc-Bold'),
+         local('Noto Sans CJK SC Bold'),
+         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc') format('truetype'),
+         url('/home/node/.openclaw/workspace/fonts/NotoSansSC-Bold.ttf') format('truetype');
+    font-weight: 700;
+  }
+  @font-face {
+    font-family: 'JetBrains Mono';
+    src: local('JetBrainsMono-Regular'),
+         url('/home/node/.openclaw/workspace/fonts/JetBrainsMono-Regular.ttf') format('truetype');
+    font-weight: normal;
+  }
+
   @page {
     size: A4;
     margin: 0;
