@@ -526,6 +526,17 @@ def _chrome_env() -> dict:
     return env
 
 
+def _valid_file(path: Path, min_size: int = 100) -> bool:
+    return path.exists() and path.stat().st_size > min_size
+
+
+def _prepare_output(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # Remove stale output first. Otherwise a failed render can be misread as success
+    # because yesterday's/previous attempt's file still exists.
+    path.unlink(missing_ok=True)
+
+
 def _pw_render(mode: str, html_path: Path, out_path: Path, **kw) -> bool:
     """Fallback: use Playwright Node.js renderer (pw-render.js)."""
     if not PW_RENDER_JS.exists():
@@ -539,7 +550,7 @@ def _pw_render(mode: str, html_path: Path, out_path: Path, **kw) -> bool:
         cmd += ["--width", str(w), "--height", str(h), "--scale", str(s)]
     try:
         r = subprocess.run(cmd, capture_output=True, timeout=120, check=False)
-        if r.returncode == 0 and out_path.exists():
+        if r.returncode == 0 and _valid_file(out_path):
             print(f"[pw-render] {mode} OK via Playwright fallback", file=sys.stderr)
             return True
         print(f"[pw-render] {mode} failed: {r.stderr.decode()[:200] if r.stderr else 'no stderr'}", file=sys.stderr)
@@ -550,6 +561,7 @@ def _pw_render(mode: str, html_path: Path, out_path: Path, **kw) -> bool:
 
 def export_png(html_path: Path, png_path: Path, scale: int = 2) -> bool:
     """16:9 dashboard PNG. Try Chrome CLI first, fallback to Playwright."""
+    _prepare_output(png_path)
     if Path(CHROME_PATH).exists():
         cmd = [
             CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars", "--no-sandbox",
@@ -560,7 +572,7 @@ def export_png(html_path: Path, png_path: Path, scale: int = 2) -> bool:
         ]
         try:
             r = subprocess.run(cmd, capture_output=True, timeout=90, check=False, env=_chrome_env())
-            if png_path.exists() and png_path.stat().st_size > 100:
+            if _valid_file(png_path):
                 return True
         except subprocess.TimeoutExpired:
             print(f"[warn] Chrome PNG timeout (90s), trying Playwright fallback", file=sys.stderr)
@@ -570,6 +582,7 @@ def export_png(html_path: Path, png_path: Path, scale: int = 2) -> bool:
 
 def export_pdf(html_path: Path, pdf_path: Path) -> bool:
     """A4 多页 PDF. Try Chrome CLI first, fallback to Playwright."""
+    _prepare_output(pdf_path)
     if Path(CHROME_PATH).exists():
         cmd = [
             CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars", "--no-sandbox",
@@ -580,7 +593,7 @@ def export_pdf(html_path: Path, pdf_path: Path) -> bool:
         ]
         try:
             r = subprocess.run(cmd, capture_output=True, timeout=90, check=False, env=_chrome_env())
-            if pdf_path.exists() and pdf_path.stat().st_size > 100:
+            if _valid_file(pdf_path):
                 return True
         except subprocess.TimeoutExpired:
             print(f"[warn] Chrome PDF timeout (90s), trying Playwright fallback", file=sys.stderr)

@@ -76,9 +76,22 @@ def _chrome_env():
     return env
 
 
+def _valid_file(path, min_size=100):
+    path = pathlib.Path(path)
+    return path.exists() and path.stat().st_size > min_size
+
+
+def _prepare_output(path):
+    path = pathlib.Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.unlink(missing_ok=True)
+
+
 def _screenshot(html_path, png_path, w, h, scale=2):
     """Chrome 无头截图（卡片用方形窗口）。Try Chrome CLI, fallback to pw-render.js card mode."""
-    from render import CHROME_PATH, PW_RENDER_JS, _pw_render
+    from render import CHROME_PATH, _pw_render
+    png_path = pathlib.Path(png_path)
+    _prepare_output(png_path)
     if pathlib.Path(CHROME_PATH).exists():
         cmd = [CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars", "--no-sandbox",
                f"--window-size={w},{h}", "--virtual-time-budget=5000",
@@ -86,12 +99,14 @@ def _screenshot(html_path, png_path, w, h, scale=2):
                f"--screenshot={png_path}", f"file://{html_path.resolve()}"]
         try:
             r = subprocess.run(cmd, capture_output=True, timeout=90, check=False, env=_chrome_env())
-            if png_path.exists() and png_path.stat().st_size > 100:
+            if _valid_file(png_path):
                 return True
+            if r.stderr:
+                print(f"[warn] Chrome card screenshot failed: {r.stderr.decode(errors='replace')[:240]}", file=sys.stderr)
         except subprocess.TimeoutExpired:
             print("[warn] Chrome card screenshot timeout, trying Playwright fallback", file=sys.stderr)
     # Fallback to Playwright Node.js card mode
-    return _pw_render("card", pathlib.Path(html_path), pathlib.Path(png_path))
+    return _pw_render("card", pathlib.Path(html_path), png_path)
 
 
 def _prune_downloads(dl, keep_days=7):
@@ -244,8 +259,12 @@ def _render_card(payload, date):
     if not items:
         print("[warn] curated 无条目，跳过卡片更新", file=sys.stderr)
         return False
-    # importance 降序，id 升序兜底
-    top = sorted(items, key=lambda x: (-(x.get("importance") or 0), x.get("id") or 0))[0]
+    # 优先取战略动向第一条作为 BREAKING NEWS；若无战略条目则 fallback 到全局 importance 最高
+    strategy = [it for it in items if it.get("dimension") == "strategy"]
+    if strategy:
+        top = sorted(strategy, key=lambda x: (-(x.get("importance") or 0), x.get("id") or 0))[0]
+    else:
+        top = sorted(items, key=lambda x: (-(x.get("importance") or 0), x.get("id") or 0))[0]
     headline = top.get("headline") or top.get("title") or ""
     briefing = top.get("briefing") or top.get("summary") or top.get("exec_meaning") or ""
     meaning = top.get("exec_meaning") or top.get("briefing") or ""
@@ -284,42 +303,78 @@ def build_downloads(payload, date):
     dl.mkdir(exist_ok=True)
     report_html = DOCS / f"{date}.html"
     made = []
+    missing = []
 
     # 0) 先按当日数据刷新分享卡片（注入日期 + 今日爆款），随后才截图
     if _render_card(payload, date):
         made.append("卡片HTML")
+    else:
+        missing.append("卡片HTML")
 
     # 1) 日报 PDF（A4 多页，从报告 HTML 同源渲染）
     pdf_path = dl / f"ai-brief-{date}.pdf"
-    if report_html.exists() and export_pdf(report_html, pdf_path):
+    if report_html.exists() and export_pdf(report_html, pdf_path) and _valid_file(pdf_path):
         shutil.copyfile(pdf_path, dl / "latest.pdf")
         made.append("PDF")
+    else:
+        missing.append("PDF")
 
     # 2) 总览 PNG（16:9 仪表盘）
     dash_html = BUILD / f"dashboard-{date}.html"
     dash_html.write_text(render_dashboard(payload), encoding="utf-8")
     overview_png = dl / f"ai-brief-overview-{date}.png"
-    if export_png(dash_html, overview_png, scale=2):
-        shutil.copyfile(overview_png, dl / "latest-overview.png")
-        made.append("总览PNG")
-    dash_html.unlink(missing_ok=True)
+    try:
+        if export_png(dash_html, overview_png, scale=2) and _valid_file(overview_png):
+            shutil.copyfile(overview_png, dl / "latest-overview.png")
+            made.append("总览PNG")
+        else:
+            missing.append("总览PNG")
+    finally:
+        dash_html.unlink(missing_ok=True)
 
     # 3) 卡片 PNG（card 改为 min-height 模式可自由生长，窗口加高到 900 确保不裁切）
     card_png = dl / f"ai-brief-card-{date}.png"
-    if _screenshot(DOCS / "card.html", card_png, 580, 900, scale=2):
+    if _screenshot(DOCS / "card.html", card_png, 580, 900, scale=2) and _valid_file(card_png):
         shutil.copyfile(card_png, dl / "latest-card.png")
         made.append("卡片PNG")
+    else:
+        missing.append("卡片PNG")
 
     # 4) 近 7 天合辑 PDF
     try:
-        if build_weekly(date):
+        weekly = build_weekly(date)
+        if weekly and _valid_file(weekly):
             made.append("近7天合辑")
+        else:
+            missing.append("近7天合辑")
     except Exception as e:
+        missing.append("近7天合辑")
         print(f"[warn] 近 7 天合辑生成失败：{e}", file=sys.stderr)
 
     # 往期全部永久保留，不做清理
     _download_index(dl)
     print(f"[ok] downloads -> docs/download/ [{', '.join(made) or '空'}]")
+    if missing:
+        print(f"[warn] downloads missing: {', '.join(missing)}", file=sys.stderr)
+    return made, missing
+
+
+def git_commit_push(date):
+    """Commit and push generated outputs/scripts. Treat no-op commit as success for cron."""
+    run(["git", "-C", ROOT, "add", "-A", "docs", "build.py", "scripts"])
+    status = subprocess.run(
+        ["git", "-C", ROOT, "status", "--porcelain"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    if not status:
+        print("[ok] no changes to commit")
+        return
+    msg = f"AI 简讯 {date}"
+    subprocess.run(["git", "-C", ROOT, "commit", "-m", msg], check=True)
+    subprocess.run(["git", "-C", ROOT, "push"], check=True)
+    print("[ok] pushed — 稍等 1 分钟 GitHub Pages 会更新")
 
 
 def main():
@@ -357,10 +412,7 @@ def main():
         print(f"[warn] 生成下载产物失败（不影响网页发布）：{e}", file=sys.stderr)
     # 6. 推送（Pages 从 docs/ 自动发布）
     if push:
-        run(["git", "-C", ROOT, "add", "-A", "docs"])
-        run(["git", "-C", ROOT, "commit", "-m", f"AI 简讯 {date}"])
-        run(["git", "-C", ROOT, "push"])
-        print("[ok] pushed — 稍等 1 分钟 GitHub Pages 会更新")
+        git_commit_push(date)
 
 
 if __name__ == "__main__":

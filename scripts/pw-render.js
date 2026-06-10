@@ -27,6 +27,9 @@ if (!mode || !inputHtml || !outputFile) {
 
 const inputPath = path.resolve(inputHtml);
 const outputPath = path.resolve(outputFile);
+fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+// Remove stale output before rendering so a failed run cannot look successful.
+try { fs.unlinkSync(outputPath); } catch (_) {}
 
 if (!fs.existsSync(inputPath)) {
   console.error(`Input not found: ${inputPath}`);
@@ -65,13 +68,16 @@ async function render() {
         if (rest[i] === '--height' && rest[i+1]) height = parseInt(rest[i+1]);
         if (rest[i] === '--scale' && rest[i+1]) scale = parseInt(rest[i+1]);
       }
-      const page = await browser.newPage({ viewport: { width, height } });
+      if (!Number.isFinite(width) || width <= 0) width = 1920;
+      if (!Number.isFinite(height) || height <= 0) height = 1080;
+      if (!Number.isFinite(scale) || scale <= 0) scale = 2;
+      const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale });
       await page.goto(`file://${inputPath}`, { waitUntil: 'networkidle', timeout: 60000 });
       await page.waitForTimeout(3000);
       await page.screenshot({ path: outputPath, fullPage: false });
       await page.close();
     } else if (mode === 'card') {
-      const page = await browser.newPage({ viewport: { width: 580, height: 900 } });
+      const page = await browser.newPage({ viewport: { width: 580, height: 900 }, deviceScaleFactor: 2 });
       await page.goto(`file://${inputPath}`, { waitUntil: 'networkidle', timeout: 60000 });
       await page.waitForTimeout(2000);
       await page.screenshot({ path: outputPath, fullPage: true });
@@ -81,7 +87,11 @@ async function render() {
       process.exit(1);
     }
 
-    console.log(`[pw-render] ${mode}: ${outputPath} (${fs.existsSync(outputPath) ? fs.statSync(outputPath).size : 0} bytes)`);
+    const size = fs.existsSync(outputPath) ? fs.statSync(outputPath).size : 0;
+    if (size <= 100) {
+      throw new Error(`render produced missing/tiny file: ${outputPath} (${size} bytes)`);
+    }
+    console.log(`[pw-render] ${mode}: ${outputPath} (${size} bytes)`);
   } finally {
     await browser.close();
   }
