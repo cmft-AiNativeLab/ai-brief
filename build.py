@@ -77,17 +77,21 @@ def _chrome_env():
 
 
 def _screenshot(html_path, png_path, w, h, scale=2):
-    """Chrome 无头截图（卡片用方形窗口）。"""
-    from render import CHROME_PATH
-    if not pathlib.Path(CHROME_PATH).exists():
-        print("[warn] Chrome 缺失，跳过卡片截图", file=sys.stderr)
-        return False
-    cmd = [CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars", "--no-sandbox",
-           f"--window-size={w},{h}", "--virtual-time-budget=2500",
-           f"--force-device-scale-factor={scale}",
-           f"--screenshot={png_path}", f"file://{html_path.resolve()}"]
-    subprocess.run(cmd, capture_output=True, timeout=60, check=False, env=_chrome_env())
-    return png_path.exists()
+    """Chrome 无头截图（卡片用方形窗口）。Try Chrome CLI, fallback to pw-render.js card mode."""
+    from render import CHROME_PATH, PW_RENDER_JS, _pw_render
+    if pathlib.Path(CHROME_PATH).exists():
+        cmd = [CHROME_PATH, "--headless", "--disable-gpu", "--hide-scrollbars", "--no-sandbox",
+               f"--window-size={w},{h}", "--virtual-time-budget=5000",
+               f"--force-device-scale-factor={scale}",
+               f"--screenshot={png_path}", f"file://{html_path.resolve()}"]
+        try:
+            r = subprocess.run(cmd, capture_output=True, timeout=90, check=False, env=_chrome_env())
+            if png_path.exists() and png_path.stat().st_size > 100:
+                return True
+        except subprocess.TimeoutExpired:
+            print("[warn] Chrome card screenshot timeout, trying Playwright fallback", file=sys.stderr)
+    # Fallback to Playwright Node.js card mode
+    return _pw_render("card", pathlib.Path(html_path), pathlib.Path(png_path))
 
 
 def _prune_downloads(dl, keep_days=7):
