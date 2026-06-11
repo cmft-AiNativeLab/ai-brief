@@ -24,6 +24,106 @@ BUILD = ROOT / "build"
 PY = sys.executable
 
 
+def _analytics_snippet(prefix=""):
+    """Invisible analytics: page views + download/link click events.
+
+    Configure runtime endpoint outside the visible page UI with either:
+      window.AI_BRIEF_ANALYTICS_ENDPOINT = "https://..."
+    or:
+      <meta name="ai-brief-analytics-endpoint" content="https://...">
+    If no endpoint is configured the script is a safe no-op.
+    """
+    return f'<script defer src="{prefix}analytics.js"></script>'
+
+
+def _inject_analytics(html, prefix=""):
+    snippet = _analytics_snippet(prefix)
+    if "analytics.js" in html:
+        return html
+    if "</body>" in html:
+        return html.replace("</body>", snippet + "</body>", 1)
+    return html + snippet
+
+
+def write_analytics_js():
+    js = r'''
+(() => {
+  'use strict';
+  const ENDPOINT = (window.AI_BRIEF_ANALYTICS_ENDPOINT ||
+    document.querySelector('meta[name="ai-brief-analytics-endpoint"]')?.content || '').trim();
+  const SITE = 'cmft-ai-brief';
+  const now = () => new Date().toISOString();
+  const anonId = () => {
+    const key = 'ai_brief_aid';
+    try {
+      let v = localStorage.getItem(key);
+      if (!v) {
+        v = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + '-' + Math.random().toString(36).slice(2));
+        localStorage.setItem(key, v);
+      }
+      return v;
+    } catch (_) { return ''; }
+  };
+  const pageDate = () => {
+    const m = location.pathname.match(/(20\d{6})(?:\.html)?$/);
+    return m ? m[1] : '';
+  };
+  const classifyDownload = (href) => {
+    const path = new URL(href, location.href).pathname.split('/').pop() || '';
+    let type = 'file';
+    const mDate = path.match(/(20\d{6})/);
+    if (/7days\.pdf$/i.test(path)) type = 'weekly_pdf';
+    else if (/latest\.pdf$/i.test(path) || /ai-brief-20\d{6}\.pdf$/i.test(path)) type = 'daily_pdf';
+    else if (/overview.*\.png$/i.test(path)) type = 'overview_png';
+    else if (/card.*\.png$/i.test(path)) type = 'card_png';
+    return { file: path, file_type: type, file_date: mDate ? mDate[1] : '' };
+  };
+  const send = (event, data = {}) => {
+    if (!ENDPOINT) return;
+    const payload = JSON.stringify({
+      site: SITE,
+      event,
+      ts: now(),
+      url: location.href,
+      path: location.pathname,
+      referrer: document.referrer || '',
+      title: document.title || '',
+      page_date: pageDate(),
+      visitor_id: anonId(),
+      ua: navigator.userAgent || '',
+      ...data
+    });
+    try {
+      if (navigator.sendBeacon) {
+        const ok = navigator.sendBeacon(ENDPOINT, new Blob([payload], { type: 'application/json' }));
+        if (ok) return;
+      }
+      fetch(ENDPOINT, { method: 'POST', mode: 'cors', keepalive: true, headers: { 'content-type': 'application/json' }, body: payload }).catch(() => {});
+    } catch (_) {}
+  };
+  const pageView = () => send('page_view');
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', pageView, { once: true });
+  } else {
+    pageView();
+  }
+  document.addEventListener('click', (ev) => {
+    const a = ev.target.closest && ev.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    const isDownload = a.hasAttribute('download') || /\.(pdf|png)(\?|#|$)/i.test(href);
+    if (isDownload) {
+      send('download_click', { ...classifyDownload(href), link_text: (a.textContent || '').trim().slice(0, 80) });
+    } else {
+      send('link_click', { link_url: new URL(href, location.href).href, link_text: (a.textContent || '').trim().slice(0, 80) });
+    }
+  }, true);
+})();
+'''
+    (DOCS / "analytics.js").write_text(js.strip() + "\n", encoding="utf-8")
+    print("[ok] wrote docs/analytics.js")
+
+
 def load_env():
     envf = ROOT / ".env"
     if envf.exists():
@@ -62,7 +162,7 @@ def build_archive():
         f"{lis}\n</ul>"
         "<div class=foot>由 招商金科 出品</div></body></html>"
     )
-    (DOCS / "archive.html").write_text(html, encoding="utf-8")
+    (DOCS / "archive.html").write_text(_inject_analytics(html), encoding="utf-8")
     print(f"[ok] wrote docs/archive.html ({len(dates)} 期)")
 
 
@@ -200,7 +300,7 @@ def _download_index(dl):
         '<div class="foot">由 招商金科 出品 · 数据来源 量子位 / 新智元 / 36氪 / 华尔街见闻 等 ＋ artificialanalysis.ai</div>'
         '</div></body></html>'
     )
-    (dl / "index.html").write_text(html, encoding="utf-8")
+    (dl / "index.html").write_text(_inject_analytics(html, "../"), encoding="utf-8")
 
 
 def build_weekly(date):
@@ -290,7 +390,7 @@ def _render_card(payload, date):
     filled = _fill(primary.read_text(encoding="utf-8"))
     rendered = 0
     for out_name in ("card.html", "card-pro.html"):
-        (DOCS / out_name).write_text(filled, encoding="utf-8")
+        (DOCS / out_name).write_text(_inject_analytics(filled), encoding="utf-8")
         rendered += 1
     print(f"[ok] wrote docs/card*.html × {rendered} (card-pro 模板) · 今日精选：{headline[:24]}…")
     return True
@@ -397,7 +497,8 @@ def main():
     sys.path.insert(0, str(SCRIPTS))
     from render import render_report
     payload = json.loads(curated_json.read_text(encoding="utf-8"))
-    html = render_report(payload)
+    html = _inject_analytics(render_report(payload))
+    write_analytics_js()
     date_iso = (payload.get("generated_at") or "")[:10] or datetime.date.today().isoformat()
     date = date_iso.replace("-", "")  # 紧凑日期 YYYYMMDD → URL 形如 /ai-brief/20260601
     (DOCS / "index.html").write_text(html, encoding="utf-8")
