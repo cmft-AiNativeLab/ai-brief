@@ -25,7 +25,7 @@ PY = sys.executable
 
 
 def _analytics_snippet(prefix=""):
-    """百度统计埋点代码"""
+    """百度统计埋点 + 下载事件追踪"""
     return '''<script>
 var _hmt = _hmt || [];
 (function() {
@@ -33,6 +33,31 @@ var _hmt = _hmt || [];
  hm.src = "https://hm.baidu.com/hm.js?5b3142c3d7836775b91647439de7a663";
  var s = document.getElementsByTagName("script")[0];
  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+(function(){
+  function classify(href){
+    var p=(new URL(href,location.href)).pathname.split('/').pop()||'';
+    if(/7days\\.pdf$/i.test(p)) return 'weekly_pdf';
+    if(/latest\\.pdf$/i.test(p)||/ai-brief-20\\d{6}\\.pdf$/i.test(p)) return 'daily_pdf';
+    if(/overview.*\\.png$/i.test(p)) return 'overview_png';
+    if(/card.*\\.png$/i.test(p)) return 'card_png';
+    if(/\\.pdf$/i.test(p)) return 'other_pdf';
+    if(/\\.png$/i.test(p)) return 'other_png';
+    return '';
+  }
+  document.addEventListener('click',function(ev){
+    var a=ev.target.closest&&ev.target.closest('a[href]');
+    if(!a)return;
+    var href=a.getAttribute('href')||'';
+    var isDl=a.hasAttribute('download')||/\\.(pdf|png)(\\?|#|$)/i.test(href);
+    if(!isDl)return;
+    var type=classify(href);
+    if(type){
+      _hmt.push(['_trackEvent','download',type,a.textContent.trim().slice(0,60)]);
+    }
+  },true);
 })();
 </script>'''
 
