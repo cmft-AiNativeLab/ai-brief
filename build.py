@@ -429,11 +429,133 @@ def git_commit_push(date):
     print("[ok] pushed — 稍等 1 分钟 GitHub Pages 会更新")
 
 
+def verify_downloads(date):
+    """验证当日所有关键下载产物是否存在且有效。
+    返回 (ok: bool, missing: list[str])。
+    """
+    dl = DOCS / "download"
+    required = [
+        (f"ai-brief-{date}.pdf", 50_000),       # PDF 至少 50KB
+        (f"ai-brief-overview-{date}.png", 100_000),  # 总览至少 100KB
+        (f"ai-brief-card-{date}.png", 50_000),   # 卡片至少 50KB
+    ]
+    missing = []
+    for name, min_size in required:
+        p = dl / name
+        if not p.exists():
+            missing.append(f"{name} (不存在)")
+        elif p.stat().st_size < min_size:
+            missing.append(f"{name} (仅 {p.stat().st_size} bytes，需 >{min_size})")
+    # 检查 latest.* 固定链接
+    for alias in ("latest.pdf", "latest-overview.png", "latest-card.png"):
+        p = dl / alias
+        if not p.exists() or p.stat().st_size < 100:
+            missing.append(f"{alias} (缺失或过小)")
+    # 检查 7 天合辑
+    wk = dl / "ai-brief-7days.pdf"
+    if not wk.exists() or wk.stat().st_size < 100_000:
+        missing.append("ai-brief-7days.pdf (缺失或过小)")
+    # 检查下载索引
+    idx = dl / "index.html"
+    if not idx.exists():
+        missing.append("download/index.html (缺失)")
+    return (len(missing) == 0, missing)
+
+
+def retry_missing_downloads(payload, date, max_retries=2):
+    """验证产物，缺失的尝试重新渲染（最多 max_retries 次）。
+    返回最终 (ok, missing)。
+    """
+    from render import render_dashboard, export_pdf, export_png
+    for attempt in range(1, max_retries + 1):
+        ok, missing = verify_downloads(date)
+        if ok:
+            return True, []
+        print(f"[retry #{attempt}] 缺失产物: {', '.join(missing)}")
+        dl = DOCS / "download"
+        dl.mkdir(exist_ok=True)
+        report_html = DOCS / f"{date}.html"
+        # 逐个尝试补渲染
+        pdf_name = f"ai-brief-{date}.pdf"
+        if any(pdf_name in m for m in missing) and report_html.exists():
+            pdf_path = dl / pdf_name
+            print(f"  重试 PDF: {pdf_name}")
+            try:
+                if export_pdf(report_html, pdf_path) and _valid_file(pdf_path):
+                    shutil.copyfile(pdf_path, dl / "latest.pdf")
+                    print(f"  ✓ PDF 重试成功 ({pdf_path.stat().st_size} bytes)")
+            except Exception as e:
+                print(f"  ✗ PDF 重试失败: {e}", file=sys.stderr)
+        overview_name = f"ai-brief-overview-{date}.png"
+        if any(overview_name in m for m in missing):
+            dash_html = BUILD / f"dashboard-{date}.html"
+            overview_png = dl / overview_name
+            print(f"  重试总览 PNG: {overview_name}")
+            try:
+                dash_html.write_text(render_dashboard(payload), encoding="utf-8")
+                if export_png(dash_html, overview_png, scale=2) and _valid_file(overview_png):
+                    shutil.copyfile(overview_png, dl / "latest-overview.png")
+                    print(f"  ✓ 总览 PNG 重试成功 ({overview_png.stat().st_size} bytes)")
+            except Exception as e:
+                print(f"  ✗ 总览 PNG 重试失败: {e}", file=sys.stderr)
+            finally:
+                dash_html.unlink(missing_ok=True)
+        card_name = f"ai-brief-card-{date}.png"
+        if any(card_name in m for m in missing):
+            card_png = dl / card_name
+            print(f"  重试卡片 PNG: {card_name}")
+            try:
+                if _screenshot(DOCS / "card.html", card_png, 580, 900, scale=2) and _valid_file(card_png):
+                    shutil.copyfile(card_png, dl / "latest-card.png")
+                    print(f"  ✓ 卡片 PNG 重试成功 ({card_png.stat().st_size} bytes)")
+            except Exception as e:
+                print(f"  ✗ 卡片 PNG 重试失败: {e}", file=sys.stderr)
+        # 7 天合辑
+        if any("7days" in m for m in missing):
+            try:
+                build_weekly(date)
+                print(f"  ✓ 7 天合辑重试完成")
+            except Exception as e:
+                print(f"  ✗ 7 天合辑重试失败: {e}", file=sys.stderr)
+        # 下载索引
+        if any("index.html" in m for m in missing):
+            try:
+                _download_index(dl)
+                print(f"  ✓ 下载索引重试完成")
+            except Exception as e:
+                print(f"  ✗ 下载索引重试失败: {e}", file=sys.stderr)
+    # 最终验证
+    ok, missing = verify_downloads(date)
+    if not ok:
+        print(f"[error] 重试 {max_retries} 次后仍有 {len(missing)} 个产物缺失：", file=sys.stderr)
+        for m in missing:
+            print(f"  - {m}", file=sys.stderr)
+    return ok, missing
+
+
 def main():
     load_env()
     push = "--push" in sys.argv
+    verify_only = "--verify-only" in sys.argv
     BUILD.mkdir(exist_ok=True)
     DOCS.mkdir(exist_ok=True)
+    # --verify-only: 仅验证产物完整性，不重新构建
+    if verify_only:
+        # 取最新的日期 HTML
+        dates = sorted([p.stem for p in DOCS.glob("20*.html") if p.stem.isdigit()], reverse=True)
+        if not dates:
+            print("[error] 没有找到任何日期 HTML", file=sys.stderr)
+            sys.exit(1)
+        date = dates[0]
+        ok, missing = verify_downloads(date)
+        if ok:
+            print(f"[ok] {date} 全部产物完整 ✓")
+        else:
+            print(f"[fail] {date} 缺失 {len(missing)} 个产物:")
+            for m in missing:
+                print(f"  - {m}")
+            sys.exit(1)
+        return
     # 旁路：--from-curated <path> 跳过抓取+提炼，直接用现成 curated JSON 渲染发布
     if "--from-curated" in sys.argv:
         curated_json = pathlib.Path(sys.argv[sys.argv.index("--from-curated") + 1])
@@ -462,8 +584,14 @@ def main():
     try:
         build_downloads(payload, date)
     except Exception as e:
-        print(f"[warn] 生成下载产物失败（不影响网页发布）：{e}", file=sys.stderr)
-    # 6. 推送（Pages 从 docs/ 自动发布）
+        print(f"[warn] 生成下载产物异常（将进入验证+重试）：{e}", file=sys.stderr)
+    # 6. 验证产物完整性，缺失则自动重试
+    ok, missing = retry_missing_downloads(payload, date, max_retries=2)
+    if not ok:
+        print(f"[error] 产物验证失败，放弃推送！缺失: {missing}", file=sys.stderr)
+        sys.exit(1)
+    print(f"[ok] 产物验证通过 ✓ (PDF + 总览PNG + 卡片PNG + 7天合辑 + 下载索引)")
+    # 7. 推送（Pages 从 docs/ 自动发布）
     if push:
         git_commit_push(date)
 
