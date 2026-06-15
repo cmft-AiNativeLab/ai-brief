@@ -563,8 +563,8 @@ def main():
     else:
         fetch_json = BUILD / "fetch.json"
         curated_json = BUILD / "curated.json"
-        # 1. 抓取 10 源 + 榜单
-        run([PY, SCRIPTS / "brief.py", "--curate", "--json-out", fetch_json, "--hours", "24"])
+        # 1. 抓取 10 源 + 榜单，仅保留最近 8 小时新闻
+        run([PY, SCRIPTS / "brief.py", "--curate", "--json-out", fetch_json, "--hours", "8"])
         # 2. Claude 自动提炼（选 12 条 + 打标 + 摘要/行动）
         run([PY, SCRIPTS / "curate_auto.py", fetch_json, curated_json])
     # 3. 渲染 HTML（直接拿字符串，写入 docs/，链接可点）
