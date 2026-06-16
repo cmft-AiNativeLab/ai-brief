@@ -7,7 +7,7 @@
 环境变量：
   AI_BRIEF_API_KEY   (必需) 中转 / Anthropic key
   AI_BRIEF_BASE_URL  (默认 https://newapi.ai-native-lab.com)
-  AI_BRIEF_MODEL     (默认 claude-opus-4-7)
+  AI_BRIEF_MODEL     (默认 qwen3.7-max)
 
 用法: python curate_auto.py <fetch.json> <curated.json>
 
@@ -24,7 +24,7 @@ from collections import Counter
 
 BASE_URL = os.environ.get("AI_BRIEF_BASE_URL", "https://newapi.ai-native-lab.com").rstrip("/")
 API_KEY = os.environ.get("AI_BRIEF_API_KEY", "")
-MODEL = os.environ.get("AI_BRIEF_MODEL", "claude-opus-4-7")
+MODEL = os.environ.get("AI_BRIEF_MODEL", "qwen3.7-max")
 MAX_CAND = 50  # 传给 LLM 的候选上限（太多会让单次生成过久、触发中转 504）
 PER_SRC_CAP = 6  # 候选阶段每来源最多 N 条：避免高频源（如 Hacker News）淹没候选池导致选稿偏科
 

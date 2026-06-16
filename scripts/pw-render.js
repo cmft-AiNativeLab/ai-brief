@@ -77,10 +77,10 @@ async function render() {
       await page.screenshot({ path: outputPath, fullPage: false });
       await page.close();
     } else if (mode === 'card') {
-      const page = await browser.newPage({ viewport: { width: 580, height: 900 }, deviceScaleFactor: 2 });
+      const page = await browser.newPage({ viewport: { width: 900, height: 1200 }, deviceScaleFactor: 2 });
       await page.goto(`file://${inputPath}`, { waitUntil: 'networkidle', timeout: 60000 });
       await page.waitForTimeout(2000);
-      await page.screenshot({ path: outputPath, fullPage: true });
+      await page.screenshot({ path: outputPath, fullPage: false });
       await page.close();
     } else {
       console.error(`Unknown mode: ${mode}`);
