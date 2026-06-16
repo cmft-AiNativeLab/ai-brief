@@ -16,7 +16,13 @@
   body{display:flex;align-items:center;justify-content:center;background:#dfe5ef;font-family:NotoSansSC,"PingFang SC","Microsoft YaHei",sans-serif;color:#172033;padding:0}
   .card{--card-w:min(100vw,calc(100vh * 9 / 16),900px);position:relative;width:var(--card-w);height:calc(var(--card-w) * 16 / 9);overflow:hidden;background:linear-gradient(180deg,#eef3fa 0%,#dbe4ef 46%,#cbd6e5 100%);padding:calc(var(--card-w) * .064) calc(var(--card-w) * .06) calc(var(--card-w) * .049);box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
   .card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 8%,rgba(93,124,166,.25),transparent 28%),radial-gradient(circle at 16% 94%,rgba(255,255,255,.38),transparent 24%);pointer-events:none}
-  .date{position:absolute;top:calc(var(--card-w) * .049);right:calc(var(--card-w) * .06);font-family:Georgia,serif;font-size:calc(var(--card-w) * .028);letter-spacing:calc(var(--card-w) * .0033);font-weight:700;color:#516b90;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+  /* 日期：右上角"钢印"——衬线 + 暗压字 + 高光与暗影模拟压印纸面 */
+  .date{position:absolute;top:calc(var(--card-w) * .049);right:calc(var(--card-w) * .06);
+    font-family:"Bodoni 72","Didot","Playfair Display",Georgia,serif;
+    font-size:calc(var(--card-w) * .025);letter-spacing:calc(var(--card-w) * .003);
+    font-weight:700;color:rgba(58,90,140,.85);
+    text-shadow:0 1px 0 rgba(255,255,255,.75),0 -1px 0 rgba(28,36,55,.12),1px 1px 1px rgba(28,36,55,.08);
+    font-feature-settings:"tnum","lnum";-webkit-font-smoothing:antialiased;}
   .title{position:relative;font-family:Georgia,"Noto Serif SC",serif;font-size:calc(var(--card-w) * .087);line-height:.92;font-weight:700;letter-spacing:calc(var(--card-w) * .0078);color:#172033}
   .sub{position:relative;margin-top:calc(var(--card-w) * .024);padding-bottom:calc(var(--card-w) * .029);border-bottom:2px dashed rgba(57,82,122,.38);display:flex;justify-content:space-between;align-items:flex-end;gap:calc(var(--card-w) * .025);color:#3b465a;font-size:calc(var(--card-w) * .0275);line-height:1.35;letter-spacing:.6px}
   .brand{font-weight:800;color:#6f819e;white-space:nowrap}
