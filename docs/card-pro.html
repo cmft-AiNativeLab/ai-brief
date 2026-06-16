@@ -5,264 +5,63 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>AI 简讯 · 招商金科</title>
 <meta property="og:title" content="AI 简讯 · 招商金科">
-<meta property="og:description" content="每日 AI 行业关键动向 — 战略 / 行业 / 实践 + 大模型能力榜">
+<meta property="og:description" content="每日 AI 行业关键动向 — 战略 / 行业 / 实践">
 <meta property="og:image" content="https://cmft-AiNativeLab.github.io/ai-brief/logo.png">
-<meta name="theme-color" content="#e2e7ef">
+<meta name="theme-color" content="#dfe5ef">
 <style>
-  /* === 容器环境字体兜底：@font-face 注册本地中文字体 === */
-  @font-face {
-    font-family: 'Noto Serif SC';
-    src: local('NotoSerifCJKsc-Regular'),
-         local('Noto Serif CJK SC'),
-         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc') format('truetype'),
-         url('/home/node/.openclaw/workspace/fonts/NotoSansCJKsc-Regular.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: 'Noto Serif SC';
-    src: local('NotoSerifCJKsc-Bold'),
-         local('Noto Serif CJK SC Bold'),
-         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc') format('truetype'),
-         url('/home/node/.openclaw/workspace/fonts/NotoSansSC-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: 'Noto Sans SC';
-    src: local('NotoSansCJKsc-Regular'),
-         local('Noto Sans CJK SC'),
-         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc') format('truetype'),
-         url('/home/node/.openclaw/workspace/fonts/NotoSansSC.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: 'Noto Sans SC';
-    src: local('NotoSansCJKsc-Bold'),
-         local('Noto Sans CJK SC Bold'),
-         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc') format('truetype'),
-         url('/home/node/.openclaw/workspace/fonts/NotoSansSC-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-  }
-  :root{
-    --bg:#e2e7ef;            /* 冷调纸感 */
-    --bg-soft:#ecf0f5;
-    --steel:#3a5a8c;         /* 钢蓝（替代金色，做强调） */
-    --steel-soft:#7287a8;    /* 浅蓝灰 */
-    --bronze:#a38660;        /* 暖铜（杂志封面日期/序号色） */
-    --ink:#1c2433;           /* 冷墨 */
-    --ink2:#3a4659;
-    --grey:#6c7587;
-    --pill:#161d2c;          /* 来源胶囊深底 */
-    --pill-ink:#9bb3d4;      /* 冷调金属字 */
-    /* 杂志封面字体栈：Didot / Bodoni 强对比衬线，中文回落到宋体 */
-    --display:"Didot","Bodoni 72","Bodoni 72 Smallcaps","Playfair Display","Songti SC","STSong","Source Han Serif SC","Noto Serif SC",Georgia,serif;
-    --serif:"Source Han Serif SC","Noto Serif SC","Songti SC","STSong",Georgia,serif;
-    --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
-  }
-  *{ box-sizing:border-box; margin:0; padding:0; }
-  html,body{ width:100%; height:100%; max-width:100vw; overflow:hidden; }
-  body{ font-family:var(--serif);
-    background:linear-gradient(160deg,#d2dae6 0%,#dee4ed 35%,#cad3df 100%);
-    min-height:100%; display:flex; align-items:center; justify-content:center; padding:10px; }
-
-  /* 主卡：强制 9:16 竖版，尽量侵占画布；中部信息区按剩余空间自适应。 */
-  .card{ --card-w:min(calc(100vw - 20px), calc((100vh - 20px) * 9 / 16), 880px);
-    position:relative; width:var(--card-w); height:calc(var(--card-w) * 16 / 9);
-    aspect-ratio:9/16;
-    border-radius:30px; overflow:hidden;
-    background:linear-gradient(168deg,var(--bg-soft) 0%,var(--bg) 60%,#d6dde8 100%);
-    box-shadow:0 30px 70px rgba(28,36,55,.24), inset 0 1px 0 rgba(255,255,255,.6);
-    padding:30px 28px 18px; display:flex; flex-direction:column; }
-
-  /* 右上角放射冷光（替代暖金光） */
-  .card::before{ content:''; position:absolute; top:-160px; right:-160px;
-    width:480px; height:480px; border-radius:50%;
-    background:
-      radial-gradient(circle at center,
-        rgba(114,135,168,.28) 0%,
-        rgba(58,90,140,.16) 28%,
-        rgba(58,90,140,.08) 55%,
-        transparent 78%);
-    pointer-events:none; }
-  /* 同心圆细线点缀 */
-  .card::after{ content:''; position:absolute; top:-188px; right:-188px;
-    width:540px; height:540px; border-radius:50%;
-    border:1px solid rgba(58,90,140,.16); pointer-events:none; }
-
-  /* Row 1：标题（杂志封面式高对比衬线）；日期改为绝对定位的角落印章 */
-  .row-1{ position:relative; z-index:1; display:flex; align-items:baseline; }
-  .title{ font-family:var(--display); font-size:clamp(30px,5.1vw,46px); font-weight:700;
-    letter-spacing:2.2px; color:var(--ink); line-height:.95; }
-  /* 日期：右上角"钢印"——衬线 + 暗压字 + 高光与暗影模拟压印纸面 */
-  .date{ position:absolute; top:22px; right:26px; z-index:3;
-    font-family:"Bodoni 72","Didot","Playfair Display",Georgia,serif;
-    font-size:11.5px; font-weight:700; letter-spacing:1.5px;
-    color:rgba(58,90,140,.85);
-    text-shadow:
-      0 1px 0 rgba(255,255,255,.75),
-      0 -1px 0 rgba(28,36,55,.12),
-      1px 1px 1px rgba(28,36,55,.08);
-    font-feature-settings:"tnum","lnum";
-    -webkit-font-smoothing:antialiased; }
-
-  /* Row 2：副标 + 出品方 */
-  .row-2{ position:relative; z-index:1; margin-top:9px; padding-bottom:12px;
-    border-bottom:1px dashed rgba(58,90,140,.4);
-    display:flex; justify-content:space-between; align-items:baseline; gap:16px;
-    font-family:var(--sans); font-size:clamp(11px,1.45vw,13px); color:var(--ink2); }
-  .tagline{ letter-spacing:.4px; }
-  .by{ font-family:"SF Pro Text","Helvetica Neue","Inter",-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;
-    color:var(--steel-soft); font-weight:700; letter-spacing:.5px; }
-
-  /* Row 3：今日精选区——居中、用毛玻璃框包裹 */
-  .row-3{ position:relative; z-index:1; margin-top:16px; flex:1; min-height:0;
-    display:flex; flex-direction:column; justify-content:stretch; gap:14px; }
-  .hot-box{ position:relative; flex:1; min-height:0;
-    display:flex; flex-direction:column;
-    background:rgba(255,255,255,.52);
-    backdrop-filter:blur(14px) saturate(120%);
-    -webkit-backdrop-filter:blur(14px) saturate(120%);
-    border:1px solid rgba(255,255,255,.72);
-    border-radius:20px; padding:18px 20px 14px; overflow:hidden;
-    box-shadow:0 10px 26px rgba(28,36,55,.10), inset 0 1px 0 rgba(255,255,255,.75); }
-  .label{ font-family:var(--sans); font-size:clamp(10px,1.25vw,12px); font-weight:800;
-    letter-spacing:3.2px; color:var(--steel); margin-bottom:10px; }
-  .hot-title{ font-family:var(--sans); font-weight:800; font-size:clamp(17px,2.5vw,22px);
-    line-height:1.34; color:var(--ink); margin-bottom:10px; letter-spacing:.35px;
-    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
-  /* 引文区：底色横向延展到卡片边框；上下也渐变淡出（四向羽化） */
-  .quote{ position:relative; flex:1; min-height:0; display:flex; align-items:center;
-    padding:12px 10px; margin:2px 0; }
-  .quote::before{ content:''; position:absolute; top:-6px; bottom:-6px;
-    left:-120px; right:-120px;
-    background:linear-gradient(90deg,
-      transparent 0%,
-      rgba(58,90,140,.06) 8%,
-      rgba(58,90,140,.16) 35%,
-      rgba(58,90,140,.16) 65%,
-      rgba(58,90,140,.06) 92%,
-      transparent 100%);
-    -webkit-mask:linear-gradient(180deg,
-      transparent 0%,
-      #000 25%,
-      #000 75%,
-      transparent 100%);
-    mask:linear-gradient(180deg,
-      transparent 0%,
-      #000 25%,
-      #000 75%,
-      transparent 100%);
-    pointer-events:none; }
-  .quote p{ position:relative; z-index:1; }
-  .quote p{ font-family:var(--serif); font-size:clamp(15px,2.2vw,19px); font-weight:700;
-    line-height:1.58; color:var(--ink); letter-spacing:.25px; text-indent:0;
-    display:-webkit-box; -webkit-line-clamp:10; -webkit-box-orient:vertical; overflow:hidden; }
-  .quote p::before{ content:'\201C'; color:var(--steel-soft);
-    font-family:Georgia,serif; font-weight:700; margin-right:2px; }
-  .quote p::after{ content:'\201D'; color:var(--steel-soft);
-    font-family:Georgia,serif; font-weight:700; margin-left:2px; }
-  /* 源胶囊靠右，仍在毛玻璃框内 */
-  .source-row{ margin-top:8px; display:flex; justify-content:flex-end; }
-  .source-pill{ background:var(--pill); color:var(--pill-ink);
-    padding:5px 12px; border-radius:18px;
-    font-family:var(--sans); font-size:clamp(10px,1.2vw,11.5px); letter-spacing:.25px; }
-
-  /* SO WHAT 模块：编辑视角点评，置于 hot-box 之下 */
-  .sw-box{ position:relative; z-index:1; flex:0 0 auto;
-    padding:10px 14px 10px 16px; max-height:calc(var(--card-w) * .30); overflow:hidden;
-    border-left:3px solid var(--steel);
-    background:linear-gradient(95deg, rgba(58,90,140,.10), rgba(58,90,140,.04) 70%, transparent);
-    border-radius:0 12px 12px 0; }
-  .sw-label{ font-family:var(--sans); font-size:10.5px; font-weight:800;
-    letter-spacing:3px; color:var(--steel); margin-bottom:6px; }
-  .sw-label::before{ content:'◆ '; font-size:8px; vertical-align:1px; }
-  .sw-text{ font-family:var(--serif); font-size:clamp(12px,1.65vw,14.5px); font-weight:600;
-    line-height:1.48; color:var(--ink2); letter-spacing:.2px;
-    display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
-
-  /* Row 4：底部 QR（左）；logo 改用绝对定位贴右下角，与右上日期形成对角轴 */
-  .row-4{ position:relative; z-index:1; margin-top:12px; padding-top:8px;
-    display:flex; justify-content:flex-start; align-items:flex-end; gap:12px; }
-  .qr-group{ display:flex; gap:14px; align-items:flex-start; }
-  .qr-mini{ text-decoration:none; color:inherit; text-align:center; transition:.18s; }
-  .qr-mini:hover{ transform:translateY(-1px); }
-  .qr-mini img{ width:clamp(58px,8.2vw,74px); height:clamp(58px,8.2vw,74px); display:block;
-    filter:drop-shadow(0 2px 4px rgba(28,36,55,.16)); }
-  .qr-mini .lbl{ margin-top:4px; font-family:var(--sans); font-size:10px; font-weight:700;
-    color:var(--ink2); letter-spacing:.3px; }
-  /* logo 钉到卡片右下角边缘，更贴右框 */
-  .foot-logo{ position:absolute; bottom:10px; right:12px; z-index:3;
-    height:clamp(20px,3vw,28px); width:auto; opacity:.95;
-    filter:drop-shadow(0 1px 3px rgba(28,36,55,.14)); }
-
-  /* —— 窄屏适配：保持 9:16，不再让高度自由生长 —— */
-  @media (max-width:460px){
-    body{ padding:8px; min-height:100vh; overflow:hidden; }
-    .card{ --card-w:min(calc(100vw - 16px), calc((100vh - 16px) * 9 / 16));
-      padding:22px 18px 14px; border-radius:22px; }
-    .card::before{ top:-110px; right:-110px; width:320px; height:320px; }
-    .card::after{ top:-130px; right:-130px; width:360px; height:360px; }
-    .date{ top:18px; right:18px; font-size:10.5px; letter-spacing:1.2px; }
-    .row-2{ flex-direction:column; align-items:flex-start; gap:3px; padding-bottom:10px; }
-    .row-3{ margin-top:12px; gap:10px; }
-    .hot-box{ padding:14px 14px 11px; border-radius:15px; }
-    .label{ letter-spacing:3px; margin-bottom:8px; }
-    .hot-title{ margin-bottom:8px; }
-    .quote{ padding:8px 5px; }
-    .quote::before{ inset:-3px -4px -3px; filter:blur(1px); }
-    .source-row{ margin-top:6px; }
-    .sw-box{ padding:8px 10px 8px 12px; max-height:calc(var(--card-w) * .34); }
-    .sw-label{ margin-bottom:4px; }
-    .row-4{ margin-top:8px; padding-top:4px; }
-    .qr-group{ gap:10px; }
-    .qr-mini .lbl{ font-size:9px; }
-    .foot-logo{ bottom:8px; right:10px; }
-  }
+  @font-face{font-family:NotoSansSC;src:local('Noto Sans SC'),local('NotoSansCJKsc-Regular'),url('/home/node/.openclaw/workspace/.fonts/NotoSansSC-Regular.ttf') format('truetype'),url('/home/node/.openclaw/workspace/fonts/NotoSansSC.ttf') format('truetype');font-weight:400;font-style:normal}
+  @font-face{font-family:NotoSansSC;src:local('Noto Sans SC Bold'),local('NotoSansCJKsc-Bold'),url('/home/node/.openclaw/workspace/.fonts/NotoSansSC-Bold.ttf') format('truetype'),url('/home/node/.openclaw/workspace/fonts/NotoSansSC-Bold.ttf') format('truetype');font-weight:800;font-style:normal}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;max-width:100vw;overflow:hidden}
+  body{display:flex;align-items:center;justify-content:center;background:#dfe5ef;font-family:NotoSansSC,"PingFang SC","Microsoft YaHei",sans-serif;color:#172033;padding:0}
+  .card{--card-w:min(100vw,calc(100vh * 9 / 16),900px);position:relative;width:var(--card-w);height:calc(var(--card-w) * 16 / 9);overflow:hidden;background:linear-gradient(180deg,#eef3fa 0%,#dbe4ef 46%,#cbd6e5 100%);padding:calc(var(--card-w) * .064) calc(var(--card-w) * .06) calc(var(--card-w) * .049);box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+  .card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 8%,rgba(93,124,166,.25),transparent 28%),radial-gradient(circle at 16% 94%,rgba(255,255,255,.38),transparent 24%);pointer-events:none}
+  .date{position:absolute;top:calc(var(--card-w) * .049);right:calc(var(--card-w) * .06);font-family:Georgia,serif;font-size:calc(var(--card-w) * .028);letter-spacing:calc(var(--card-w) * .0033);font-weight:700;color:#516b90;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+  .title{position:relative;font-family:Georgia,"Noto Serif SC",serif;font-size:calc(var(--card-w) * .087);line-height:.92;font-weight:700;letter-spacing:calc(var(--card-w) * .0078);color:#172033}
+  .sub{position:relative;margin-top:calc(var(--card-w) * .024);padding-bottom:calc(var(--card-w) * .029);border-bottom:2px dashed rgba(57,82,122,.38);display:flex;justify-content:space-between;align-items:flex-end;gap:calc(var(--card-w) * .025);color:#3b465a;font-size:calc(var(--card-w) * .0275);line-height:1.35;letter-spacing:.6px}
+  .brand{font-weight:800;color:#6f819e;white-space:nowrap}
+  .body{position:relative;height:calc(var(--card-w) * 1.284);margin-top:calc(var(--card-w) * .04);display:flex;flex-direction:column;gap:calc(var(--card-w) * .031)}
+  .hero{flex:1;min-height:0;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.82);border-radius:calc(var(--card-w) * .038);box-shadow:0 22px 56px rgba(31,43,66,.12),inset 0 1px 0 rgba(255,255,255,.8);padding:calc(var(--card-w) * .044) calc(var(--card-w) * .049) calc(var(--card-w) * .038);display:flex;flex-direction:column;overflow:hidden}
+  .kicker{font-size:calc(var(--card-w) * .0255);font-weight:900;letter-spacing:calc(var(--card-w) * .0089);color:#315c98;margin-bottom:calc(var(--card-w) * .033)}
+  .headline{font-size:calc(var(--card-w) * .053);font-weight:900;line-height:1.23;letter-spacing:.8px;color:#10192b;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:calc(var(--card-w) * .038)}
+  .quote{position:relative;flex:1;min-height:0;display:flex;align-items:center;padding:calc(var(--card-w) * .038) calc(var(--card-w) * .024);margin:0 calc(var(--card-w) * -.009);background:linear-gradient(90deg,transparent,rgba(50,89,143,.12) 13%,rgba(50,89,143,.18) 50%,rgba(50,89,143,.12) 87%,transparent);-webkit-mask:linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%);mask:linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%)}
+  .quote p{font-family:Georgia,"Noto Serif SC",serif;font-size:calc(var(--card-w) * .042);font-weight:700;line-height:1.56;letter-spacing:.5px;color:#182236;display:-webkit-box;-webkit-line-clamp:8;-webkit-box-orient:vertical;overflow:hidden}
+  .quote p:before{content:"\201C";color:#6c84a7;margin-right:4px}.quote p:after{content:"\201D";color:#6c84a7;margin-left:4px}
+  .source{align-self:flex-end;margin-top:calc(var(--card-w) * .031);background:#141c2b;color:#a9bfdc;border-radius:999px;padding:calc(var(--card-w) * .014) calc(var(--card-w) * .031);font-size:calc(var(--card-w) * .0255);letter-spacing:.5px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sowhat{flex:0 0 auto;border-left:calc(var(--card-w) * .009) solid #315c98;border-radius:0 calc(var(--card-w) * .027) calc(var(--card-w) * .027) 0;background:linear-gradient(90deg,rgba(49,92,152,.13),rgba(49,92,152,.04));padding:calc(var(--card-w) * .027) calc(var(--card-w) * .033) calc(var(--card-w) * .027) calc(var(--card-w) * .038);max-height:calc(var(--card-w) * .271);overflow:hidden}
+  .swlabel{font-size:calc(var(--card-w) * .023);font-weight:900;letter-spacing:calc(var(--card-w) * .0078);color:#315c98;margin-bottom:calc(var(--card-w) * .014)}.swlabel:before{content:"◆ ";font-size:calc(var(--card-w) * .017);vertical-align:2px}
+  .swtext{font-family:Georgia,"Noto Serif SC",serif;font-size:calc(var(--card-w) * .031);font-weight:700;line-height:1.48;color:#354257;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .footer{position:absolute;left:calc(var(--card-w) * .06);right:calc(var(--card-w) * .06);bottom:calc(var(--card-w) * .04);height:calc(var(--card-w) * .124);display:flex;align-items:flex-end;justify-content:space-between;gap:calc(var(--card-w) * .03)}
+  .qrs{display:flex;gap:calc(var(--card-w) * .031)}.qr{display:flex;flex-direction:column;align-items:center;gap:7px;text-decoration:none;font-size:calc(var(--card-w) * .019);font-weight:800;color:#334158}.qr img{width:calc(var(--card-w) * .084);height:calc(var(--card-w) * .084);border-radius:10px;display:block;box-shadow:0 4px 10px rgba(31,43,66,.16)}
+  .logo{height:calc(var(--card-w) * .046);width:auto;max-width:calc(var(--card-w) * .42);object-fit:contain;margin-bottom:calc(var(--card-w) * .013);filter:drop-shadow(0 1px 3px rgba(28,36,55,.14))}
+  @media (max-width:520px){.card{--card-w:min(100vw,calc(100vh * 9 / 16));}.sub{flex-direction:column;align-items:flex-start;gap:4px}.brand{font-size:.95em}.qrs{gap:12px}.logo{max-width:44%}}
 </style>
 </head>
 <body>
-  <div class="card">
-    <div class="date">20260616</div>
-    <div class="row-1">
-      <div class="title">AI 简讯</div>
+<div class="card">
+  <div class="date">20260616</div>
+  <div class="title">AI 简讯</div>
+  <div class="sub"><div>每日 AI 行业关键动向 · 战略 / 行业 / 实践</div><div class="brand">由 招商金科 出品</div></div>
+  <main class="body">
+    <section class="hero">
+      <div class="kicker">BREAKING NEWS</div>
+      <h1 class="headline">Anthropic高层与特朗普政府官员举行会谈</h1>
+      <div class="quote"><p>据Politico报道，特朗普政府官员周一正式会见Anthropic代表，具体议题未披露。此次会面标志着头部AI企业与新任美国政府在政策协调层面的直接接触，或涉及AI监管框架、算力出口管制及政府采购等重大议题。</p></div>
+      <div class="source">源：华尔街见闻 · ★★★★★</div>
+    </section>
+    <section class="sowhat">
+      <div class="swlabel">SO WHAT</div>
+      <p class="swtext">美国AI政策走向将直接影响算力出口管制与合规要求，国内企业应密切追踪谈判结果，提前评估供应链与技术授权受限风险。</p>
+    </section>
+  </main>
+  <div class="footer">
+    <div class="qrs">
+      <a class="qr" href="./"><img src="qr.png" alt="今日资讯"><div>今日资讯</div></a>
+      <a class="qr" href="./download/"><img src="qr-download.png" alt="往期下载"><div>往期下载</div></a>
     </div>
-    <div class="row-2">
-      <div class="tagline">每日 AI 行业关键动向 · 战略 / 行业 / 实践</div>
-      <div class="by">由 招商金科 出品</div>
-    </div>
-    <div class="row-3">
-      <div class="hot-box">
-        <div class="label">BREAKING NEWS</div>
-        <div class="hot-title">Anthropic高层与特朗普政府官员举行会谈</div>
-        <div class="quote">
-          <p>据Politico报道，特朗普政府官员周一正式会见Anthropic代表，具体议题未披露。此次会面标志着头部AI企业与新任美国政府在政策协调层面的直接接触，或涉及AI监管框架、算力出口管制及政府采购等重大议题。</p>
-        </div>
-        <div class="source-row">
-          <div class="source-pill">源：华尔街见闻 · ★★★★★</div>
-        </div>
-      </div>
-      <div class="sw-box">
-        <div class="sw-label">SO WHAT</div>
-        <p class="sw-text">美国AI政策走向将直接影响算力出口管制与合规要求，国内企业应密切追踪谈判结果，提前评估供应链与技术授权受限风险。</p>
-      </div>
-    </div>
-    <div class="row-4">
-      <div class="qr-group">
-        <a class="qr-mini" href="./">
-          <img src="qr.png" alt="今日资讯">
-          <div class="lbl">今日资讯</div>
-        </a>
-        <a class="qr-mini" href="./download/">
-          <img src="qr-download.png" alt="往期下载">
-          <div class="lbl">往期下载</div>
-        </a>
-      </div>
-      <img class="foot-logo" src="logo.png" alt="招商金融科技 · CMG Fintech">
-    </div>
+    <img class="logo" src="logo.png" alt="招商金融科技 · CMG Fintech">
   </div>
+</div>
 <script>
 var _hmt = _hmt || [];
 (function() {
