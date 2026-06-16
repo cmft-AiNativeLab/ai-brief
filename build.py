@@ -384,9 +384,9 @@ def build_downloads(payload, date):
     finally:
         dash_html.unlink(missing_ok=True)
 
-    # 3) 卡片 PNG（3:4 分享卡，900×1200 视口；固定画幅防裁切）
+    # 3) 卡片 PNG（9:16 分享卡，900×1600 视口；固定画幅防裁切）
     card_png = dl / f"ai-brief-card-{date}.png"
-    if _screenshot(DOCS / "card.html", card_png, 900, 1200, scale=2) and _valid_file(card_png):
+    if _screenshot(DOCS / "card.html", card_png, 900, 1600, scale=2) and _valid_file(card_png):
         shutil.copyfile(card_png, dl / "latest-card.png")
         made.append("卡片PNG")
     else:
@@ -505,7 +505,7 @@ def retry_missing_downloads(payload, date, max_retries=2):
             card_png = dl / card_name
             print(f"  重试卡片 PNG: {card_name}")
             try:
-                if _screenshot(DOCS / "card.html", card_png, 900, 1200, scale=2) and _valid_file(card_png):
+                if _screenshot(DOCS / "card.html", card_png, 900, 1600, scale=2) and _valid_file(card_png):
                     shutil.copyfile(card_png, dl / "latest-card.png")
                     print(f"  ✓ 卡片 PNG 重试成功 ({card_png.stat().st_size} bytes)")
             except Exception as e:
