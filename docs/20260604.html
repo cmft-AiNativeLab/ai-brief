@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>AI 简讯 · 20260604</title>
+<style>
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #b8862b;
+    --gold-light: #d4a373;
+    --blue: #2e5b9f;
+    --blue-light: #4a9eff;
+    --green: #2e8b57;
+    --green-light: #4ade80;
+    --red: #a73a2d;
+    --text: #1a1f2e;
+    --text-dim: #4a5060;
+    --text-faint: #8b94a5;
+    --bg: #fcfbf7;
+    --line: #d8d3c6;
+    --highlight: #f7f1e3;
+  }
+  html, body {
+    font-family: Georgia, 'Songti SC', 'STSong', 'Times New Roman', 'PingFang SC', serif;
+    -webkit-font-smoothing: antialiased;
+    background: white;
+    color: var(--text);
+    font-size: 11pt;
+    line-height: 1.55;
+  }
+  /* A4 单页 - 用 .page 容器分页 */
+  .page {
+    width: 210mm;
+    height: 297mm;          /* 强制顶到 A4，避免超出溢出到次页 */
+    padding: 14mm 18mm;
+    background: var(--bg);
+    position: relative;
+    page-break-after: always;
+    overflow: hidden;       /* 维度页内容兜底不许溢出 */
+  }
+  /* 维度页：flex 纵向撑满，条目在页眉与页脚之间均匀分布 */
+  .page.dim-strategy,
+  .page.dim-industry,
+  .page.dim-practice {
+    display: flex;
+    flex-direction: column;
+  }
+  .dim-items {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+  }
+  .page:last-child {
+    page-break-after: auto;
+  }
+
+  /* ===== 封面页 ===== */
+  .cover {
+    display: flex; flex-direction: column;
+    gap: 6mm;
+  }
+  .cover-header {
+    border-top: 4px solid var(--gold);
+    padding-top: 7mm;
+  }
+  /* 页脚品牌 logo（每页底部居中） */
+  .footer-logo { height: 6mm; width: auto; flex-shrink: 0; }
+  .cover-foot {
+    margin-top: auto;
+    padding-top: 3mm;
+    border-top: 1px solid var(--line);
+    display: flex; justify-content: center;
+  }
+  .cover-tagline {
+    font-size: 9pt;
+    letter-spacing: 4pt;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 5mm;
+  }
+  .cover-title {
+    font-size: 38pt;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 3mm;
+  }
+  .cover-subtitle {
+    font-size: 12pt;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+  .cover-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4mm;
+    padding-top: 3mm;
+    border-top: 1px solid var(--line);
+  }
+  .cover-meta {
+    text-align: left;
+  }
+  .cover-meta .lbl {
+    font-size: 8pt;
+    letter-spacing: 1.5pt;
+    color: var(--text-faint);
+    margin-bottom: 2mm;
+  }
+  .cover-meta .val {
+    font-size: 20pt;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .cover-meta .sub {
+    font-size: 8.5pt;
+    color: var(--text-faint);
+    margin-top: 1mm;
+  }
+
+  .cover-exec {
+    background: var(--highlight);
+    border-left: 4px solid var(--gold);
+    padding: 5mm 7mm;
+  }
+  .cover-exec .lbl {
+    font-size: 9.5pt;
+    letter-spacing: 3pt;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 3mm;
+  }
+  .cover-exec .txt {
+    font-size: 11.5pt;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .cover-pie {
+    display: flex; align-items: center; gap: 10mm;
+    padding: 2mm 0;
+    border-top: 1px dashed var(--line);
+    border-bottom: 1px dashed var(--line);
+  }
+  .cover-pie .pie-svg { flex-shrink: 0; }
+  .cover-pie .legend {
+    flex: 1;
+    display: flex; flex-direction: column;
+    gap: 2mm;
+  }
+  .cover-pie .legend-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 2mm 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 10.5pt;
+  }
+  .cover-pie .legend-row:last-child { border-bottom: none; }
+  .cover-pie .name { display: flex; align-items: center; gap: 3mm; color: var(--text); }
+  .cover-pie .dot {
+    display: inline-block;
+    width: 3.5mm; height: 3.5mm;
+    border-radius: 1mm;
+  }
+  .cover-pie .num {
+    font-size: 14pt;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .cover-pie .pct {
+    font-size: 9pt;
+    color: var(--text-faint);
+    margin-left: 2mm;
+  }
+
+  /* 封面行动建议（替代单独行动页） */
+  .cover-action {
+    padding-top: 1mm;
+  }
+  .cover-action .lbl {
+    font-size: 9pt;
+    letter-spacing: 3pt;
+    color: var(--blue);
+    font-weight: 700;
+    margin-bottom: 2.5mm;
+  }
+  .cover-action-list {
+    list-style: none;
+    counter-reset: act;
+    display: flex; flex-direction: column;
+    gap: 1.5mm;
+  }
+  .cover-action-list li {
+    counter-increment: act;
+    padding: 2mm 4mm 2mm 11mm;
+    background: white;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--blue);
+    border-radius: 1mm;
+    font-size: 9.5pt;
+    line-height: 1.5;
+    color: var(--text);
+    position: relative;
+  }
+  .cover-action-list li::before {
+    content: counter(act, decimal-leading-zero);
+    position: absolute;
+    left: 4mm; top: 2mm;
+    font-size: 10pt;
+    font-weight: 800;
+    color: var(--blue);
+    letter-spacing: 0.5pt;
+  }
+
+
+  /* ===== 维度页（每页 5 条，舒展布局） ===== */
+  .dim-header {
+    display: flex; align-items: baseline; gap: 5mm;
+    padding-bottom: 4mm;
+    border-bottom: 2px solid var(--text);
+    margin-bottom: 6mm;
+  }
+  .dim-no {
+    font-size: 24pt;
+    font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .dim-cn { font-size: 17pt; font-weight: 800; color: var(--text); }
+  .dim-en { font-size: 8.5pt; letter-spacing: 3pt; color: var(--text-faint); font-weight: 700; margin-left: auto; }
+  .dim-count {
+    font-size: 8.5pt;
+    padding: 1mm 3mm;
+    border: 1px solid var(--line);
+    border-radius: 1mm;
+    color: var(--text-faint);
+  }
+
+  /* 卡片 - 每页 4 条；间距由 .dim-items 的 space-between 自动分配 */
+  .item {
+    padding-bottom: 4mm;
+    border-bottom: 1px dashed var(--line);
+    page-break-inside: avoid;
+  }
+  .item:last-child { border-bottom: none; padding-bottom: 0; }
+  .item-head {
+    display: flex; align-items: baseline; gap: 3mm;
+    margin-bottom: 2.5mm;
+  }
+  .item-rank {
+    font-size: 10pt;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.5pt;
+  }
+  .item-impl {
+    font-size: 9pt;
+    color: var(--gold);
+    letter-spacing: 0.5pt;
+  }
+  .item-source {
+    margin-left: auto;
+    font-size: 9pt;
+    color: var(--text-faint);
+  }
+  .item-title {
+    font-size: 14pt;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text);
+    margin-bottom: 3mm;
+  }
+  .item-title a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold-light);
+    padding-bottom: 0.5pt;
+  }
+  .item-title a::after {
+    content: '  ↗';
+    color: var(--gold);
+    font-size: 10pt;
+    font-weight: 600;
+  }
+  .dim-industry .item-title a { border-bottom-color: var(--blue-light); }
+  .dim-industry .item-title a::after { color: var(--blue); }
+  .dim-practice .item-title a { border-bottom-color: var(--green-light); }
+  .dim-practice .item-title a::after { color: var(--green); }
+
+  .item-brief {
+    font-size: 10.5pt;
+    line-height: 1.65;
+    color: var(--text-dim);
+    margin-bottom: 3mm;
+  }
+  .item-meaning {
+    background: var(--highlight);
+    border-left: 3px solid var(--gold);
+    padding: 3mm 4.5mm;
+    font-size: 10.5pt;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 2.5mm;
+  }
+  .item-meaning::before {
+    content: 'So What';
+    display: inline-block;
+    font-size: 7.5pt;
+    letter-spacing: 1pt;
+    color: var(--gold);
+    font-weight: 700;
+    margin-right: 2.5mm;
+    padding: 0.3mm 2mm;
+    border: 0.5pt solid var(--gold);
+    border-radius: 1mm;
+    vertical-align: 1pt;
+  }
+
+  /* 鸿蒙微信兜底：明文 URL 始终显示，无需依赖 PDF link annotation */
+  .item-url {
+    font-size: 7.5pt;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    color: var(--text-faint);
+    letter-spacing: -0.1pt;
+    word-break: break-all;
+    line-height: 1.35;
+  }
+  .item-url a { color: var(--blue); text-decoration: none; }
+
+  /* 不同维度色调 */
+  .dim-strategy .dim-no { color: var(--gold); }
+  .dim-strategy .item-rank,
+  .dim-strategy .item-impl,
+  .dim-strategy .item-meaning::before { color: var(--gold); border-color: var(--gold); }
+  .dim-strategy .item-meaning { border-left-color: var(--gold); background: var(--highlight); }
+
+  .dim-industry .dim-no { color: var(--blue); }
+  .dim-industry .item-rank,
+  .dim-industry .item-impl,
+  .dim-industry .item-meaning::before { color: var(--blue); border-color: var(--blue); }
+  .dim-industry .item-meaning { border-left-color: var(--blue); background: #eef4fc; }
+
+  .dim-practice .dim-no { color: var(--green); }
+  .dim-practice .item-rank,
+  .dim-practice .item-impl,
+  .dim-practice .item-meaning::before { color: var(--green); border-color: var(--green); }
+  .dim-practice .item-meaning { border-left-color: var(--green); background: #edf6ee; }
+
+  .page-footer {
+    flex-shrink: 0;
+    margin-top: 4mm;
+    font-size: 7.5pt;
+    color: var(--text-faint);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding-top: 2mm;
+  }
+  .page-footer > span:last-child { text-align: right; }
+
+  /* ===== 大模型榜单页 ===== */
+  .page.lb-page { display: flex; flex-direction: column; }
+  .lb-header .dim-cn { font-size: 21pt; }
+  .lb-head, .lb-row { display: flex; align-items: center; gap: 2.5mm; }
+  .lb-head {
+    font-size: 8pt; letter-spacing: 1pt; color: var(--text-faint);
+    font-weight: 700; padding-bottom: 2mm;
+    border-bottom: 1.5px solid var(--text); margin-bottom: 1mm;
+  }
+  .lb-list {
+    flex: 1 1 auto; display: flex; flex-direction: column;
+    justify-content: space-between; min-height: 0; padding: 1mm 0;
+  }
+  .lb-row {
+    padding: 1.2mm 1mm;
+    border-bottom: 1px solid var(--line);
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-rank {
+    width: 6mm; flex-shrink: 0; text-align: center;
+    font-weight: 800; font-size: 10.5pt; color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .lb-rank-1 { color: #b8862b; }
+  .lb-rank-2 { color: #8b94a5; }
+  .lb-rank-3 { color: #a9743b; }
+  .lb-name {
+    flex: 1 1 auto; min-width: 0; padding-right: 2mm;
+    display: flex; flex-direction: column; justify-content: center;
+    line-height: 1.18;
+  }
+  .lb-main { font-weight: 700; font-size: 9.5pt; color: var(--text); }
+  .lb-cfg { font-size: 7.5pt; color: var(--text-faint); margin-top: 0.3mm; }
+  .lb-head .lb-name { font-weight: 700; }
+  .lb-tag {
+    display: inline-block; font-size: 6.5pt; font-weight: 700;
+    color: var(--blue); border: 0.5pt solid var(--blue);
+    border-radius: 1mm; padding: 0 1mm; margin-left: 1.5mm; vertical-align: 1.5pt;
+  }
+  .lb-param {
+    width: 15mm; flex-shrink: 0;
+    font-size: 8pt; color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .lb-price {
+    width: 18mm; flex-shrink: 0;
+    font-size: 8pt; color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .lb-sep { color: var(--text-faint); margin: 0 0.3mm; }
+  .lb-creator {
+    width: 21mm; flex-shrink: 0;
+    font-size: 8pt; color: var(--text-dim);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .lb-bar {
+    width: 13mm; flex-shrink: 0; height: 4mm; background: #ece7da;
+    border-radius: 1mm; overflow: hidden;
+  }
+  .lb-head .lb-bar { background: none; height: auto; color: var(--text-faint); }
+  .lb-bar-fill {
+    display: block; height: 100%;
+    background: linear-gradient(90deg, var(--gold-light), var(--gold));
+    border-radius: 1mm;
+  }
+  .lb-score {
+    width: 12mm; flex-shrink: 0; text-align: right;
+    font-weight: 800; font-size: 11pt; color: var(--gold);
+    font-variant-numeric: tabular-nums;
+  }
+  .lb-cn .lb-main { color: var(--red); }
+  .lb-cn .lb-bar-fill { background: linear-gradient(90deg, #d4796a, var(--red)); }
+  .lb-cn .lb-score { color: var(--red); }
+  .lb-note {
+    flex-shrink: 0; font-size: 7.5pt; color: var(--text-faint);
+    padding-top: 2.5mm; border-top: 1px solid var(--line); margin-top: 2mm;
+  }
+  .lb-link {
+    flex-shrink: 0; font-size: 8pt; color: var(--text-faint);
+    margin-top: 1.5mm; word-break: break-all;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  }
+  .lb-link a { color: var(--blue); text-decoration: none; }
+
+  /* ===== 屏幕查看（浏览器/手机/微信）精排；@media print→PDF 不受影响 ===== */
+  @media screen {
+    html, body { background: #1b1e25; }
+    body { padding: 18px 0; -webkit-text-size-adjust: 100%; }
+    .page {
+      width: 820px; max-width: calc(100% - 26px);
+      height: auto; min-height: 0; overflow: visible;
+      margin: 0 auto 18px; padding: 40px 46px;
+      border-radius: 9px;
+      box-shadow: 0 12px 44px rgba(0,0,0,0.5);
+    }
+    /* 网页流式：条目正常间距，不靠 A4 高度撑满 */
+    .dim-items, .lb-list { display: block; }
+    .dim-items > .item { margin-bottom: 22px; }
+    .dim-items > .item:last-child { margin-bottom: 0; }
+    .item-meaning { border-radius: 3px; }
+  }
+  /* 手机：全宽、放大正文便于阅读、榜单整体可横向滑动 */
+  @media screen and (max-width: 680px) {
+    body { padding: 10px 0; }
+    .page { padding: 24px 18px; border-radius: 6px; }
+    .cover-title { font-size: 30pt; }
+    .item-title { font-size: 13.5pt; line-height: 1.45; }
+    .item-brief, .item-meaning { font-size: 11.5pt; line-height: 1.7; }
+    .item-url, .lb-link, .lb-note { font-size: 9pt; }
+    .dim-cn { font-size: 15pt; }
+    .dim-no { font-size: 20pt; }
+    .lb-page { overflow-x: auto; }
+    .lb-head, .lb-list { min-width: 540px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ 封面页 ============ -->
+  <div class="page cover">
+    <div class="cover-header">
+      <h1 class="cover-title">AI 简讯</h1>
+      <div class="cover-subtitle">2026年06月04日 周四　|　近 24 小时 AI 行业关键动向</div>
+    </div>
+
+    <div class="cover-meta-grid">
+      <div class="cover-meta">
+        <div class="lbl">SCANNED</div>
+        <div class="val">433</div>
+        <div class="sub">条原始资讯</div>
+      </div>
+      <div class="cover-meta">
+        <div class="lbl">SOURCES</div>
+        <div class="val">10</div>
+        <div class="sub">主流媒体</div>
+      </div>
+      <div class="cover-meta">
+        <div class="lbl">CURATED</div>
+        <div class="val">12</div>
+        <div class="sub">精选条目</div>
+      </div>
+      <div class="cover-meta">
+        <div class="lbl">DIMENSIONS</div>
+        <div class="val">3</div>
+        <div class="sub">战略 / 行业 / 实践</div>
+      </div>
+    </div>
+
+    <div class="cover-exec">
+      <div class="lbl">EXECUTIVE SUMMARY · 执行摘要</div>
+      <div class="txt">今天最值得管理层关注的三件事：第一，AI竞争已升级为芯片、电力、资本协同的基础设施战，博通、英伟达、Anthropic动作集中出现。第二，AI开始实质改写行业资源分配，内存芯片、能源与区域资本市场都在重估受益者。第三，企业落地进入精细化管理阶段，工具统一入口、按量计费和OT安全风险正在同步抬升治理复杂度。</div>
+    </div>
+
+    <div class="cover-pie">
+      <svg class="pie-svg" width="180" height="180" viewBox="0 0 180 180"><circle cx="90.0" cy="90.0" r="74.0" fill="none" stroke="#e8e2d2" stroke-width="32"/><circle cx="90.0" cy="90.0" r="74.0" fill="none" stroke="#b8862b" stroke-width="32" stroke-dasharray="154.99 309.97" stroke-dashoffset="-0.00" transform="rotate(-90 90.0 90.0)" stroke-linecap="butt"/><circle cx="90.0" cy="90.0" r="74.0" fill="none" stroke="#2e5b9f" stroke-width="32" stroke-dasharray="154.99 309.97" stroke-dashoffset="-154.99" transform="rotate(-90 90.0 90.0)" stroke-linecap="butt"/><circle cx="90.0" cy="90.0" r="74.0" fill="none" stroke="#2e8b57" stroke-width="32" stroke-dasharray="154.99 309.97" stroke-dashoffset="-309.97" transform="rotate(-90 90.0 90.0)" stroke-linecap="butt"/><text x="90.0" y="86.0" text-anchor="middle" dominant-baseline="central" fill="#1a1f2e" font-size="40" font-weight="800">12</text><text x="90.0" y="121" text-anchor="middle" fill="#8b94a5" font-size="14" letter-spacing="2">条目</text></svg>
+      <div class="legend">
+        <div class="legend-row"><span class="name"><span class="dot" style="background:#b8862b"></span>战略动向 · Strategy</span><span><span class="num">4</span><span class="pct">33%</span></span></div>
+        <div class="legend-row"><span class="name"><span class="dot" style="background:#2e5b9f"></span>行业影响 · Industry</span><span><span class="num">4</span><span class="pct">33%</span></span></div>
+        <div class="legend-row"><span class="name"><span class="dot" style="background:#2e8b57"></span>管理实践 · Practice</span><span><span class="num">4</span><span class="pct">33%</span></span></div>
+      </div>
+    </div>
+
+    <div class="cover-action">
+      <div class="lbl">ACTION ITEMS · 行动建议</div>
+      <ol class="cover-action-list">
+        <li>盘点未来24个月算力、用电与关键芯片需求，评估锁价与多供应商方案。</li>
+<li>将现有AI工具从按席位采购改为按场景核算，补齐调用量与产出报表。</li>
+<li>对接入生产和运维的AI系统开展一次OT安全审计，先查资产暴露面。</li>
+<li>复核年度组织规划，明确哪些岗位应扩编、转岗或因AI自动化而收缩。</li>
+      </ol>
+    </div>
+
+    <div class="cover-foot">
+      <img class="footer-logo" src="logo.png" alt="招商金融科技 · CMG Fintech">
+    </div>
+  </div>
+
+  <!-- ============ 3 内容页（战略 / 行业 / 实践） ============ -->
+  <div class="page dim-strategy">
+      <div class="dim-header">
+        <div class="dim-no">01</div>
+        <div class="dim-cn">战略动向</div>
+        <div class="dim-en">STRATEGY</div>
+        <div class="dim-count">4 条</div>
+      </div>
+      <div class="dim-items">
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#01</span>
+        <span class="item-impl">★★★★★</span>
+        <span class="item-source">华尔街见闻 · 1 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://wallstreetcn.com/livenews/3114027" target="_blank">博通披露OpenAI与Meta定制芯片大单</a></div>
+      <div class="item-brief">博通称正为OpenAI开发芯片，计划于2027财年部署1.3GW，并将在2028财年末向Meta部署3GW，且与阿波罗、黑石合作承接相关基础设施。</div>
+      <div class="item-meaning">AI竞争正从模型转向电力、芯片与资本协同，企业需重新评估长期算力锁定、供应链议价与资金安排。</div>
+      <div class="item-url"><a href="https://wallstreetcn.com/livenews/3114027" target="_blank">https://wallstreetcn.com/livenews/3114027</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#02</span>
+        <span class="item-impl">★★★★★</span>
+        <span class="item-source">华尔街见闻 · 5 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://wallstreetcn.com/livenews/3113950" target="_blank">Anthropic启动IPO辅导冲刺AI第一股</a></div>
+      <div class="item-brief">报道称Anthropic已选定摩根士丹利和高盛牵头IPO，摩根大通也将参与。AI独角兽开始进入公开资本市场竞速阶段。</div>
+      <div class="item-meaning">AI公司估值将更快接受资本市场检验，合作伙伴、客户与投资人都需重估其持续投入能力与商业化压力。</div>
+      <div class="item-url"><a href="https://wallstreetcn.com/livenews/3113950" target="_blank">https://wallstreetcn.com/livenews/3113950</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#03</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">华尔街见闻 · 55 分钟前</span>
+      </div>
+      <div class="item-title"><a href="https://wallstreetcn.com/livenews/3114045" target="_blank">Meta拟向高阶AI智能体月收费两百美元</a></div>
+      <div class="item-brief">The Information称，Meta考虑对AI智能体产品按月收费，价格最高达200美元，显示头部厂商正测试高价值任务型AI的订阅上限。</div>
+      <div class="item-meaning">AI代理正从流量竞争转向ARPU竞争，企业应尽快建立按岗位、按任务核算的可接受单用户成本线。</div>
+      <div class="item-url"><a href="https://wallstreetcn.com/livenews/3114045" target="_blank">https://wallstreetcn.com/livenews/3114045</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#04</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">华尔街见闻 · 1 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://wallstreetcn.com/livenews/3114033" target="_blank">英伟达收购Kumo补强企业图谱AI能力</a></div>
+      <div class="item-brief">据《财富》报道，英伟达已收购Kumo AI，交易条款未披露。Kumo专注图机器学习与企业关系数据建模，补强英伟达企业级AI栈。</div>
+      <div class="item-meaning">龙头并购正向行业数据与垂直能力延伸，企业采购应警惕平台绑定，同时关注图谱类AI在风控与推荐中的落地机会。</div>
+      <div class="item-url"><a href="https://wallstreetcn.com/livenews/3114033" target="_blank">https://wallstreetcn.com/livenews/3114033</a></div>
+    </div>
+      </div>
+      <div class="page-footer">
+        <span>AI 简讯 · 战略动向</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
+        <span>2 / 5</span>
+      </div>
+    </div>
+<div class="page dim-industry">
+      <div class="dim-header">
+        <div class="dim-no">02</div>
+        <div class="dim-cn">行业影响</div>
+        <div class="dim-en">INDUSTRY</div>
+        <div class="dim-count">4 条</div>
+      </div>
+      <div class="dim-items">
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#01</span>
+        <span class="item-impl">★★★★★</span>
+        <span class="item-source">华尔街见闻 · 2 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://wallstreetcn.com/livenews/3114021" target="_blank">AI数据中心挤压内存芯片供给引发预警</a></div>
+      <div class="item-brief">约10个美国贸易团体敦促政府增加受AI挤压的内存芯片供应，称数据中心扩张推高价格并减少供给，波及汽车、医疗等行业。</div>
+      <div class="item-meaning">AI正在重排上游资源分配，非科技企业也会遭遇元器件涨价与交期风险，采购策略需前置到年度层面。</div>
+      <div class="item-url"><a href="https://wallstreetcn.com/livenews/3114021" target="_blank">https://wallstreetcn.com/livenews/3114021</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#02</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">华尔街见闻 · 1 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://wallstreetcn.com/livenews/3114040" target="_blank">AI盈利推动韩国股市利润预期反超日本</a></div>
+      <div class="item-brief">分析师预计韩国综合股指核心公司本财年合并净利润约4500亿美元，高于日本东证指数可比公司的约4400亿美元，AI是关键驱动。</div>
+      <div class="item-meaning">AI已开始改变区域资本市场叙事，管理层应关注供应链与市场重心向受益地区迁移带来的配置机会。</div>
+      <div class="item-url"><a href="https://wallstreetcn.com/livenews/3114040" target="_blank">https://wallstreetcn.com/livenews/3114040</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#03</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">Hacker News · 1 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://www.politico.eu/article/eu-households-electricity-energy-artificial-intelligence-ai/" target="_blank">欧盟拟推动居民错峰用电应对AI负荷</a></div>
+      <div class="item-brief">媒体称，随着工业与AI用电需求激增，欧盟希望家庭削减高峰时段用电。AI算力扩张已开始影响公共能源调度与社会分配。</div>
+      <div class="item-meaning">算力成本不再只是IT预算问题，未来选址、用电合规与能源合同可能成为企业AI扩张的硬约束。</div>
+      <div class="item-url"><a href="https://www.politico.eu/article/eu-households-electricity-energy-artificial-intelligence-ai/" target="_blank">https://www.politico.eu/article/eu-households-electricity-energy-artificial-intelligence-ai/</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#04</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">Hacker News · 6 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://techcrunch.com/2026/06/03/gitlab-cuts-14-of-staff-as-it-scales-its-platform-to-serve-ai-workloads/" target="_blank">GitLab裁员14%以重配资源服务AI负载</a></div>
+      <div class="item-brief">GitLab宣布裁减约14%员工，以调整成本结构并扩展平台服务AI工作负载，反映软件公司正在用组织重构换取AI投资空间。</div>
+      <div class="item-meaning">AI转型不只是加预算，也伴随组织与岗位再分配。管理层需提前设计裁撤、转岗与效率指标的联动机制。</div>
+      <div class="item-url"><a href="https://techcrunch.com/2026/06/03/gitlab-cuts-14-of-staff-as-it-scales-its-platform-to-serve-ai-workloads/" target="_blank">https://techcrunch.com/2026/06/03/gitlab-cuts-14-of-staff-as-it-scales-its-platform-to…i-workloads/</a></div>
+    </div>
+      </div>
+      <div class="page-footer">
+        <span>AI 简讯 · 行业影响</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
+        <span>3 / 5</span>
+      </div>
+    </div>
+<div class="page dim-practice">
+      <div class="dim-header">
+        <div class="dim-no">03</div>
+        <div class="dim-cn">管理实践</div>
+        <div class="dim-en">PRACTICE</div>
+        <div class="dim-count">4 条</div>
+      </div>
+      <div class="dim-items">
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#01</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">华尔街见闻 · 57 分钟前</span>
+      </div>
+      <div class="item-title"><a href="https://wallstreetcn.com/livenews/3114043" target="_blank">OpenAI拟整合Codex与ChatGPT统一入口</a></div>
+      <div class="item-brief">The Information称，OpenAI计划整合CodeX与ChatGPT，将编码与通用对话能力收敛到同一产品界面，降低企业使用门槛。</div>
+      <div class="item-meaning">企业级AI工具正走向套件化，采购与治理应从单点工具转为统一账号、权限、审计与成本管理。</div>
+      <div class="item-url"><a href="https://wallstreetcn.com/livenews/3114043" target="_blank">https://wallstreetcn.com/livenews/3114043</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#02</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">Hacker News · 2 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://www.bleepingcomputer.com/news/security/cisa-warns-of-cyberattacks-targeting-fuel-tank-monitoring-systems/" target="_blank">CISA警告燃料罐监测系统遭网络攻击</a></div>
+      <div class="item-brief">美国CISA警示针对燃料罐监测系统的网络攻击风险。此类OT设备一旦接入AI运维或自动化流程，暴露面与业务中断风险同步上升。</div>
+      <div class="item-meaning">把AI接入生产与运维前，必须先补齐OT资产盘点、网络隔离和应急预案，否则效率收益会被安全事故吞噬。</div>
+      <div class="item-url"><a href="https://www.bleepingcomputer.com/news/security/cisa-warns-of-cyberattacks-targeting-fuel-tank-monitoring-systems/" target="_blank">https://www.bleepingcomputer.com/news/security/cisa-warns-of-cyberattacks-targeting-fu…ing-systems/</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#03</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">Hacker News · 3 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://www.anthropic.com/news/AI-enabled-cyber-threats-mitre-attack" target="_blank">年度研究显示AI赋能网络威胁持续升级</a></div>
+      <div class="item-brief">一项针对过去一年AI赋能网络威胁的梳理显示，攻击者正更快生成钓鱼、侦察与自动化攻击流程，安全团队面临响应压力上升。</div>
+      <div class="item-meaning">生成式AI已显著降低攻击成本，管理层应把安全预算从事后检测转向员工防钓鱼、身份治理和自动化响应。</div>
+      <div class="item-url"><a href="https://www.anthropic.com/news/AI-enabled-cyber-threats-mitre-attack" target="_blank">https://www.anthropic.com/news/AI-enabled-cyber-threats-mitre-attack</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#04</span>
+        <span class="item-impl">★★★☆☆</span>
+        <span class="item-source">Hacker News · 6 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://arstechnica.com/ai/2026/06/ai-costs-how-much-github-copilot-users-react-to-new-usage-based-pricing-system/" target="_blank">Copilot按量计费引发企业AI成本重估</a></div>
+      <div class="item-brief">GitHub Copilot推出基于使用量的定价后，用户对AI编码工具总成本高度敏感。Seat模式正转向按调用量与能力层级收费。</div>
+      <div class="item-meaning">AI工具ROI不能只看授权数，需建立每团队、每场景的真实调用成本、产出提升与预算上限机制。</div>
+      <div class="item-url"><a href="https://arstechnica.com/ai/2026/06/ai-costs-how-much-github-copilot-users-react-to-new-usage-based-pricing-system/" target="_blank">https://arstechnica.com/ai/2026/06/ai-costs-how-much-github-copilot-users-react-to-new…cing-system/</a></div>
+    </div>
+      </div>
+      <div class="page-footer">
+        <span>AI 简讯 · 管理实践</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
+        <span>4 / 5</span>
+      </div>
+    </div>
+
+  <!-- ============ 大模型能力榜单页 ============ -->
+  <div class="page lb-page"><div class="dim-header lb-header"><div class="dim-cn">大模型能力榜</div><div class="dim-en">MODEL LEADERBOARD · TOP 20</div><div class="dim-count">20 个</div></div><div class="lb-head"><span class="lb-rank">#</span><span class="lb-name">模型</span><span class="lb-param">参数量</span><span class="lb-price">单价 $/1M</span><span class="lb-creator">厂商 · 国家</span><span class="lb-bar">能力分布（II）</span><span class="lb-score">分数</span></div><div class="lb-list"><div class="lb-row"><span class="lb-rank lb-rank-1">1</span><span class="lb-name"><span class="lb-main">Claude Opus 4.8<span class="lb-tag">R</span></span><span class="lb-cfg">(Adaptive Reasoning, Max Effort)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">6.25<span class="lb-sep">/</span>25</span><span class="lb-creator">Anthropic · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:100.0%"></span></span><span class="lb-score">61.4</span></div>
+<div class="lb-row"><span class="lb-rank lb-rank-2">2</span><span class="lb-name"><span class="lb-main">GPT-5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(xhigh)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">5<span class="lb-sep">/</span>30</span><span class="lb-creator">OpenAI · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:98.0%"></span></span><span class="lb-score">60.2</span></div>
+<div class="lb-row"><span class="lb-rank lb-rank-3">3</span><span class="lb-name"><span class="lb-main">GPT-5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(high)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">5<span class="lb-sep">/</span>30</span><span class="lb-creator">OpenAI · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:95.9%"></span></span><span class="lb-score">58.9</span></div>
+<div class="lb-row"><span class="lb-rank">4</span><span class="lb-name"><span class="lb-main">Claude Opus 4.7<span class="lb-tag">R</span></span><span class="lb-cfg">(Adaptive Reasoning, Max Effort)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">6.25<span class="lb-sep">/</span>25</span><span class="lb-creator">Anthropic · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:93.3%"></span></span><span class="lb-score">57.3</span></div>
+<div class="lb-row"><span class="lb-rank">5</span><span class="lb-name"><span class="lb-main">Gemini 3.1 Pro Preview<span class="lb-tag">R</span></span></span><span class="lb-param">闭源未知</span><span class="lb-price">2<span class="lb-sep">/</span>12</span><span class="lb-creator">Google · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:93.2%"></span></span><span class="lb-score">57.2</span></div>
+<div class="lb-row"><span class="lb-rank">6</span><span class="lb-name"><span class="lb-main">GPT-5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(medium)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">5<span class="lb-sep">/</span>30</span><span class="lb-creator">OpenAI · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:92.3%"></span></span><span class="lb-score">56.7</span></div>
+<div class="lb-row lb-cn"><span class="lb-rank">7</span><span class="lb-name"><span class="lb-main">Qwen3.7 Max<span class="lb-tag">R</span></span></span><span class="lb-param">≈1T·闭源</span><span class="lb-price">2.5<span class="lb-sep">/</span>7.5</span><span class="lb-creator">Alibaba · 中国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:92.2%"></span></span><span class="lb-score">56.6</span></div>
+<div class="lb-row"><span class="lb-rank">8</span><span class="lb-name"><span class="lb-main">Gemini 3.5 Flash<span class="lb-tag">R</span></span><span class="lb-cfg">(high)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">1.5<span class="lb-sep">/</span>9</span><span class="lb-creator">Google · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:90.1%"></span></span><span class="lb-score">55.3</span></div>
+<div class="lb-row"><span class="lb-rank">9</span><span class="lb-name"><span class="lb-main">Gemini 3.5 Flash<span class="lb-tag">R</span></span><span class="lb-cfg">(medium)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">1.5<span class="lb-sep">/</span>9</span><span class="lb-creator">Google · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:89.3%"></span></span><span class="lb-score">54.8</span></div>
+<div class="lb-row lb-cn"><span class="lb-rank">10</span><span class="lb-name"><span class="lb-main">Kimi K2.6<span class="lb-tag">R</span></span></span><span class="lb-param">1T MoE</span><span class="lb-price">0.95<span class="lb-sep">/</span>4</span><span class="lb-creator">Kimi · 中国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:87.8%"></span></span><span class="lb-score">53.9</span></div>
+<div class="lb-row lb-cn"><span class="lb-rank">11</span><span class="lb-name"><span class="lb-main">MiMo-V2.5-Pro<span class="lb-tag">R</span></span></span><span class="lb-param">未公开</span><span class="lb-price">0.43<span class="lb-sep">/</span>0.87</span><span class="lb-creator">Xiaomi · 中国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:87.6%"></span></span><span class="lb-score">53.8</span></div>
+<div class="lb-row"><span class="lb-rank">12</span><span class="lb-name"><span class="lb-main">GPT-5.3 Codex<span class="lb-tag">R</span></span><span class="lb-cfg">(xhigh)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">1.75<span class="lb-sep">/</span>14</span><span class="lb-creator">OpenAI · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:87.3%"></span></span><span class="lb-score">53.6</span></div>
+<div class="lb-row lb-cn"><span class="lb-rank">13</span><span class="lb-name"><span class="lb-main">Qwen3.7 Plus<span class="lb-tag">R</span></span></span><span class="lb-param">闭源未知</span><span class="lb-price">0.4<span class="lb-sep">/</span>1.16</span><span class="lb-creator">Alibaba · 中国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:86.8%"></span></span><span class="lb-score">53.3</span></div>
+<div class="lb-row"><span class="lb-rank">14</span><span class="lb-name"><span class="lb-main">Grok 4.3<span class="lb-tag">R</span></span><span class="lb-cfg">(high)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">1.25<span class="lb-sep">/</span>2.5</span><span class="lb-creator">xAI · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:86.6%"></span></span><span class="lb-score">53.2</span></div>
+<div class="lb-row"><span class="lb-rank">15</span><span class="lb-name"><span class="lb-main">Muse Spark<span class="lb-tag">R</span></span></span><span class="lb-param">闭源未知</span><span class="lb-price">—</span><span class="lb-creator">Meta · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:85.0%"></span></span><span class="lb-score">52.2</span></div>
+<div class="lb-row"><span class="lb-rank">16</span><span class="lb-name"><span class="lb-main">Claude Opus 4.7</span><span class="lb-cfg">(Non-reasoning, High Effort)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">6.25<span class="lb-sep">/</span>25</span><span class="lb-creator">Anthropic · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:84.4%"></span></span><span class="lb-score">51.8</span></div>
+<div class="lb-row"><span class="lb-rank">17</span><span class="lb-name"><span class="lb-main">Claude Sonnet 4.6<span class="lb-tag">R</span></span><span class="lb-cfg">(Adaptive Reasoning, Max Effort)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">3.75<span class="lb-sep">/</span>15</span><span class="lb-creator">Anthropic · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:84.2%"></span></span><span class="lb-score">51.7</span></div>
+<div class="lb-row lb-cn"><span class="lb-rank">18</span><span class="lb-name"><span class="lb-main">DeepSeek V4 Pro<span class="lb-tag">R</span></span><span class="lb-cfg">(Reasoning, Max Effort)</span></span><span class="lb-param">≈671B MoE</span><span class="lb-price">0.43<span class="lb-sep">/</span>0.87</span><span class="lb-creator">DeepSeek · 中国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:83.9%"></span></span><span class="lb-score">51.5</span></div>
+<div class="lb-row lb-cn"><span class="lb-rank">19</span><span class="lb-name"><span class="lb-main">GLM-5.1<span class="lb-tag">R</span></span><span class="lb-cfg">(Reasoning)</span></span><span class="lb-param">745B MoE</span><span class="lb-price">1.4<span class="lb-sep">/</span>4.4</span><span class="lb-creator">Z AI · 中国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:83.7%"></span></span><span class="lb-score">51.4</span></div>
+<div class="lb-row"><span class="lb-rank">20</span><span class="lb-name"><span class="lb-main">GPT-5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(low)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">5<span class="lb-sep">/</span>30</span><span class="lb-creator">OpenAI · 美国</span><span class="lb-bar"><span class="lb-bar-fill" style="width:82.7%"></span></span><span class="lb-score">50.8</span></div></div><div class="lb-note">数据来源：artificialanalysis.ai · II=综合推理/编程/Agent 能力 · 单价=每百万 token 输入/输出（美元）· 参数量据公开资料（闭源标「闭源未知」）· <b>R</b>=推理模型 · 中国模型高亮</div><div class="lb-link">完整榜单：<a href="https://artificialanalysis.ai/models#intelligence" target="_blank">https://artificialanalysis.ai/models#intelligence</a></div><div class="page-footer"><span>AI 简讯 · 大模型榜单</span><img class="footer-logo" src="logo.png" alt="招商金融科技"><span>5 / 5</span></div></div>
+
+</body>
+</html>
