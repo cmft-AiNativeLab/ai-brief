@@ -1,0 +1,14 @@
+name = "ai-brief-analytics"
+main = "worker.js"
+compatibility_date = "2024-09-25"
+
+# KV namespace - 部署前需要创建并替换这里的 id
+# wrangler kv:namespace create ANALYTICS
+[[kv_namespaces]]
+binding = "ANALYTICS"
+id = "替换为你的KV命名空间ID"
+
+# 访问 /stats 接口时的鉴权 key（可选）
+# 部署时通过 wrangler secret put API_KEY 设置
+# [vars]
+# 不要在这里写明文密钥
