@@ -591,6 +591,8 @@ def main():
         print(f"[error] 产物验证失败，放弃推送！缺失: {missing}", file=sys.stderr)
         sys.exit(1)
     print(f"[ok] 产物验证通过 ✓ (PDF + 总览PNG + 卡片PNG + 7天合辑 + 下载索引)")
+    # 6.5. 清理旧下载产物（只保留近 7 天），控制仓库体积
+    _prune_downloads(DOCS / "download")
     # 7. 推送（Pages 从 docs/ 自动发布）
     if push:
         git_commit_push(date)
