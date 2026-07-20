@@ -45,7 +45,7 @@ def main():
     o = []
     o.append(f"# AI 简讯 · {date}")
     o.append("")
-    o.append(f"> 近 8 小时 AI 行业关键动向 ｜ 扫描 {data.get('total_scanned', 0)} 条 · "
+    o.append(f"> 近 24 小时 AI 行业关键动向 ｜ 扫描 {data.get('total_scanned', 0)} 条 · "
              f"{data.get('source_count', 0)} 源 · 精选 {len(picked)} 条")
     o.append("")
     o.append("## 执行摘要")

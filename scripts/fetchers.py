@@ -604,9 +604,274 @@ def fetch_model_leaderboard(top_n: int = 20) -> list[dict[str, Any]]:
     return out
 
 
+# ---------- 12. 机器之心 (RSS) ----------
+# 国内顶级 AI 媒体，覆盖学术界+产业界
+
+def fetch_jiqizhixin() -> list[dict[str, Any]]:
+    r = requests.get("https://www.jiqizhixin.com/rss", headers=HEADERS, timeout=TIMEOUT)
+    r.raise_for_status()
+    feed = feedparser.parse(r.content)
+    out = []
+    for e in feed.entries[:30]:
+        pub = None
+        if getattr(e, "published_parsed", None):
+            pub = _to_utc(datetime.fromtimestamp(time.mktime(e.published_parsed), tz=timezone.utc))
+        elif getattr(e, "published", None):
+            try:
+                pub = _to_utc(parsedate_to_datetime(e.published))
+            except Exception:
+                pass
+        if not pub:
+            continue
+        out.append({
+            "source": "机器之心",
+            "title": e.title.strip(),
+            "url": e.link,
+            "published_at": pub,
+            "summary": _strip_html(getattr(e, "summary", "")),
+            "image": None,
+            "metrics": {"views": None, "comments": None, "points": None, "likes": None},
+        })
+    return out
+
+
+# ---------- 13. IT之家 (RSS + AI 关键词过滤) ----------
+# 高流量科技媒体，需要 AI 过滤
+
+def fetch_ithome() -> list[dict[str, Any]]:
+    r = requests.get("https://www.ithome.com/rss/", headers=HEADERS, timeout=TIMEOUT)
+    r.raise_for_status()
+    feed = feedparser.parse(r.content)
+    out = []
+    for e in feed.entries[:50]:
+        pub = None
+        if getattr(e, "published_parsed", None):
+            pub = _to_utc(datetime.fromtimestamp(time.mktime(e.published_parsed), tz=timezone.utc))
+        elif getattr(e, "published", None):
+            try:
+                pub = _to_utc(parsedate_to_datetime(e.published))
+            except Exception:
+                pass
+        if not pub:
+            continue
+        title = e.title.strip()
+        summary = _strip_html(getattr(e, "summary", ""))
+        blob = (title + " " + summary).lower()
+        if not _ai_related(blob):
+            continue
+        out.append({
+            "source": "IT之家",
+            "title": title,
+            "url": e.link,
+            "published_at": pub,
+            "summary": summary,
+            "image": None,
+            "metrics": {"views": None, "comments": None, "points": None, "likes": None},
+        })
+    return out
+
+
+# ---------- 14. TechCrunch AI (RSS) ----------
+# 硅谷视角的 AI 创业/投资/产品
+
+def fetch_techcrunch() -> list[dict[str, Any]]:
+    r = requests.get("https://techcrunch.com/category/artificial-intelligence/feed/", headers=HEADERS, timeout=TIMEOUT)
+    r.raise_for_status()
+    feed = feedparser.parse(r.content)
+    out = []
+    for e in feed.entries[:25]:
+        pub = None
+        if getattr(e, "published_parsed", None):
+            pub = _to_utc(datetime.fromtimestamp(time.mktime(e.published_parsed), tz=timezone.utc))
+        elif getattr(e, "published", None):
+            try:
+                pub = _to_utc(parsedate_to_datetime(e.published))
+            except Exception:
+                pass
+        if not pub:
+            continue
+        out.append({
+            "source": "TechCrunch",
+            "title": e.title.strip(),
+            "url": e.link,
+            "published_at": pub,
+            "summary": _strip_html(getattr(e, "summary", "")),
+            "image": None,
+            "metrics": {"views": None, "comments": None, "points": None, "likes": None},
+        })
+    return out
+
+
+# ---------- 15. The Verge AI (RSS) ----------
+# 消费级 AI 产品与社会影响
+
+def fetch_theverge() -> list[dict[str, Any]]:
+    r = requests.get("https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", headers=HEADERS, timeout=TIMEOUT)
+    r.raise_for_status()
+    feed = feedparser.parse(r.content)
+    out = []
+    for e in feed.entries[:25]:
+        pub = None
+        if getattr(e, "published_parsed", None):
+            pub = _to_utc(datetime.fromtimestamp(time.mktime(e.published_parsed), tz=timezone.utc))
+        elif getattr(e, "published", None):
+            try:
+                pub = _to_utc(parsedate_to_datetime(e.published))
+            except Exception:
+                pass
+        if not pub:
+            continue
+        out.append({
+            "source": "The Verge",
+            "title": e.title.strip(),
+            "url": e.link,
+            "published_at": pub,
+            "summary": _strip_html(getattr(e, "summary", "")),
+            "image": None,
+            "metrics": {"views": None, "comments": None, "points": None, "likes": None},
+        })
+    return out
+
+
+# ---------- 16. VentureBeat AI (RSS) ----------
+# 企业级 AI 应用与部署
+
+def fetch_venturebeat() -> list[dict[str, Any]]:
+    r = requests.get("https://venturebeat.com/category/ai/feed/", headers=HEADERS, timeout=TIMEOUT)
+    r.raise_for_status()
+    feed = feedparser.parse(r.content)
+    out = []
+    for e in feed.entries[:25]:
+        pub = None
+        if getattr(e, "published_parsed", None):
+            pub = _to_utc(datetime.fromtimestamp(time.mktime(e.published_parsed), tz=timezone.utc))
+        elif getattr(e, "published", None):
+            try:
+                pub = _to_utc(parsedate_to_datetime(e.published))
+            except Exception:
+                pass
+        if not pub:
+            continue
+        out.append({
+            "source": "VentureBeat",
+            "title": e.title.strip(),
+            "url": e.link,
+            "published_at": pub,
+            "summary": _strip_html(getattr(e, "summary", "")),
+            "image": None,
+            "metrics": {"views": None, "comments": None, "points": None, "likes": None},
+        })
+    return out
+
+
+# ---------- 17. 界面新闻 (API + AI 过滤) ----------
+# 财经+科技视角
+
+def fetch_jiemian() -> list[dict[str, Any]]:
+    r = requests.get(
+        "https://www.jiemian.com/lists/65.html",
+        headers={**HEADERS, "Referer": "https://www.jiemian.com/"},
+        timeout=TIMEOUT,
+    )
+    r.raise_for_status()
+    # 解析 HTML 中的文章列表
+    soup = BeautifulSoup(r.text, "lxml")
+    out = []
+    cn_tz = timezone(timedelta(hours=8))
+    for article in soup.select("article, .article-item, .news-item"):
+        link_el = article.select_one("a[href]")
+        if not link_el:
+            continue
+        href = link_el.get("href", "")
+        title = link_el.get_text(strip=True)
+        if not title or len(title) < 5:
+            continue
+        # 提取时间
+        time_el = article.select_one("time, .time, .date")
+        pub = None
+        if time_el:
+            time_text = time_el.get("datetime") or time_el.get_text(strip=True)
+            try:
+                if "T" in time_text:
+                    pub = _to_utc(datetime.fromisoformat(time_text.replace("Z", "+00:00")))
+                else:
+                    # 尝试解析 "2026-07-20 10:30" 格式
+                    pub = datetime.strptime(time_text[:16], "%Y-%m-%d %H:%M").replace(tzinfo=cn_tz).astimezone(timezone.utc)
+            except Exception:
+                pass
+        if not pub:
+            continue
+        summary_el = article.select_one(".summary, .desc, p")
+        summary = _strip_html(summary_el.get_text() if summary_el else "")
+        blob = (title + " " + summary).lower()
+        if not _ai_related(blob):
+            continue
+        if not href.startswith("http"):
+            href = "https://www.jiemian.com" + href
+        out.append({
+            "source": "界面新闻",
+            "title": title,
+            "url": href,
+            "published_at": pub,
+            "summary": summary,
+            "image": None,
+            "metrics": {"views": None, "comments": None, "points": None, "likes": None},
+        })
+    return out
+
+
+# ---------- 18. arXiv CS.AI (最新论文) ----------
+# 学术前沿，适合捕捉重大突破
+
+def fetch_arxiv_ai() -> list[dict[str, Any]]:
+    r = requests.get(
+        "http://export.arxiv.org/api/query",
+        params={
+            "search_query": "cat:cs.AI OR cat:cs.CL OR cat:cs.LG",
+            "sortBy": "submittedDate",
+            "sortOrder": "descending",
+            "max_results": "30",
+        },
+        headers=HEADERS,
+        timeout=TIMEOUT + 6,
+    )
+    r.raise_for_status()
+    feed = feedparser.parse(r.content)
+    out = []
+    for e in feed.entries[:30]:
+        pub = None
+        if getattr(e, "published_parsed", None):
+            pub = _to_utc(datetime.fromtimestamp(time.mktime(e.published_parsed), tz=timezone.utc))
+        elif getattr(e, "published", None):
+            try:
+                pub = _to_utc(parsedate_to_datetime(e.published))
+            except Exception:
+                pass
+        if not pub:
+            continue
+        # 提取作者
+        authors = []
+        if hasattr(e, "authors"):
+            authors = [a.get("name", "") for a in e.authors[:5]]
+        summary = _strip_html(getattr(e, "summary", ""))
+        # 加入作者信息到摘要
+        if authors:
+            summary = f"作者: {', '.join(authors)}. {summary}"[:240]
+        out.append({
+            "source": "arXiv",
+            "title": e.title.strip().replace("\n", " "),
+            "url": e.link,
+            "published_at": pub,
+            "summary": summary,
+            "image": None,
+            "metrics": {"views": None, "comments": None, "points": None, "likes": None},
+        })
+    return out
+
+
 # ---------- registry ----------
-# 用户指定 10 源（2026-05）：aibase + 量子位 + InfoQ + 新智元 + 36氪 + HN
-#   + 虎嗅 + 钛媒体 + 新浪财经(替代财联社风控) + 华尔街见闻。
+# 14 源（2026-07 扩展）：原有 9 源 + IT之家 + TechCrunch + The Verge + VentureBeat + arXiv
+# 注：sina 永久 403、jiqizhixin RSS 失效、jiemian 无可靠时间戳，暂移除
 # 另含独立的 fetch_model_leaderboard（大模型榜单，不在 SOURCES）。
 
 SOURCES: dict[str, Any] = {
@@ -618,6 +883,11 @@ SOURCES: dict[str, Any] = {
     "hackernews":   fetch_hackernews,
     "huxiu":        fetch_huxiu,
     "tmtpost":      fetch_tmtpost,
-    "sina":         fetch_sina,
     "wallstreetcn": fetch_wallstreetcn,
+    # 新增源（2026-07）
+    "ithome":       fetch_ithome,
+    "techcrunch":   fetch_techcrunch,
+    "theverge":     fetch_theverge,
+    "venturebeat":  fetch_venturebeat,
+    "arxiv":        fetch_arxiv_ai,
 }
