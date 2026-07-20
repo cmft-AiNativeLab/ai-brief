@@ -1,13 +1,13 @@
 ---
 name: ai-brief-daily
-description: 每日 AI 行业简讯生成与发布的完整流水线（抓取 → Claude 提炼 → 渲染 → GitHub Pages 发布）。当用户说「跑今日的 AI 简讯 / 日报」「生成 AI 简报」「更新分享卡片 / 总览图 / 7 天合辑」「自动每天 7:30 出 AI 日报」「让 cron 跑 AI 简讯」「调整卡片样式 / 模板」「回填历史卡片版式」「为高管做一份 AI 行业简报」「招商金科 AI 简讯」等表达时立即触发——即使用户只说「跑下日报」「更新卡片」上下文与 AI 行业资讯相关也应优先使用本技能。抓取 10 个中英文 AI 媒体 + artificialanalysis 大模型榜单近 8 小时内容，由 Claude/Qwen 按战略·行业·实践三维度精选 12 条（每源硬约束 ≤3 条），渲染 A4 多页 PDF 报告 + 16:9 总览大图 + 杂志竖版分享卡片（标准版 + 含 SO WHAT 影响价值点评的深度版），加近 7 天合辑 PDF 与下载主页，可选 git push 到 GitHub Pages 触发线上发布。
+description: 每日 AI 行业简讯生成与双渠道发布的完整流水线（抓取 → Claude 提炼 → 渲染 → 固定域名原子发布 + GitHub Pages）。当用户说「跑今日的 AI 简讯 / 日报」「生成 AI 简报」「更新分享卡片 / 总览图 / 7 天合辑」「自动每天 7:30 出 AI 日报」「让 cron 跑 AI 简讯」「调整卡片样式 / 模板」「回填历史卡片版式」「为高管做一份 AI 行业简报」「招商金科 AI 简讯」等表达时立即触发——即使用户只说「跑下日报」「更新卡片」上下文与 AI 行业资讯相关也应优先使用本技能。抓取 10 个中英文 AI 媒体 + artificialanalysis 大模型榜单近 8 小时内容，由 Claude/Qwen 按战略·行业·实践三维度精选 12 条（每源硬约束 ≤3 条），渲染 A4 多页 PDF 报告 + 16:9 总览大图 + 杂志竖版分享卡片（标准版 + 含 SO WHAT 影响价值点评的深度版），加近 7 天合辑 PDF 与下载主页，发布到 brief.ai-native-lab.com 并推送 GitHub Pages。
 ---
 
 # AI 简讯 · 每日生成与发布技能
 
 ## 一句话
 
-抓 10 个中英文 AI 来源最近 8 小时内容 → Claude 提炼 12 条 + 摘要 + 行动建议 + 大模型榜 → 渲染网页/PDF/总览图/分享卡片 → 推 GitHub Pages → 落地 cron 每日 7:30 自动出报。
+抓 10 个中英文 AI 来源最近 8 小时内容 → Claude 提炼 12 条 + 摘要 + 行动建议 + 大模型榜 → 渲染网页/PDF/总览图/分享卡片 → 固定域名原子发布 + 推 GitHub Pages → 落地 cron 每日 7:30 自动出报。
 
 ## 何时触发
 
@@ -25,9 +25,9 @@ description: 每日 AI 行业简讯生成与发布的完整流水线（抓取 �
 
 ```
                   ┌──────────────────────────────────────────┐
-                  │  cron 7:30  →  run_daily.sh              │
-                  │   ├─ 等代理 / 网络就绪                    │
-                  │   ├─ python3 build.py --push              │
+                  │  cron 7:30  →  run_daily.sh build        │
+                  │   ├─ 互斥锁 + Chrome 依赖检查             │
+                  │   ├─ python3 build.py                     │
                   │   │    ├─ scripts/brief.py  抓取 10 源    │
                   │   │    │     + 大模型榜单                 │
                   │   │    ├─ scripts/curate_auto.py  Claude  │
@@ -39,6 +39,8 @@ description: 每日 AI 行业简讯生成与发布的完整流水线（抓取 �
                   │   │         · docs/download/ai-brief-7days.pdf │
                   │   │         · docs/archive.html (往期列表)│
                   │   │         · docs/download/index.html    │
+                  │   ├─ 验证当天产物                         │
+                  │   ├─ .deploy/releases → 原子切换固定域名  │
                   │   └─ git commit & push → GitHub Pages    │
                   └──────────────────────────────────────────┘
 ```
@@ -46,8 +48,14 @@ description: 每日 AI 行业简讯生成与发布的完整流水线（抓取 �
 ## 立即使用（已部署好的项目）
 
 ```bash
-# 一次性手动跑（生成 + 推送）
-python3 build.py --push
+# 一次性手动跑（生成 + 两个渠道发布 + 在线校验）
+bash run_daily.sh build
+
+# 看门狗补发：当天产物完整时不会重复抓取或调用模型
+bash run_daily.sh repair
+
+# 只把现有当天产物补发到两个渠道
+bash run_daily.sh publish
 
 # 仅生成不推送（看完再决定）
 python3 build.py
@@ -135,7 +143,7 @@ ai-brief-daily/
 ## 触发示例
 
 **Example 1** — 用户：「跑下今天的 AI 简讯」
-→ `python3 build.py --push`，等 1–3 分钟，回报头条 + 来源分布，给出线上 URL
+→ `bash run_daily.sh build`，验证固定域名和 GitHub Pages 后，回报头条 + 来源分布与两个线上 URL
 
 **Example 2** — 用户：「卡片字体换成 Didot 杂志封面风」
 → 改 `assets/card-pro.html` 的 `--display` 字体栈和 `.title` `.date` 字体；`_render_card` 用最新数据重渲染 → 截图 → push

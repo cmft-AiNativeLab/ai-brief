@@ -3,6 +3,7 @@
 
 # 中间产物
 build/
+.deploy/
 __pycache__/
 *.pyc
 .DS_Store

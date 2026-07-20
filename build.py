@@ -4,6 +4,8 @@
 用法:
   python build.py            # 生成到 docs/，不提交
   python build.py --push     # 生成并 git commit & push（触发 GitHub Pages 更新）
+  python build.py --push-only [--date YYYYMMDD]  # 仅提交并推送已验证产物
+  python build.py --verify-only [--date YYYYMMDD] # 仅验证指定日期（默认上海时区今天）
 
 依赖 .env（不进仓库）：AI_BRIEF_API_KEY / AI_BRIEF_BASE_URL / AI_BRIEF_MODEL
 """
@@ -16,12 +18,28 @@ import hashlib
 import datetime
 import subprocess
 import pathlib
+import time
 
 ROOT = pathlib.Path(__file__).resolve().parent
 SCRIPTS = ROOT / "scripts"
 DOCS = ROOT / "docs"
 BUILD = ROOT / "build"
 PY = sys.executable
+
+
+def china_today():
+    """上海时区当天，避免容器 UTC 时区导致日报日期错位。"""
+    tz = datetime.timezone(datetime.timedelta(hours=8))
+    return datetime.datetime.now(tz).strftime("%Y%m%d")
+
+
+def _arg_value(name, default=None):
+    if name not in sys.argv:
+        return default
+    idx = sys.argv.index(name)
+    if idx + 1 >= len(sys.argv):
+        raise SystemExit(f"{name} 需要一个参数")
+    return sys.argv[idx + 1]
 
 
 def _analytics_snippet(prefix=""):
@@ -324,9 +342,11 @@ def _render_card(payload, date):
     imp = int(top.get("importance") or 0)
     stars = "★" * imp + "☆" * (5 - imp) if imp else "—"
     date_dot = date  # 紧凑 YYYYMMDD：20260605（按需求去掉点分隔）
+    site_url = os.environ.get("AI_BRIEF_SITE_URL", "https://brief.ai-native-lab.com").rstrip("/")
 
     def _fill(text):
         return (text
+                .replace("{{SITE_URL}}", _html.escape(site_url, quote=True))
                 .replace("{{DATE_DOT}}", _html.escape(date_dot))
                 .replace("{{HOT_HEADLINE}}", _html.escape(headline))
                 .replace("{{HOT_QUOTE}}", _html.escape(briefing))
@@ -412,21 +432,53 @@ def build_downloads(payload, date):
 
 
 def git_commit_push(date):
-    """Commit and push generated outputs/scripts. Treat no-op commit as success for cron."""
-    run(["git", "-C", ROOT, "add", "-A", "docs", "build.py", "scripts"])
-    status = subprocess.run(
-        ["git", "-C", ROOT, "status", "--porcelain"],
+    """只提交 docs，并确保已有未推送提交也会继续重试 push。"""
+    run(["git", "-C", ROOT, "add", "-A", "--", "docs"])
+    staged = subprocess.run(
+        ["git", "-C", ROOT, "diff", "--cached", "--quiet", "--exit-code"],
+        check=False,
+    ).returncode
+    if staged == 1:
+        subprocess.run(
+            ["git", "-C", ROOT, "commit", "-m", f"AI 简讯 {date}"],
+            check=True,
+        )
+    elif staged == 0:
+        print("[ok] no generated changes to commit; checking pending push")
+    else:
+        raise subprocess.CalledProcessError(staged, "git diff --cached")
+
+    branch = os.environ.get("AI_BRIEF_GIT_BRANCH", "main")
+    retries = int(os.environ.get("AI_BRIEF_GIT_PUSH_RETRIES", "3"))
+    local_sha = subprocess.run(
+        ["git", "-C", ROOT, "rev-parse", "HEAD"],
         check=True,
         capture_output=True,
         text=True,
     ).stdout.strip()
-    if not status:
-        print("[ok] no changes to commit")
-        return
-    msg = f"AI 简讯 {date}"
-    subprocess.run(["git", "-C", ROOT, "commit", "-m", msg], check=True)
-    subprocess.run(["git", "-C", ROOT, "push"], check=True)
-    print("[ok] pushed — 稍等 1 分钟 GitHub Pages 会更新")
+    for attempt in range(1, retries + 1):
+        pushed = subprocess.run(
+            ["git", "-C", ROOT, "push", "origin", f"HEAD:{branch}"],
+            check=False,
+        )
+        if pushed.returncode == 0:
+            remote_result = subprocess.run(
+                ["git", "-C", ROOT, "ls-remote", "origin", f"refs/heads/{branch}"],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            remote = remote_result.stdout.strip()
+            remote_sha = remote.split()[0] if remote_result.returncode == 0 and remote else ""
+            if remote_sha == local_sha:
+                print(f"[ok] GitHub {branch} 已更新到 {local_sha[:12]}")
+                return
+            print(f"[warn] GitHub SHA 尚未一致（第 {attempt}/{retries} 次）", file=sys.stderr)
+        else:
+            print(f"[warn] git push 失败（第 {attempt}/{retries} 次）", file=sys.stderr)
+        if attempt < retries:
+            time.sleep(15 * attempt)
+    raise RuntimeError(f"GitHub 推送 {retries} 次后仍未成功")
 
 
 def verify_downloads(date):
@@ -446,11 +498,19 @@ def verify_downloads(date):
             missing.append(f"{name} (不存在)")
         elif p.stat().st_size < min_size:
             missing.append(f"{name} (仅 {p.stat().st_size} bytes，需 >{min_size})")
-    # 检查 latest.* 固定链接
-    for alias in ("latest.pdf", "latest-overview.png", "latest-card.png"):
+    # 检查 latest.* 固定链接，并确认不是昨天遗留的旧文件
+    aliases = {
+        "latest.pdf": f"ai-brief-{date}.pdf",
+        "latest-overview.png": f"ai-brief-overview-{date}.png",
+        "latest-card.png": f"ai-brief-card-{date}.png",
+    }
+    for alias, dated in aliases.items():
         p = dl / alias
+        source = dl / dated
         if not p.exists() or p.stat().st_size < 100:
             missing.append(f"{alias} (缺失或过小)")
+        elif source.exists() and hashlib.sha256(p.read_bytes()).digest() != hashlib.sha256(source.read_bytes()).digest():
+            missing.append(f"{alias} (与 {dated} 内容不一致)")
     # 检查 7 天合辑
     wk = dl / "ai-brief-7days.pdf"
     if not wk.exists() or wk.stat().st_size < 100_000:
@@ -536,18 +596,34 @@ def retry_missing_downloads(payload, date, max_retries=2):
 def main():
     load_env()
     push = "--push" in sys.argv
+    push_only = "--push-only" in sys.argv
     verify_only = "--verify-only" in sys.argv
+    requested_date = _arg_value("--date", china_today())
+    if not re.fullmatch(r"\d{8}", requested_date):
+        raise SystemExit("--date 必须是 YYYYMMDD")
     BUILD.mkdir(exist_ok=True)
     DOCS.mkdir(exist_ok=True)
+    if push_only:
+        ok, missing = verify_downloads(requested_date)
+        if not ok or not (DOCS / f"{requested_date}.html").exists():
+            for item in missing:
+                print(f"  - {item}", file=sys.stderr)
+            if not (DOCS / f"{requested_date}.html").exists():
+                print(f"  - docs/{requested_date}.html (不存在)", file=sys.stderr)
+            raise SystemExit(f"[fail] {requested_date} 产物未通过验证，拒绝推送")
+        git_commit_push(requested_date)
+        return
     # --verify-only: 仅验证产物完整性，不重新构建
     if verify_only:
-        # 取最新的日期 HTML
-        dates = sorted([p.stem for p in DOCS.glob("20*.html") if p.stem.isdigit()], reverse=True)
-        if not dates:
-            print("[error] 没有找到任何日期 HTML", file=sys.stderr)
-            sys.exit(1)
-        date = dates[0]
+        date = requested_date
         ok, missing = verify_downloads(date)
+        if not (DOCS / f"{date}.html").exists():
+            missing.append(f"{date}.html (不存在)")
+            ok = False
+        index = DOCS / "index.html"
+        if not index.exists() or date not in index.read_text(encoding="utf-8", errors="ignore"):
+            missing.append(f"index.html (未包含 {date})")
+            ok = False
         if ok:
             print(f"[ok] {date} 全部产物完整 ✓")
         else:
@@ -593,6 +669,8 @@ def main():
     print(f"[ok] 产物验证通过 ✓ (PDF + 总览PNG + 卡片PNG + 7天合辑 + 下载索引)")
     # 6.5. 清理旧下载产物（只保留近 7 天），控制仓库体积
     _prune_downloads(DOCS / "download")
+    # 清理后重建下载索引，避免残留已删除文件的链接
+    _download_index(DOCS / "download")
     # 7. 推送（Pages 从 docs/ 自动发布）
     if push:
         git_commit_push(date)

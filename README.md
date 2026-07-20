@@ -1,6 +1,6 @@
-# AI 简讯 · 每日自动日报（本地生成 + GitHub Pages 发布）
+# AI 简讯 · 每日自动日报（固定域名 + GitHub Pages 双渠道发布）
 
-每天本地抓取 10 个 AI 信息源 + 大模型榜单 → Claude 自动提炼成「战略/行业/实践」三维度 12 条简报 → 生成网页 → push 到 GitHub，GitHub Pages 自动更新。领导收藏一个固定链接，每天点开看最新一期、链接可点。
+每天由 OpenClaw 抓取 AI 信息源 + 大模型榜单 → 自动提炼成「战略/行业/实践」三维度简报 → 生成网页/PDF/图片 → 原子发布到 `https://brief.ai-native-lab.com`，同时 push 到 GitHub Pages 作为第二渠道。
 
 ## 🔐 安全（务必先看）
 
@@ -39,12 +39,12 @@ git push -u origin main
 
 约 1 分钟后链接生效：`https://<你的用户名>.github.io/<仓库名>/`（领导收藏这个）。
 
-## 三、每天出一期
+## 三、每天出一期并发布两个渠道
 
 ```bash
-python3 build.py --push     # 抓取+提炼+渲染+推送，一条命令
+bash run_daily.sh build
 ```
-推送后 GitHub Pages 自动更新，`index.html` 永远是最新一期，`archive.html` 是往期列表。
+脚本会先验证当天全部产物，再更新固定域名并推送 GitHub Pages；任一渠道失败会返回非零，由 08:15 看门狗执行 `bash run_daily.sh repair` 补发。
 
 ## 四、设成每天自动（本地定时）
 

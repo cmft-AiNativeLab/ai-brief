@@ -1,71 +1,112 @@
-#!/bin/bash
-# AI 简讯 · 每日自动构建 + 发布（供 cron 调用）
-# 关键：cron 环境不继承交互终端，这里显式补上 PATH 和代理。
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
-export HTTP_PROXY="http://127.0.0.1:7897"
-export HTTPS_PROXY="http://127.0.0.1:7897"
-# 中转 API（newapi）若在国内、走代理反而不通，可解除下一行注释让它直连：
-# export NO_PROXY="newapi.ai-native-lab.com"
+#!/usr/bin/env bash
+# AI 简讯 · OpenClaw 双渠道每日发布入口
+set -u
+set -o pipefail
 
-cd "$(dirname "$0")" || exit 1
-mkdir -p build
-echo "===== $(date '+%F %T') 开始 =====" >> build/daily.log
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT" || exit 1
+mkdir -p build .deploy
 
-# ── Step 0: 确保 Chrome 渲染依赖存在 ──
-# 容器重启后 /tmp/libs 可能被清空，此脚本自动检测并恢复
-echo "$(date '+%F %T') [Step 0] 检查 Chrome 依赖..." >> build/daily.log
-bash scripts/ensure_chrome_deps.sh >> build/daily.log 2>&1
-if [ $? -ne 0 ]; then
-    echo "$(date '+%F %T') [error] Chrome 依赖安装失败，中止构建！" >> build/daily.log
-    exit 1
+LOG="$ROOT/build/daily.log"
+exec > >(tee -a "$LOG") 2>&1
+
+MODE="${1:-build}"
+case "$MODE" in
+  build|repair|publish) ;;
+  *) echo "[fatal] 用法: $0 [build|repair|publish]"; exit 2 ;;
+esac
+
+if [ -f .env ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . ./.env
+  set +a
 fi
 
-# 等网络/代理就绪（电脑睡眠唤醒后 Clash 自启需时间），最多等 ~5 分钟
-for i in $(seq 1 20); do
-  if /usr/bin/curl -s --max-time 8 -o /dev/null https://github.com; then
-    echo "$(date '+%F %T') 网络就绪（第 $i 次探测）" >> build/daily.log; break
+PYTHON_BIN="${PYTHON_BIN:-$(command -v python3)}"
+TODAY="$(TZ=Asia/Shanghai date +%Y%m%d)"
+
+exec 9>".deploy/run.lock"
+if ! flock -w 900 9; then
+  echo "[fatal] 等待另一个日报任务结束超时"
+  exit 1
+fi
+
+echo "===== $(date '+%F %T') 开始 mode=$MODE date=$TODAY ====="
+
+curated_is_today() {
+  [ -f build/curated.json ] && "$PYTHON_BIN" - "$TODAY" <<'PY'
+import json
+import sys
+from pathlib import Path
+date = sys.argv[1]
+try:
+    value = json.loads(Path("build/curated.json").read_text(encoding="utf-8"))
+    generated = (value.get("generated_at") or "")[:10].replace("-", "")
+except Exception:
+    raise SystemExit(1)
+raise SystemExit(0 if generated == date else 1)
+PY
+}
+
+verify_today() {
+  "$PYTHON_BIN" build.py --verify-only --date "$TODAY"
+}
+
+render_or_build() {
+  if [ "$MODE" = "repair" ] && verify_today; then
+    echo "[ok] 当天构建产物已存在，repair 不重复抓取或调用模型"
+    return 0
   fi
-  echo "$(date '+%F %T') 网络/代理未就绪，等待…($i)" >> build/daily.log
-  sleep 15
-done
-
-# ── Step 1: 构建（含自动重试和产物验证） ──
-echo "$(date '+%F %T') [Step 1] 开始构建..." >> build/daily.log
-/usr/local/bin/python3 build.py --push >> build/daily.log 2>&1
-BUILD_EXIT=$?
-
-if [ $BUILD_EXIT -ne 0 ]; then
-    echo "$(date '+%F %T') [error] build.py 失败 (exit=$BUILD_EXIT)，进入重试..." >> build/daily.log
-    # 等待 30 秒后重试一次
+  bash scripts/ensure_chrome_deps.sh || return 1
+  if [ "$MODE" = "repair" ] && curated_is_today; then
+    echo "[repair] 使用当天 curated.json 补渲染"
+    "$PYTHON_BIN" build.py --from-curated build/curated.json
+    return $?
+  fi
+  echo "[build] 开始抓取、提炼和渲染"
+  if "$PYTHON_BIN" build.py; then
+    return 0
+  fi
+  echo "[warn] 完整构建失败，尝试恢复"
+  if curated_is_today; then
+    "$PYTHON_BIN" build.py --from-curated build/curated.json
+  else
     sleep 30
-    /usr/local/bin/python3 build.py --push >> build/daily.log 2>&1
-    BUILD_EXIT=$?
-fi
+    "$PYTHON_BIN" build.py
+  fi
+}
 
-if [ $BUILD_EXIT -ne 0 ]; then
-    echo "$(date '+%F %T') [FATAL] 构建最终失败 (exit=$BUILD_EXIT)！请检查 build/daily.log" >> build/daily.log
+if [ "$MODE" != "publish" ]; then
+  if ! render_or_build; then
+    echo "[fatal] 日报生成失败"
     exit 1
+  fi
 fi
 
-# ── Step 2: 最终产物验证 ──
-echo "$(date '+%F %T') [Step 2] 最终产物验证..." >> build/daily.log
-/usr/local/bin/python3 build.py --verify-only >> build/daily.log 2>&1
-VERIFY_EXIT=$?
-
-if [ $VERIFY_EXIT -ne 0 ]; then
-    echo "$(date '+%F %T') [error] 产物验证失败！尝试补渲染..." >> build/daily.log
-    # 用 --from-curated 重新渲染下载产物
-    if [ -f build/curated.json ]; then
-        /usr/local/bin/python3 build.py --from-curated build/curated.json --push >> build/daily.log 2>&1
-        # 再次验证
-        /usr/local/bin/python3 build.py --verify-only >> build/daily.log 2>&1
-        VERIFY_EXIT=$?
-    fi
+if ! verify_today; then
+  echo "[fatal] 当天产物验证失败，两个渠道均不发布"
+  exit 1
 fi
 
-if [ $VERIFY_EXIT -ne 0 ]; then
-    echo "$(date '+%F %T') [FATAL] 产物验证最终失败！请检查 build/daily.log" >> build/daily.log
-    exit 1
+STATUS=0
+if "$PYTHON_BIN" scripts/publish_local.py --date "$TODAY"; then
+  "$PYTHON_BIN" scripts/verify_channels.py \
+    --channel fixed --date "$TODAY" --attempts 12 --interval 5 || STATUS=1
+else
+  STATUS=1
 fi
 
-echo "===== $(date '+%F %T') 结束 ✓ (全部产物验证通过) =====" >> build/daily.log
+if "$PYTHON_BIN" build.py --push-only --date "$TODAY"; then
+  "$PYTHON_BIN" scripts/verify_channels.py \
+    --channel github --date "$TODAY" --attempts 20 --interval 15 || STATUS=1
+else
+  STATUS=1
+fi
+
+if [ "$STATUS" -eq 0 ]; then
+  echo "===== $(date '+%F %T') 结束 ✓ 固定域名与 GitHub Pages 均已更新 ====="
+else
+  echo "===== $(date '+%F %T') 结束 ✗ 至少一个发布渠道未通过，请由 watchdog 补发 ====="
+fi
+exit "$STATUS"

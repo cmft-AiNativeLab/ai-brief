@@ -1,6 +1,10 @@
-# 部署与自动化（GitHub Pages + cron）
+# 部署与自动化（固定域名 + GitHub Pages + OpenClaw cron）
 
-技能本身只生成内容；要做到「每天 7:30 自动出报 + 推送 + 线上发布」，还需要一次性配好 GitHub 仓库、凭据、定时任务。
+技能通过 `run_daily.sh` 统一完成生成、验证、固定域名原子发布、GitHub 推送和两端在线校验。
+
+正式地址：`https://brief.ai-native-lab.com/`
+
+GitHub Pages 备份：`https://cmft-AiNativeLab.github.io/ai-brief/`
 
 ## 1. GitHub Pages 站点
 
@@ -37,18 +41,22 @@ URL 里内嵌 username。`credential.helper store` 会按 `(host, username)` 索
 - **不要**把 PAT 写到代码或 `.env` 任何 push 进仓的文件里
 - `gh auth login` 用的是 keychain，cron **读不到**——必须用 `credential.helper store`
 
-## 3. cron 定时任务
+## 3. OpenClaw 定时任务
 
 ```bash
 crontab -e
 # 加这一行（改成你的绝对路径）：
-30 7 * * * /Users/xxxx/ai-brief/run_daily.sh
+30 7 * * * cd /绝对路径/ai-brief && bash run_daily.sh build
 ```
 
-`run_daily.sh` 已经做了三件事：
-1. 显式 export `PATH` + 代理环境变量（cron 不继承交互 shell）
-2. 等代理/网络就绪最多 5 分钟（电脑睡眠唤醒后 Clash 自启需时间）
-3. 调 `python3 build.py --push`，日志重定向到 `build/daily.log`
+`run_daily.sh` 已经完成：
+1. 互斥执行，防止主任务和看门狗并发覆盖；
+2. 生成并强制验证上海时区当天产物；
+3. 原子切换 `.deploy/current`，发布固定域名；
+4. 提交并重试推送 GitHub；
+5. 比对两个线上渠道的日期和 `latest.pdf` SHA-256。
+
+08:15 看门狗调用 `bash run_daily.sh repair`。如果当天文件已完整，它只补发缺失渠道，不重复抓取或调用模型。
 
 > 苹果电脑只在亮屏时执行 cron——长期运行需 caffeinate / 不睡眠 + 接电源。
 
@@ -82,9 +90,10 @@ curl -H "Authorization: Bearer $AI_BRIEF_API_KEY" $AI_BRIEF_BASE_URL/v1/models |
 ## 6. 验证清单（推送后 1 分钟）
 
 ```bash
-P=https://你账号.github.io/你的repo
-for u in "" "20260608" "card" "card-pro" "archive" "download/" "download/latest.pdf"; do
+for P in https://brief.ai-native-lab.com https://cmft-AiNativeLab.github.io/ai-brief; do
+  for u in "" "20260608" "card" "card-pro" "archive" "download/" "download/latest.pdf"; do
   echo "$(curl -s -o /dev/null -w '%{http_code}' "$P/$u?v=$RANDOM")  /$u"
+  done
 done
 ```
 
