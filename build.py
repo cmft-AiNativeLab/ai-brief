@@ -265,7 +265,7 @@ def _download_index(dl):
         '<a class="back" href="../card">‹ 返回 AI 简讯</a>'
         '<img class="brand" src="../logo.png" alt="招商金融科技 · CMG Fintech">'
         '<h1>AI 简讯 · 资料下载</h1>'
-        '<div class="sub">每日 7:30 自动生成 · 日报 PDF / 总览大图 / 分享卡片 · 往期全部永久保留</div>'
+        '<div class="sub">每日 17:00 自动生成 · 日报 PDF / 总览大图 / 分享卡片 · 往期全部永久保留</div>'
         f'{body}'
         '<div class="foot">由 招商金科 出品 · 数据来源 量子位 / 新智元 / 36氪 / 华尔街见闻 等 ＋ artificialanalysis.ai</div>'
         '</div></body></html>'
@@ -639,8 +639,8 @@ def main():
     else:
         fetch_json = BUILD / "fetch.json"
         curated_json = BUILD / "curated.json"
-        # 1. 抓取 16 源 + 榜单，仅保留最近 24 小时新闻
-        run([PY, SCRIPTS / "brief.py", "--curate", "--json-out", fetch_json, "--hours", "24"])
+        # 1. 抓取 16 源 + 榜单，仅保留最近 12 小时新闻
+        run([PY, SCRIPTS / "brief.py", "--curate", "--json-out", fetch_json, "--hours", "12"])
         # 2. Claude 自动提炼（选 12 条 + 打标 + 摘要/行动）
         run([PY, SCRIPTS / "curate_auto.py", fetch_json, curated_json])
     # 3. 渲染 HTML（直接拿字符串，写入 docs/，链接可点）

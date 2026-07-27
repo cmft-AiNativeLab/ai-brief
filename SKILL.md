@@ -1,13 +1,13 @@
 ---
 name: ai-brief-daily
-description: 每日 AI 行业简讯生成与双渠道发布的完整流水线（抓取 → Claude 提炼 → 渲染 → 固定域名原子发布 + GitHub Pages）。当用户说「跑今日的 AI 简讯 / 日报」「生成 AI 简报」「更新分享卡片 / 总览图 / 7 天合辑」「自动每天 7:30 出 AI 日报」「让 cron 跑 AI 简讯」「调整卡片样式 / 模板」「回填历史卡片版式」「为高管做一份 AI 行业简报」「招商金科 AI 简讯」等表达时立即触发——即使用户只说「跑下日报」「更新卡片」上下文与 AI 行业资讯相关也应优先使用本技能。抓取 10 个中英文 AI 媒体 + artificialanalysis 大模型榜单近 8 小时内容，由 Claude/Qwen 按战略·行业·实践三维度精选 12 条（每源硬约束 ≤3 条），渲染 A4 多页 PDF 报告 + 16:9 总览大图 + 杂志竖版分享卡片（标准版 + 含 SO WHAT 影响价值点评的深度版），加近 7 天合辑 PDF 与下载主页，发布到 brief.ai-native-lab.com 并推送 GitHub Pages。
+description: 每日 AI 行业简讯生成与双渠道发布的完整流水线（抓取 → Claude 提炼 → 渲染 → 固定域名原子发布 + GitHub Pages）。当用户说「跑今日的 AI 简讯 / 日报」「生成 AI 简报」「更新分享卡片 / 总览图 / 7 天合辑」「自动每天 17:00 出 AI 日报」「让 cron 跑 AI 简讯」「调整卡片样式 / 模板」「回填历史卡片版式」「为高管做一份 AI 行业简报」「招商金科 AI 简讯」等表达时立即触发——即使用户只说「跑下日报」「更新卡片」上下文与 AI 行业资讯相关也应优先使用本技能。抓取 10 个中英文 AI 媒体 + artificialanalysis 大模型榜单近 12 小时内容，由 Claude/Qwen 按战略·行业·实践三维度精选 12 条（每源硬约束 ≤3 条），渲染 A4 多页 PDF 报告 + 16:9 总览大图 + 杂志竖版分享卡片（标准版 + 含 SO WHAT 影响价值点评的深度版），加近 7 天合辑 PDF 与下载主页，发布到 brief.ai-native-lab.com 并推送 GitHub Pages。
 ---
 
 # AI 简讯 · 每日生成与发布技能
 
 ## 一句话
 
-抓 10 个中英文 AI 来源最近 8 小时内容 → Claude 提炼 12 条 + 摘要 + 行动建议 + 大模型榜 → 渲染网页/PDF/总览图/分享卡片 → 固定域名原子发布 + 推 GitHub Pages → 落地 cron 每日 7:30 自动出报。
+抓 10 个中英文 AI 来源最近 12 小时内容 → Claude 提炼 12 条 + 摘要 + 行动建议 + 大模型榜 → 渲染网页/PDF/总览图/分享卡片 → 固定域名原子发布 + 推 GitHub Pages → 落地 cron 每日 17:00 自动出报。
 
 ## 何时触发
 
@@ -16,7 +16,7 @@ description: 每日 AI 行业简讯生成与双渠道发布的完整流水线（
 - "更新分享卡片 / 总览图 / 近 7 天合辑"
 - "为领导做一份 AI 行业速递"
 - "招商金科 AI 简讯 / 凯总日报"
-- "AI 简讯 cron 没跑 / 每日 7:30 自动"
+- "AI 简讯 cron 没跑 / 每日 17:00 自动"
 - "调整卡片样式 / 字体 / 配色 / 二维码"
 - "回填历史卡片版式"
 - 任何关于 AI 行业新闻汇总 + 自动发布的请求
@@ -25,7 +25,7 @@ description: 每日 AI 行业简讯生成与双渠道发布的完整流水线（
 
 ```
                   ┌──────────────────────────────────────────┐
-                  │  cron 7:30  →  run_daily.sh build        │
+                  │  cron 17:00 →  run_daily.sh build        │
                   │   ├─ 互斥锁 + Chrome 依赖检查             │
                   │   ├─ python3 build.py                     │
                   │   │    ├─ scripts/brief.py  抓取 10 源    │
@@ -80,7 +80,7 @@ python3 scripts/reskin_past.py docs/20260526.html docs/20260530.html
 3. `git remote add origin https://github.com/<你>/<repo>.git`
 4. `git config --global credential.helper store` + 首次手动 push 把 PAT 落到 `~/.git-credentials`（cron 才能免交互推）
 5. GitHub Pages 设置：从 `main` 分支 `/docs` 目录发布
-6. 加 cron：`30 7 * * * /绝对路径/run_daily.sh`
+6. 加 cron：`0 17 * * * /绝对路径/run_daily.sh`
 
 ## 模板与样式定制
 

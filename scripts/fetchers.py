@@ -244,8 +244,8 @@ def fetch_36kr() -> list[dict[str, Any]]:
 # ---------- 6. Hacker News (Algolia API) ----------
 
 def fetch_hackernews() -> list[dict[str, Any]]:
-    # 近 24h 内、tag=story、查询 AI 相关关键词
-    cutoff = int(time.time()) - 24 * 3600
+    # 近 12h 内、tag=story、查询 AI 相关关键词
+    cutoff = int(time.time()) - 12 * 3600
     queries = ["AI", "LLM", "GPT", "Claude", "Anthropic", "OpenAI"]
     seen_ids = set()
     out = []

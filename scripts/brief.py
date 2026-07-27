@@ -5,7 +5,7 @@ AI 管理者日报（ai-exec-brief）主入口。
 两阶段流水线，跟 ai-news-daily 类似但增加「维度分类 + 管理者意义」：
 
   Phase 1（脚本 fetch + curate）：
-    并发抓 9 个源近 24h → 写 ./ai-exec-brief-YYYYMMDD-HHMM.json
+    并发抓 9 个源近 12h → 写 ./ai-exec-brief-YYYYMMDD-HHMM.json
     每条带空字段 dimension / importance / headline / briefing / exec_meaning，
     等 Claude 在对话中填好后另存为 -curated.json
 
@@ -39,7 +39,7 @@ def parse_args():
     # 默认（无子命令）走 fetch
     p.add_argument("--curate", action="store_true",
                    help="抓完只输出 JSON，等 Claude 填维度/管理者意义后再 render")
-    p.add_argument("--hours", type=int, default=24, help="只保留 H 小时内的新闻")
+    p.add_argument("--hours", type=int, default=12, help="只保留 H 小时内的新闻")
     p.add_argument("--json-out", type=Path, default=None)
     p.add_argument("--source", type=str, default=None,
                    help="逗号分隔，只跑指定源（调试用，如 huxiu,cls,tmtpost）")
