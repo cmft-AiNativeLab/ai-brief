@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>AI 简讯 · 20261012</title>
+<style>
+  /* === 容器环境字体兜底：@font-face 注册本地中文字体 === */
+  @font-face {
+    font-family: 'Noto Serif SC';
+    src: local('NotoSerifCJKsc-Regular'),
+         local('Noto Serif CJK SC'),
+         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc') format('truetype'),
+         url('/home/node/.openclaw/workspace/fonts/NotoSansCJKsc-Regular.otf') format('opentype');
+    font-weight: normal;
+  }
+  @font-face {
+    font-family: 'Noto Serif SC';
+    src: local('NotoSerifCJKsc-Bold'),
+         local('Noto Serif CJK SC Bold'),
+         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc') format('truetype'),
+         url('/home/node/.openclaw/workspace/fonts/NotoSansSC-Bold.ttf') format('truetype');
+    font-weight: 700;
+  }
+  @font-face {
+    font-family: 'Noto Sans SC';
+    src: local('NotoSansCJKsc-Regular'),
+         local('Noto Sans CJK SC'),
+         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc') format('truetype'),
+         url('/home/node/.openclaw/workspace/fonts/NotoSansSC.ttf') format('truetype');
+    font-weight: normal;
+  }
+  @font-face {
+    font-family: 'Noto Sans SC';
+    src: local('NotoSansCJKsc-Bold'),
+         local('Noto Sans CJK SC Bold'),
+         url('/tmp/libs/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc') format('truetype'),
+         url('/home/node/.openclaw/workspace/fonts/NotoSansSC-Bold.ttf') format('truetype');
+    font-weight: 700;
+  }
+  @font-face {
+    font-family: 'JetBrains Mono';
+    src: local('JetBrainsMono-Regular'),
+         url('/home/node/.openclaw/workspace/fonts/JetBrainsMono-Regular.ttf') format('truetype');
+    font-weight: normal;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #b8862b;
+    --gold-light: #d4a373;
+    --blue: #2e5b9f;
+    --blue-light: #4a9eff;
+    --green: #2e8b57;
+    --green-light: #4ade80;
+    --red: #a73a2d;
+    --text: #1a1f2e;
+    --text-dim: #4a5060;
+    --text-faint: #8b94a5;
+    --bg: #fcfbf7;
+    --line: #d8d3c6;
+    --highlight: #f7f1e3;
+  }
+  html, body {
+    font-family: Georgia, 'Songti SC', 'STSong', 'Times New Roman', 'PingFang SC', serif;
+    -webkit-font-smoothing: antialiased;
+    background: white;
+    color: var(--text);
+    font-size: 11pt;
+    line-height: 1.55;
+  }
+  /* A4 单页 - 用 .page 容器分页 */
+  .page {
+    width: 210mm;
+    height: 297mm;          /* 强制顶到 A4，避免超出溢出到次页 */
+    padding: 14mm 18mm;
+    background: var(--bg);
+    position: relative;
+    page-break-after: always;
+    overflow: hidden;       /* 维度页内容兜底不许溢出 */
+  }
+  /* 维度页：flex 纵向撑满，条目在页眉与页脚之间均匀分布 */
+  .page.dim-strategy,
+  .page.dim-industry,
+  .page.dim-practice {
+    display: flex;
+    flex-direction: column;
+  }
+  .dim-items {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+  }
+  .page:last-child {
+    page-break-after: auto;
+  }
+
+  /* ===== 封面页 ===== */
+  .cover {
+    display: flex; flex-direction: column;
+    gap: 6mm;
+  }
+  .cover-header {
+    border-top: 4px solid var(--gold);
+    padding-top: 7mm;
+  }
+  /* 页脚品牌 logo（每页底部居中） */
+  .footer-logo { height: 6mm; width: auto; flex-shrink: 0; }
+  .cover-foot {
+    margin-top: auto;
+    padding-top: 3mm;
+    border-top: 1px solid var(--line);
+    display: flex; justify-content: center;
+  }
+  .cover-tagline {
+    font-size: 9pt;
+    letter-spacing: 4pt;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 5mm;
+  }
+  .cover-title {
+    font-size: 38pt;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 3mm;
+  }
+  .cover-subtitle {
+    font-size: 12pt;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+  .cover-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4mm;
+    padding-top: 3mm;
+    border-top: 1px solid var(--line);
+  }
+  .cover-meta {
+    text-align: left;
+  }
+  .cover-meta .lbl {
+    font-size: 8pt;
+    letter-spacing: 1.5pt;
+    color: var(--text-faint);
+    margin-bottom: 2mm;
+  }
+  .cover-meta .val {
+    font-size: 20pt;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .cover-meta .sub {
+    font-size: 8.5pt;
+    color: var(--text-faint);
+    margin-top: 1mm;
+  }
+
+  .cover-exec {
+    background: var(--highlight);
+    border-left: 4px solid var(--gold);
+    padding: 5mm 7mm;
+  }
+  .cover-exec .lbl {
+    font-size: 9.5pt;
+    letter-spacing: 3pt;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 3mm;
+  }
+  .cover-exec .txt {
+    font-size: 11.5pt;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .cover-pie {
+    display: flex; align-items: center; gap: 10mm;
+    padding: 2mm 0;
+    border-top: 1px dashed var(--line);
+    border-bottom: 1px dashed var(--line);
+  }
+  .cover-pie .pie-svg { flex-shrink: 0; }
+  .cover-pie .legend {
+    flex: 1;
+    display: flex; flex-direction: column;
+    gap: 2mm;
+  }
+  .cover-pie .legend-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 2mm 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 10.5pt;
+  }
+  .cover-pie .legend-row:last-child { border-bottom: none; }
+  .cover-pie .name { display: flex; align-items: center; gap: 3mm; color: var(--text); }
+  .cover-pie .dot {
+    display: inline-block;
+    width: 3.5mm; height: 3.5mm;
+    border-radius: 1mm;
+  }
+  .cover-pie .num {
+    font-size: 14pt;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .cover-pie .pct {
+    font-size: 9pt;
+    color: var(--text-faint);
+    margin-left: 2mm;
+  }
+
+  /* 封面行动建议（替代单独行动页） */
+  .cover-action {
+    padding-top: 1mm;
+  }
+  .cover-action .lbl {
+    font-size: 9pt;
+    letter-spacing: 3pt;
+    color: var(--blue);
+    font-weight: 700;
+    margin-bottom: 2.5mm;
+  }
+  .cover-action-list {
+    list-style: none;
+    counter-reset: act;
+    display: flex; flex-direction: column;
+    gap: 1.5mm;
+  }
+  .cover-action-list li {
+    counter-increment: act;
+    padding: 2mm 4mm 2mm 11mm;
+    background: white;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--blue);
+    border-radius: 1mm;
+    font-size: 9.5pt;
+    line-height: 1.5;
+    color: var(--text);
+    position: relative;
+  }
+  .cover-action-list li::before {
+    content: counter(act, decimal-leading-zero);
+    position: absolute;
+    left: 4mm; top: 2mm;
+    font-size: 10pt;
+    font-weight: 800;
+    color: var(--blue);
+    letter-spacing: 0.5pt;
+  }
+
+
+  /* ===== 维度页（每页 5 条，舒展布局） ===== */
+  .dim-header {
+    display: flex; align-items: baseline; gap: 5mm;
+    padding-bottom: 4mm;
+    border-bottom: 2px solid var(--text);
+    margin-bottom: 6mm;
+  }
+  .dim-no {
+    font-size: 24pt;
+    font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .dim-cn { font-size: 17pt; font-weight: 800; color: var(--text); }
+  .dim-en { font-size: 8.5pt; letter-spacing: 3pt; color: var(--text-faint); font-weight: 700; margin-left: auto; }
+  .dim-count {
+    font-size: 8.5pt;
+    padding: 1mm 3mm;
+    border: 1px solid var(--line);
+    border-radius: 1mm;
+    color: var(--text-faint);
+  }
+
+  /* 卡片 - 每页 4 条；间距由 .dim-items 的 space-between 自动分配 */
+  .item {
+    padding-bottom: 4mm;
+    border-bottom: 1px dashed var(--line);
+    page-break-inside: avoid;
+  }
+  .item:last-child { border-bottom: none; padding-bottom: 0; }
+  .item-head {
+    display: flex; align-items: baseline; gap: 3mm;
+    margin-bottom: 2.5mm;
+  }
+  .item-rank {
+    font-size: 10pt;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.5pt;
+  }
+  .item-impl {
+    font-size: 9pt;
+    color: var(--gold);
+    letter-spacing: 0.5pt;
+  }
+  .item-source {
+    margin-left: auto;
+    font-size: 9pt;
+    color: var(--text-faint);
+  }
+  .item-title {
+    font-size: 14pt;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text);
+    margin-bottom: 3mm;
+  }
+  .item-title a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold-light);
+    padding-bottom: 0.5pt;
+  }
+  .item-title a::after {
+    content: '  ↗';
+    color: var(--gold);
+    font-size: 10pt;
+    font-weight: 600;
+  }
+  .dim-industry .item-title a { border-bottom-color: var(--blue-light); }
+  .dim-industry .item-title a::after { color: var(--blue); }
+  .dim-practice .item-title a { border-bottom-color: var(--green-light); }
+  .dim-practice .item-title a::after { color: var(--green); }
+
+  .item-brief {
+    font-size: 10.5pt;
+    line-height: 1.65;
+    color: var(--text-dim);
+    margin-bottom: 3mm;
+  }
+  .item-meaning {
+    background: var(--highlight);
+    border-left: 3px solid var(--gold);
+    padding: 3mm 4.5mm;
+    font-size: 10.5pt;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 2.5mm;
+  }
+  .item-meaning::before {
+    content: 'So What';
+    display: inline-block;
+    font-size: 7.5pt;
+    letter-spacing: 1pt;
+    color: var(--gold);
+    font-weight: 700;
+    margin-right: 2.5mm;
+    padding: 0.3mm 2mm;
+    border: 0.5pt solid var(--gold);
+    border-radius: 1mm;
+    vertical-align: 1pt;
+  }
+
+  /* 鸿蒙微信兜底：明文 URL 始终显示，无需依赖 PDF link annotation */
+  .item-url {
+    font-size: 7.5pt;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    color: var(--text-faint);
+    letter-spacing: -0.1pt;
+    word-break: break-all;
+    line-height: 1.35;
+  }
+  .item-url a { color: var(--blue); text-decoration: none; }
+
+  /* 不同维度色调 */
+  .dim-strategy .dim-no { color: var(--gold); }
+  .dim-strategy .item-rank,
+  .dim-strategy .item-impl,
+  .dim-strategy .item-meaning::before { color: var(--gold); border-color: var(--gold); }
+  .dim-strategy .item-meaning { border-left-color: var(--gold); background: var(--highlight); }
+
+  .dim-industry .dim-no { color: var(--blue); }
+  .dim-industry .item-rank,
+  .dim-industry .item-impl,
+  .dim-industry .item-meaning::before { color: var(--blue); border-color: var(--blue); }
+  .dim-industry .item-meaning { border-left-color: var(--blue); background: #eef4fc; }
+
+  .dim-practice .dim-no { color: var(--green); }
+  .dim-practice .item-rank,
+  .dim-practice .item-impl,
+  .dim-practice .item-meaning::before { color: var(--green); border-color: var(--green); }
+  .dim-practice .item-meaning { border-left-color: var(--green); background: #edf6ee; }
+
+  .page-footer {
+    flex-shrink: 0;
+    margin-top: 4mm;
+    font-size: 7.5pt;
+    color: var(--text-faint);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding-top: 2mm;
+  }
+  .page-footer > span:last-child { text-align: right; }
+
+  /* ===== 大模型榜单页 ===== */
+  .page.lb-page { display: flex; flex-direction: column; }
+  .lb-header .dim-cn { font-size: 21pt; }
+  .lb-head, .lb-row { display: flex; align-items: center; gap: 2.5mm; }
+  .lb-head {
+    font-size: 8pt; letter-spacing: 1pt; color: var(--text-faint);
+    font-weight: 700; padding-bottom: 2mm;
+    border-bottom: 1.5px solid var(--text); margin-bottom: 1mm;
+  }
+  .lb-list {
+    flex: 1 1 auto; display: flex; flex-direction: column;
+    justify-content: space-between; min-height: 0; padding: 1mm 0;
+  }
+  .lb-row {
+    padding: 1.2mm 1mm;
+    border-bottom: 1px solid var(--line);
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-rank {
+    width: 6mm; flex-shrink: 0; text-align: center;
+    font-weight: 800; font-size: 10.5pt; color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .lb-rank-1 { color: #b8862b; }
+  .lb-rank-2 { color: #8b94a5; }
+  .lb-rank-3 { color: #a9743b; }
+  .lb-name {
+    flex: 1 1 auto; min-width: 0; padding-right: 2mm;
+    display: flex; flex-direction: column; justify-content: center;
+    line-height: 1.18;
+  }
+  .lb-main { font-weight: 700; font-size: 9.5pt; color: var(--text); }
+  .lb-cfg { font-size: 7.5pt; color: var(--text-faint); margin-top: 0.3mm; }
+  .lb-head .lb-name { font-weight: 700; }
+  .lb-tag {
+    display: inline-block; font-size: 6.5pt; font-weight: 700;
+    color: var(--blue); border: 0.5pt solid var(--blue);
+    border-radius: 1mm; padding: 0 1mm; margin-left: 1.5mm; vertical-align: 1.5pt;
+  }
+  .lb-param {
+    width: 15mm; flex-shrink: 0;
+    font-size: 8pt; color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .lb-price {
+    width: 18mm; flex-shrink: 0;
+    font-size: 8pt; color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .lb-sep { color: var(--text-faint); margin: 0 0.3mm; }
+  .lb-creator {
+    width: 21mm; flex-shrink: 0;
+    font-size: 8pt; color: var(--text-dim);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .lb-bar {
+    width: 13mm; flex-shrink: 0; height: 4mm; background: #ece7da;
+    border-radius: 1mm; overflow: hidden;
+  }
+  .lb-head .lb-bar { background: none; height: auto; color: var(--text-faint); }
+  .lb-bar-fill {
+    display: block; height: 100%;
+    background: linear-gradient(90deg, var(--gold-light), var(--gold));
+    border-radius: 1mm;
+  }
+  .lb-score {
+    width: 12mm; flex-shrink: 0; text-align: right;
+    font-weight: 800; font-size: 11pt; color: var(--gold);
+    font-variant-numeric: tabular-nums;
+  }
+  .lb-cn .lb-main { color: var(--red); }
+  .lb-cn .lb-bar-fill { background: linear-gradient(90deg, #d4796a, var(--red)); }
+  .lb-cn .lb-score { color: var(--red); }
+  .lb-note {
+    flex-shrink: 0; font-size: 7.5pt; color: var(--text-faint);
+    padding-top: 2.5mm; border-top: 1px solid var(--line); margin-top: 2mm;
+  }
+  .lb-link {
+    flex-shrink: 0; font-size: 8pt; color: var(--text-faint);
+    margin-top: 1.5mm; word-break: break-all;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  }
+  .lb-link a { color: var(--blue); text-decoration: none; }
+
+  /* ===== 屏幕查看（浏览器/手机/微信）精排；@media print→PDF 不受影响 ===== */
+  @media screen {
+    html, body { background: #1b1e25; }
+    body { padding: 18px 0; -webkit-text-size-adjust: 100%; }
+    .page {
+      width: 820px; max-width: calc(100% - 26px);
+      height: auto; min-height: 0; overflow: visible;
+      margin: 0 auto 18px; padding: 40px 46px;
+      border-radius: 9px;
+      box-shadow: 0 12px 44px rgba(0,0,0,0.5);
+    }
+    /* 网页流式：条目正常间距，不靠 A4 高度撑满 */
+    .dim-items, .lb-list { display: block; }
+    .dim-items > .item { margin-bottom: 22px; }
+    .dim-items > .item:last-child { margin-bottom: 0; }
+    .item-meaning { border-radius: 3px; }
+  }
+  /* 手机：全宽、放大正文便于阅读、榜单整体可横向滑动 */
+  @media screen and (max-width: 680px) {
+    body { padding: 10px 0; }
+    .page { padding: 24px 18px; border-radius: 6px; }
+    .cover-title { font-size: 30pt; }
+    .item-title { font-size: 13.5pt; line-height: 1.45; }
+    .item-brief, .item-meaning { font-size: 11.5pt; line-height: 1.7; }
+    .item-url, .lb-link, .lb-note { font-size: 9pt; }
+    .dim-cn { font-size: 15pt; }
+    .dim-no { font-size: 20pt; }
+    .lb-page { overflow-x: auto; }
+    .lb-head, .lb-list { min-width: 540px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ 封面页 ============ -->
+  <div class="page cover">
+    <div class="cover-header">
+      <h1 class="cover-title">AI 简讯</h1>
+      <div class="cover-subtitle">2026年10月12日 周一　|　近 8 小时 AI 行业关键动向</div>
+    </div>
+
+    <div class="cover-meta-grid">
+      <div class="cover-meta">
+        <div class="lbl">SCANNED</div>
+        <div class="val">386</div>
+        <div class="sub">条原始资讯</div>
+      </div>
+      <div class="cover-meta">
+        <div class="lbl">SOURCES</div>
+        <div class="val">11</div>
+        <div class="sub">主流媒体</div>
+      </div>
+      <div class="cover-meta">
+        <div class="lbl">CURATED</div>
+        <div class="val">12</div>
+        <div class="sub">精选条目</div>
+      </div>
+      <div class="cover-meta">
+        <div class="lbl">DIMENSIONS</div>
+        <div class="val">3</div>
+        <div class="sub">战略 / 行业 / 实践</div>
+      </div>
+    </div>
+
+    <div class="cover-exec">
+      <div class="lbl">EXECUTIVE SUMMARY · 执行摘要</div>
+      <div class="txt">今天最值得管理者关注的有三点：第一，AI基础设施受HBM良率和供给约束，算力投资必须同步考虑存储与交付风险；第二，AI正在重塑初级程序员和FDE等岗位，企业需要重做人才梯队与交付组织；第三，智能体竞争进入落地阶段，但平台封禁、权限失控和供应商依赖正成为新的经营风险。</div>
+    </div>
+
+    <div class="cover-pie">
+      <svg class="pie-svg" width="180" height="180" viewBox="0 0 180 180"><circle cx="90.0" cy="90.0" r="74.0" fill="none" stroke="#e8e2d2" stroke-width="32"/><circle cx="90.0" cy="90.0" r="74.0" fill="none" stroke="#b8862b" stroke-width="32" stroke-dasharray="154.99 309.97" stroke-dashoffset="-0.00" transform="rotate(-90 90.0 90.0)" stroke-linecap="butt"/><circle cx="90.0" cy="90.0" r="74.0" fill="none" stroke="#2e5b9f" stroke-width="32" stroke-dasharray="154.99 309.97" stroke-dashoffset="-154.99" transform="rotate(-90 90.0 90.0)" stroke-linecap="butt"/><circle cx="90.0" cy="90.0" r="74.0" fill="none" stroke="#2e8b57" stroke-width="32" stroke-dasharray="154.99 309.97" stroke-dashoffset="-309.97" transform="rotate(-90 90.0 90.0)" stroke-linecap="butt"/><text x="90.0" y="86.0" text-anchor="middle" dominant-baseline="central" fill="#1a1f2e" font-size="40" font-weight="800">12</text><text x="90.0" y="121" text-anchor="middle" fill="#8b94a5" font-size="14" letter-spacing="2">条目</text></svg>
+      <div class="legend">
+        <div class="legend-row"><span class="name"><span class="dot" style="background:#b8862b"></span>战略动向 · Strategy</span><span><span class="num">4</span><span class="pct">33%</span></span></div>
+        <div class="legend-row"><span class="name"><span class="dot" style="background:#2e5b9f"></span>行业影响 · Industry</span><span><span class="num">4</span><span class="pct">33%</span></span></div>
+        <div class="legend-row"><span class="name"><span class="dot" style="background:#2e8b57"></span>管理实践 · Practice</span><span><span class="num">4</span><span class="pct">33%</span></span></div>
+      </div>
+    </div>
+
+    <div class="cover-action">
+      <div class="lbl">ACTION ITEMS · 行动建议</div>
+      <ol class="cover-action-list">
+        <li>为核心AI项目建立多模型、多供应商和可迁移的数据备份方案</li>
+<li>盘点初级研发岗位，将培训转向系统设计、业务理解与质量责任</li>
+<li>选择一个零售或运营场景灰度测试AI，并设定收入、成本和质量指标</li>
+<li>为智能体配置最小权限、人工审批、操作留痕和异常回滚机制</li>
+      </ol>
+    </div>
+
+    <div class="cover-foot">
+      <img class="footer-logo" src="logo.png" alt="招商金融科技 · CMG Fintech">
+    </div>
+  </div>
+
+  <!-- ============ 3 内容页（战略 / 行业 / 实践） ============ -->
+  <div class="page dim-strategy">
+      <div class="dim-header">
+        <div class="dim-no">01</div>
+        <div class="dim-cn">战略动向</div>
+        <div class="dim-en">STRATEGY</div>
+        <div class="dim-count">4 条</div>
+      </div>
+      <div class="dim-items">
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#01</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">IT之家 · 9 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://www.ithome.com/1/011/948.htm" target="_blank">Claude Opus 5.5 Max首次登顶智能体榜</a></div>
+      <div class="item-brief">Arena发布2026年第41周榜单，Anthropic的Claude Opus 5.5 Max首次进入智能体榜并排名第一，国产多模型整体维持中上游位置。</div>
+      <div class="item-meaning">模型竞争正从通用问答转向复杂任务执行。企业评测供应商时，应把任务成功率、工具调用和稳定性纳入采购标准，而非只看单次基准排名。</div>
+      <div class="item-url"><a href="https://www.ithome.com/1/011/948.htm" target="_blank">https://www.ithome.com/1/011/948.htm</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#02</span>
+        <span class="item-impl">★★★☆☆</span>
+        <span class="item-source">Hacker News · 23 分钟前</span>
+      </div>
+      <div class="item-title"><a href="https://www.scmp.com/news/china/science/article/3370492/leading-chinese-mathematicians-unite-behind-use-ai-research" target="_blank">中国数学家群体支持将AI用于科研</a></div>
+      <div class="item-brief">多位中国数学领域专家公开支持在科研中使用人工智能，反映AI正从辅助检索和计算，逐步进入问题探索、证明验证及研究协作等环节。</div>
+      <div class="item-meaning">知识密集型组织的研发流程可能被重构。管理者应建立AI辅助研究的审验、署名和知识产权规则，同时把工具使用能力纳入科研效率建设。</div>
+      <div class="item-url"><a href="https://www.scmp.com/news/china/science/article/3370492/leading-chinese-mathematicians-unite-behind-use-ai-research" target="_blank">https://www.scmp.com/news/china/science/article/3370492/leading-chinese-mathematicians…-ai-research</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#03</span>
+        <span class="item-impl">★★★☆☆</span>
+        <span class="item-source">华尔街见闻 · 45 分钟前</span>
+      </div>
+      <div class="item-title"><a href="https://wallstreetcn.com/livenews/3177053" target="_blank">寒武纪回应与DeepSeek实际业务合作关系</a></div>
+      <div class="item-brief">投资者询问DeepSeek-V4预览版为何仅提及昇腾950而未提寒武纪。公司回应称其通用AI芯片面向视觉、语言等多样化应用，但未披露与DeepSeek的具体合作。</div>
+      <div class="item-meaning">模型厂商的硬件适配与生态绑定仍是竞争关键。企业采购AI算力时，应区分公开兼容性、实际商用验证和深度合作，避免把市场宣传当供应保障。</div>
+      <div class="item-url"><a href="https://wallstreetcn.com/livenews/3177053" target="_blank">https://wallstreetcn.com/livenews/3177053</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#04</span>
+        <span class="item-impl">★★★☆☆</span>
+        <span class="item-source">华尔街见闻 · 2 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://wallstreetcn.com/livenews/3176972" target="_blank">英特尔称AI竞赛将多赢家量子计算将主流</a></div>
+      <div class="item-brief">英特尔CEO表示，AI竞赛不会只有一个赢家，产业格局将由多家企业共同占据；同时判断量子计算可能在未来3至5年进入主流应用阶段。</div>
+      <div class="item-meaning">企业不宜押注单一模型或供应商，需保留多技术路线和多云选择。量子计算尚处前瞻期，但高价值行业应提前评估潜在替代性影响。</div>
+      <div class="item-url"><a href="https://wallstreetcn.com/livenews/3176972" target="_blank">https://wallstreetcn.com/livenews/3176972</a></div>
+    </div>
+      </div>
+      <div class="page-footer">
+        <span>AI 简讯 · 战略动向</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
+        <span>2 / 5</span>
+      </div>
+    </div>
+<div class="page dim-industry">
+      <div class="dim-header">
+        <div class="dim-no">02</div>
+        <div class="dim-cn">行业影响</div>
+        <div class="dim-en">INDUSTRY</div>
+        <div class="dim-count">4 条</div>
+      </div>
+      <div class="dim-items">
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#01</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">虎嗅 · 56 分钟前</span>
+      </div>
+      <div class="item-title"><a href="https://m.huxiu.com/article/4896829.html" target="_blank">HBM良率瓶颈限制AI存储供给扩张</a></div>
+      <div class="item-brief">AI加速器需求持续推高HBM采购，但高带宽存储制造受良率和产能爬坡限制，供给扩张速度低于算力需求，成为产业链的重要约束。</div>
+      <div class="item-meaning">AI基础设施的瓶颈已从单纯算力延伸到存储和制造工艺。涉及大规模部署的企业应提前锁定供应、评估替代架构，并将交付周期纳入投资回报测算。</div>
+      <div class="item-url"><a href="https://m.huxiu.com/article/4896829.html" target="_blank">https://m.huxiu.com/article/4896829.html</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#02</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">IT之家 · 8 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://www.ithome.com/1/011/984.htm" target="_blank">微软呼吁为AI智能体补上安全监管</a></div>
+      <div class="item-brief">微软总裁布拉德·史密斯表示，AI目前受到的监管甚至不如牛奶和洗衣机，并警告失控智能体可能入侵其他企业并造成损害。</div>
+      <div class="item-meaning">智能体一旦拥有系统权限，风险将从内容错误升级为业务事故。企业应在扩大自动化前落实权限隔离、操作留痕、人工审批和责任归属。</div>
+      <div class="item-url"><a href="https://www.ithome.com/1/011/984.htm" target="_blank">https://www.ithome.com/1/011/984.htm</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#03</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">IT之家 · 8 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://www.ithome.com/1/011/958.htm" target="_blank">美国初级程序员岗位减少约两成</a></div>
+      <div class="item-brief">报告称，自Claude Code于2025年2月发布后，美国初级软件开发职位数量下降约20%，但整体软件开发职位发布量并未同步消失，岗位结构正在变化。</div>
+      <div class="item-meaning">AI首先压缩的是标准化、初级化工作，而非全部研发需求。企业应重做技术人才梯队，把培训重点从基础编码转向系统设计、业务理解和质量责任。</div>
+      <div class="item-url"><a href="https://www.ithome.com/1/011/958.htm" target="_blank">https://www.ithome.com/1/011/958.htm</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#04</span>
+        <span class="item-impl">★★★☆☆</span>
+        <span class="item-source">虎嗅 · 2 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://m.huxiu.com/article/4896800.html" target="_blank">大模型公司百万年薪争抢FDE人才</a></div>
+      <div class="item-brief">大模型公司以高薪招聘FDE，即前线部署工程师，部分岗位年薪达到百万级，显示模型落地需要同时理解客户业务、产品实施和工程交付的复合人才。</div>
+      <div class="item-meaning">AI竞争正在从模型能力扩展到客户交付能力。企业既要防范关键人才被高薪挖走，也应建立业务专家与工程团队协作的交付机制。</div>
+      <div class="item-url"><a href="https://m.huxiu.com/article/4896800.html" target="_blank">https://m.huxiu.com/article/4896800.html</a></div>
+    </div>
+      </div>
+      <div class="page-footer">
+        <span>AI 简讯 · 行业影响</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
+        <span>3 / 5</span>
+      </div>
+    </div>
+<div class="page dim-practice">
+      <div class="dim-header">
+        <div class="dim-no">03</div>
+        <div class="dim-cn">管理实践</div>
+        <div class="dim-en">PRACTICE</div>
+        <div class="dim-count">4 条</div>
+      </div>
+      <div class="dim-items">
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#01</span>
+        <span class="item-impl">★★★★☆</span>
+        <span class="item-source">新智元 · 8 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://aiera.com.cn/asi-post.html?id=118215" target="_blank">Claude半年封禁1140万账号仅少量翻案</a></div>
+      <div class="item-brief">报道显示，Claude在半年内封禁约1140万个账号，申诉后仅约4.2万个账号被恢复，引发开发者对误封、申诉机制和平台依赖风险的争议。</div>
+      <div class="item-meaning">核心AI服务的账户治理可能直接中断研发和运营。企业应准备多供应商备份、数据可迁移方案和申诉联系人，禁止关键流程只依赖单一平台。</div>
+      <div class="item-url"><a href="https://aiera.com.cn/asi-post.html?id=118215" target="_blank">https://aiera.com.cn/asi-post.html?id=118215</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#02</span>
+        <span class="item-impl">★★★☆☆</span>
+        <span class="item-source">华尔街见闻 · 1 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://wallstreetcn.com/livenews/3176987" target="_blank">唯品会灰度上线自研AI助手小唯</a></div>
+      <div class="item-brief">唯品会近期灰度上线“AI小唯”，支持文字和语音对话，可完成找商品、查活动、问优惠等任务，并试水商品AI对比功能，同时扩招大模型岗位。</div>
+      <div class="item-meaning">零售AI正从客服问答进入导购和决策辅助。企业应以转化率、客单价和服务成本验证价值，先在可控场景灰度，而不是追求全面上线。</div>
+      <div class="item-url"><a href="https://wallstreetcn.com/livenews/3176987" target="_blank">https://wallstreetcn.com/livenews/3176987</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#03</span>
+        <span class="item-impl">★★★☆☆</span>
+        <span class="item-source">新智元 · 9 小时前</span>
+      </div>
+      <div class="item-title"><a href="https://aiera.com.cn/asi-post.html?id=118129" target="_blank">Claude多Agent协作三次揪出66个Bug</a></div>
+      <div class="item-brief">测试显示，Claude组成协作团队后连续运行三次，每次都找出66个Bug；单一Agent表现最好的一次仅发现27个，协同机制显著提升排查覆盖。</div>
+      <div class="item-meaning">AI团队协作可能比单体模型更适合复杂质量任务。管理者应把任务拆分、交叉复核和结果汇总纳入流程，并用缺陷漏检率衡量真实收益。</div>
+      <div class="item-url"><a href="https://aiera.com.cn/asi-post.html?id=118129" target="_blank">https://aiera.com.cn/asi-post.html?id=118129</a></div>
+    </div>
+<div class="item">
+      <div class="item-head">
+        <span class="item-rank">#04</span>
+        <span class="item-impl">★★☆☆☆</span>
+        <span class="item-source">Hacker News · 31 分钟前</span>
+      </div>
+      <div class="item-title"><a href="https://github.com/cluedata/cluecdc" target="_blank">开源工具统一管理Debezium与Kafka数据管道</a></div>
+      <div class="item-brief">ClueCDC提供面向Debezium和Kafka变更数据捕获管道的统一界面，覆盖创建、管理和监控，试图降低数据同步系统的运维复杂度。</div>
+      <div class="item-meaning">企业AI项目的瓶颈常在数据连接和运维，而非模型本身。可优先盘点关键数据管道的可观测性、权限和故障恢复能力，再决定是否引入开源工具。</div>
+      <div class="item-url"><a href="https://github.com/cluedata/cluecdc" target="_blank">https://github.com/cluedata/cluecdc</a></div>
+    </div>
+      </div>
+      <div class="page-footer">
+        <span>AI 简讯 · 管理实践</span>
+        <img class="footer-logo" src="logo.png" alt="招商金融科技">
+        <span>4 / 5</span>
+      </div>
+    </div>
+
+  <!-- ============ 大模型能力榜单页 ============ -->
+  <div class="page lb-page"><div class="dim-header lb-header"><div class="dim-cn">大模型能力榜</div><div class="dim-en">MODEL LEADERBOARD · TOP 20</div><div class="dim-count">20 个</div></div><div class="lb-head"><span class="lb-rank">#</span><span class="lb-name">模型</span><span class="lb-param">参数量</span><span class="lb-price">单价 $/1M</span><span class="lb-creator">厂商 · 国家</span><span class="lb-bar">能力分布（II）</span><span class="lb-score">分数</span></div><div class="lb-list"><div class="lb-row"><span class="lb-rank lb-rank-1">1</span><span class="lb-name"><span class="lb-main">Claude Opus 5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(Max, Default Fallback)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">4<span class="lb-sep">/</span>20</span><span class="lb-creator">Anthropic · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:100.0%"></span></span><span class="lb-score">57.6</span></div>
+<div class="lb-row"><span class="lb-rank lb-rank-2">2</span><span class="lb-name"><span class="lb-main">Claude Sonnet 5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(Max, Default Fallback)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">2<span class="lb-sep">/</span>10</span><span class="lb-creator">Anthropic · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:97.2%"></span></span><span class="lb-score">56.0</span></div>
+<div class="lb-row"><span class="lb-rank lb-rank-3">3</span><span class="lb-name"><span class="lb-main">Claude Opus 5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(Xhigh, Default Fallback)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">4<span class="lb-sep">/</span>20</span><span class="lb-creator">Anthropic · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:97.2%"></span></span><span class="lb-score">56.0</span></div>
+<div class="lb-row"><span class="lb-rank">4</span><span class="lb-name"><span class="lb-main">Claude Opus 5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(High, Default Fallback)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">4<span class="lb-sep">/</span>20</span><span class="lb-creator">Anthropic · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:93.1%"></span></span><span class="lb-score">53.6</span></div>
+<div class="lb-row"><span class="lb-rank">5</span><span class="lb-name"><span class="lb-main">Claude Fable 5.1<span class="lb-tag">R</span></span><span class="lb-cfg">(Max, Default Fallback)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">10<span class="lb-sep">/</span>50</span><span class="lb-creator">Anthropic · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:92.7%"></span></span><span class="lb-score">53.4</span></div>
+<div class="lb-row"><span class="lb-rank">6</span><span class="lb-name"><span class="lb-main">Claude Fable 5.1<span class="lb-tag">R</span></span><span class="lb-cfg">(Xhigh, Default Fallback)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">10<span class="lb-sep">/</span>50</span><span class="lb-creator">Anthropic · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:92.4%"></span></span><span class="lb-score">53.2</span></div>
+<div class="lb-row"><span class="lb-rank">7</span><span class="lb-name"><span class="lb-main">GPT-6 Astra<span class="lb-tag">R</span></span><span class="lb-cfg">(Max)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">10<span class="lb-sep">/</span>50</span><span class="lb-creator">OpenAI · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:91.5%"></span></span><span class="lb-score">52.7</span></div>
+<div class="lb-row"><span class="lb-rank">8</span><span class="lb-name"><span class="lb-main">Gemini 4 Argon<span class="lb-tag">R</span></span><span class="lb-cfg">(High)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">2<span class="lb-sep">/</span>10</span><span class="lb-creator">Google · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:91.3%"></span></span><span class="lb-score">52.6</span></div>
+<div class="lb-row"><span class="lb-rank">9</span><span class="lb-name"><span class="lb-main">GPT-6 Astra<span class="lb-tag">R</span></span><span class="lb-cfg">(Xhigh)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">10<span class="lb-sep">/</span>50</span><span class="lb-creator">OpenAI · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:91.0%"></span></span><span class="lb-score">52.4</span></div>
+<div class="lb-row"><span class="lb-rank">10</span><span class="lb-name"><span class="lb-main">Claude Sonnet 5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(Xhigh, Default Fallback)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">2<span class="lb-sep">/</span>10</span><span class="lb-creator">Anthropic · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:90.1%"></span></span><span class="lb-score">51.9</span></div>
+<div class="lb-row"><span class="lb-rank">11</span><span class="lb-name"><span class="lb-main">GPT-6.1 Sol<span class="lb-tag">R</span></span><span class="lb-cfg">(Max)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">2<span class="lb-sep">/</span>10</span><span class="lb-creator">OpenAI · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:89.9%"></span></span><span class="lb-score">51.8</span></div>
+<div class="lb-row"><span class="lb-rank">12</span><span class="lb-name"><span class="lb-main">Claude Opus 5.5<span class="lb-tag">R</span></span><span class="lb-cfg">(Medium, Default Fallback)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">4<span class="lb-sep">/</span>20</span><span class="lb-creator">Anthropic · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:88.9%"></span></span><span class="lb-score">51.2</span></div>
+<div class="lb-row"><span class="lb-rank">13</span><span class="lb-name"><span class="lb-main">Claude Fable 5.1<span class="lb-tag">R</span></span><span class="lb-cfg">(High, Default Fallback)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">10<span class="lb-sep">/</span>50</span><span class="lb-creator">Anthropic · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:88.9%"></span></span><span class="lb-score">51.2</span></div>
+<div class="lb-row"><span class="lb-rank">14</span><span class="lb-name"><span class="lb-main">GPT-6.1 Sol<span class="lb-tag">R</span></span><span class="lb-cfg">(Xhigh)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">2<span class="lb-sep">/</span>10</span><span class="lb-creator">OpenAI · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:88.5%"></span></span><span class="lb-score">51.0</span></div>
+<div class="lb-row"><span class="lb-rank">15</span><span class="lb-name"><span class="lb-main">GPT-6 Astra<span class="lb-tag">R</span></span><span class="lb-cfg">(High)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">10<span class="lb-sep">/</span>50</span><span class="lb-creator">OpenAI · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:88.4%"></span></span><span class="lb-score">50.9</span></div>
+<div class="lb-row"><span class="lb-rank">16</span><span class="lb-name"><span class="lb-main">GPT-6.1 Sol<span class="lb-tag">R</span></span><span class="lb-cfg">(High)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">2<span class="lb-sep">/</span>10</span><span class="lb-creator">OpenAI · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:87.2%"></span></span><span class="lb-score">50.2</span></div>
+<div class="lb-row"><span class="lb-rank">17</span><span class="lb-name"><span class="lb-main">GPT-6 Astra<span class="lb-tag">R</span></span><span class="lb-cfg">(Medium)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">10<span class="lb-sep">/</span>50</span><span class="lb-creator">OpenAI · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:86.1%"></span></span><span class="lb-score">49.6</span></div>
+<div class="lb-row"><span class="lb-rank">18</span><span class="lb-name"><span class="lb-main">Claude Fable 5.1<span class="lb-tag">R</span></span><span class="lb-cfg">(Medium, Default Fallback)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">10<span class="lb-sep">/</span>50</span><span class="lb-creator">Anthropic · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:84.9%"></span></span><span class="lb-score">48.9</span></div>
+<div class="lb-row"><span class="lb-rank">19</span><span class="lb-name"><span class="lb-main">Muse Spark 1.3<span class="lb-tag">R</span></span><span class="lb-cfg">(Max)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">1.25<span class="lb-sep">/</span>4.25</span><span class="lb-creator">Meta · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:83.5%"></span></span><span class="lb-score">48.1</span></div>
+<div class="lb-row"><span class="lb-rank">20</span><span class="lb-name"><span class="lb-main">GPT-6.1 Sol<span class="lb-tag">R</span></span><span class="lb-cfg">(Medium)</span></span><span class="lb-param">闭源未知</span><span class="lb-price">2<span class="lb-sep">/</span>10</span><span class="lb-creator">OpenAI · —</span><span class="lb-bar"><span class="lb-bar-fill" style="width:83.0%"></span></span><span class="lb-score">47.8</span></div></div><div class="lb-note">数据来源：artificialanalysis.ai · II=综合推理/编程/Agent 能力 · 单价=每百万 token 输入/输出（美元）· 参数量据公开资料（闭源标「闭源未知」）· <b>R</b>=推理模型 · 中国模型高亮</div><div class="lb-link">完整榜单：<a href="https://artificialanalysis.ai/models#intelligence" target="_blank">https://artificialanalysis.ai/models#intelligence</a></div><div class="page-footer"><span>AI 简讯 · 大模型榜单</span><img class="footer-logo" src="logo.png" alt="招商金融科技"><span>5 / 5</span></div></div>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+ var hm = document.createElement("script");
+ hm.src = "https://hm.baidu.com/hm.js?5b3142c3d7836775b91647439de7a663";
+ var s = document.getElementsByTagName("script")[0];
+ s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+(function(){
+  function classify(href){
+    var p=(new URL(href,location.href)).pathname.split('/').pop()||'';
+    if(/7days\.pdf$/i.test(p)) return 'weekly_pdf';
+    if(/latest\.pdf$/i.test(p)||/ai-brief-20\d{6}\.pdf$/i.test(p)) return 'daily_pdf';
+    if(/overview.*\.png$/i.test(p)) return 'overview_png';
+    if(/card.*\.png$/i.test(p)) return 'card_png';
+    if(/\.pdf$/i.test(p)) return 'other_pdf';
+    if(/\.png$/i.test(p)) return 'other_png';
+    return '';
+  }
+  document.addEventListener('click',function(ev){
+    var a=ev.target.closest&&ev.target.closest('a[href]');
+    if(!a)return;
+    var href=a.getAttribute('href')||'';
+    var isDl=a.hasAttribute('download')||/\.(pdf|png)(\?|#|$)/i.test(href);
+    if(!isDl)return;
+    var type=classify(href);
+    if(type){
+      _hmt.push(['_trackEvent','download',type,a.textContent.trim().slice(0,60)]);
+    }
+  },true);
+})();
+</script></body>
+</html>
